@@ -8,13 +8,11 @@ from dotenv import load_dotenv
 load_dotenv()
 AUTH = os.getenv("GITHUB_API_KEY")
 OWNER = os.getenv("GITHUB_OWNER")
-REPO = "" # TODO: Iterate over each repo of an owner to grab pull requests
 STATE = "open"
 
 # Setup endpoint
 HEADERS = {"Authorization": f"token {AUTH}"}
-RESPONSE = requests.get(f"https://api.github.com/repos/{OWNER}/{REPO}/pulls?state={STATE}", headers=HEADERS)
-# TODO: Add logic on how to pull the MR/PR (eg: more than 7 days old)
+RESPONSE = requests.get(f"https://api.github.com/repos/{OWNER}/REPO/pulls?state={STATE}", headers=HEADERS)
 
 def jprint(obj):
     """Setup pretty printing for JSON"""
