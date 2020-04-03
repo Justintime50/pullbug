@@ -8,14 +8,14 @@ import slack
 # Setup variables
 load_dotenv()
 AUTH = os.getenv("GITLAB_API_KEY")
+SCOPE = "all"
 STATE = "opened"
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 
 # Setup endpoint
 HEADERS = {'Authorization': f'Bearer {AUTH}'}
-RESPONSE = requests.get(f"https://git.ncr4.com/api/v4/merge_requests?state={STATE}", headers=HEADERS)
-# TODO: Add logic on how to pull the MR/PR (eg: more than 7 days old)
+RESPONSE = requests.get(f"https://git.ncr4.com/api/v4/merge_requests?scope={SCOPE}&state={STATE}", headers=HEADERS)
 
 def send_message(slack_client, msg):
     """Send Slack messages via a bot"""
@@ -37,10 +37,15 @@ def send_message(slack_client, msg):
 # Iterate over each merge request
 DATA = RESPONSE.json()
 i = 0
-send_message(SLACK_CLIENT, "*Pull Bug - the following merge requests on GitLab are still open and need your help!*\n")
+send_message(SLACK_CLIENT, ":bug: *The following merge requests on GitLab are still open and need your help!*\n")
 for stale_request in DATA:
-    print(f"Merge Request: {DATA[i]['title']}\nDescription: {DATA[i]['description']}\nWaiting on: {DATA[i]['assignee']}\n")
-    message = f"*Merge Request:* <{DATA[i]['web_url']}|{DATA[i]['title']}>\n*Description:* {DATA[i]['description']}\n*Waiting on:* {DATA[i]['assignee']}\n"
+    if DATA[i]['assignee'] is None:
+        user = "No assignee"
+    else:
+        user = f"<{DATA[i]['assignee']['web_url']}|{DATA[i]['assignee']['username']}>"
+
+    print(f"Merge Request: {DATA[i]['title']}\nDescription: {DATA[i]['description']}\nWaiting on: {user}\n")
+    message = f"*Merge Request:* <{DATA[i]['web_url']}|{DATA[i]['title']}>\n*Description:* {DATA[i]['description']}\n*Waiting on:* {user}\n"
     # Send Slack message
     try:
         send_message(SLACK_CLIENT, message)
