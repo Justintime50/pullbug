@@ -1,28 +1,27 @@
 """Pull Bug is great at bugging you to merge or close your pull/merge requests."""
-import requests
-import json
 import os
-from dotenv import load_dotenv
 import logging
-import slack # pip3 install slackclient
+import requests
+from dotenv import load_dotenv
+import slack
 
 # Setup variables
 load_dotenv()
 AUTH = os.getenv("GITLAB_API_KEY")
 STATE = "opened"
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
-slack_client = slack.WebClient(SLACK_BOT_TOKEN)
+SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 
 # Setup endpoint
-headers = {'Authorization': f'Bearer {AUTH}'}
-response = requests.get(f"https://git.ncr4.com/api/v4/merge_requests?state={STATE}", headers=headers)
+HEADERS = {'Authorization': f'Bearer {AUTH}'}
+RESPONSE = requests.get(f"https://git.ncr4.com/api/v4/merge_requests?state={STATE}", headers=HEADERS)
 # TODO: Add logic on how to pull the MR/PR (eg: more than 7 days old)
 
-# Send Slack messages via a bot
-def sendMessage(slack_client, msg):
+def send_message(slack_client, msg):
+    """Send Slack messages via a bot"""
     logging.debug("Authorized Slack Client")
     logging.basicConfig(level=logging.DEBUG)
-    
+
     # Make the POST request through the python slack client
     slack_response = slack_client.chat_postMessage(
         channel=os.getenv("SLACK_CHANNEL"),
@@ -31,20 +30,20 @@ def sendMessage(slack_client, msg):
 
     # Check if the request was a success
     if slack_response['ok'] is not True:
-        logging.error(response)
+        logging.error(slack_response)
     else:
-        logging.debug(response)
+        logging.debug(slack_response)
 
 # Iterate over each merge request
-data = response.json()
+DATA = RESPONSE.json()
 i = 0
-print("Pull Bug - the following merge requests on GitLab are still open and need your help!\n")
-for stale_request in data:
-    print(f"Merge Request: {data[i]['title']}\nDescription: {data[i]['description']}\nWaiting on: {data[i]['assignee']}\n")
-    message = f"Merge Request: {data[i]['title']}\nDescription: {data[i]['description']}\nWaiting on: {data[i]['assignee']}\n"
+send_message(SLACK_CLIENT, "*Pull Bug - the following merge requests on GitLab are still open and need your help!*\n")
+for stale_request in DATA:
+    print(f"Merge Request: {DATA[i]['title']}\nDescription: {DATA[i]['description']}\nWaiting on: {DATA[i]['assignee']}\n")
+    message = f"*Merge Request:* <{DATA[i]['web_url']}|{DATA[i]['title']}>\n*Description:* {DATA[i]['description']}\n*Waiting on:* {DATA[i]['assignee']}\n"
     # Send Slack message
     try:
-        sendMessage(slack_client, message)
+        send_message(SLACK_CLIENT, message)
     except IndexError:
-        sendMessage(slack_client, "No merge requests stale today! Nice job.")
+        send_message(SLACK_CLIENT, "No merge requests stale today! Nice job.")
     i += 1
