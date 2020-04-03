@@ -1,3 +1,4 @@
 requests
 slackclient
+python-dotenv
 pylint
