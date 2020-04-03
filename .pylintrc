@@ -1,2 +1,6 @@
 [FORMAT]
 max-line-length=150
+
+[SIMILARITIES]
+# Minimum lines number of a similarity. This is in place only until we can do code reuse better
+min-similarity-lines=10
