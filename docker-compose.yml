@@ -1,0 +1,12 @@
+version: '3.7'
+services: 
+    pull-bug:
+        build: .
+        environment:
+            - GITHUB_API_KEY=
+            - GITHUB_OWNER=
+            - GITLAB_API_URL=https://gitlab.com/api/v4
+            - GITLAB_API_KEY=
+            - SLACK_BOT_TOKEN=
+            - SLACK_CHANNEL=
+            - ROCKET_CHAT_URL=
