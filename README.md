@@ -36,6 +36,9 @@ python3 pull_bug_github.py
 
 # Run the following for GitLab via Rocket Chat
 python3 pull_bug_gitlab_rc.py
+
+# Run the following for Docker (environment variables must be set in docker-compose.yml)
+docker-compose up -d
 ```
 
 **NOTE:** Pull Bug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket Chat.
