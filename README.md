@@ -29,13 +29,16 @@ Pull Bug is intended to be run on a cron, launch agent, or via Docker at whateve
 
 ```bash
 # Run the following for GitLab notifications via Slack
-python3 pull_bug_gitlab.py
+python3 src/slack/pull_bug_gitlab.py
 
 # Run the following for GitHub via Slack
-python3 pull_bug_github.py
+python3 src/slack/pull_bug_github.py
 
 # Run the following for GitLab via Rocket Chat
-python3 pull_bug_gitlab_rc.py
+python3 src/rocket-chat/pull_bug_gitlab.py
+
+# Run the following for GitHub via Rocket Chat
+python3 src/rocket-chat/pull_bug_github.py
 
 # Run the following for Docker (environment variables must be set in docker-compose.yml)
 docker-compose up -d

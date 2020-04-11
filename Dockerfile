@@ -1,7 +1,9 @@
 FROM python:3.7
 
 COPY requirements.txt /
-COPY src/pull_bug_gitlab_rc.py /
+COPY src/rocket-chat/pull_bug_gitlab.py /
+COPY src/slack/pull_bug_github.py /
+COPY pull-bug.sh /
 RUN pip install -r requirements.txt
 
-CMD [ "python", "./pull_bug_gitlab_rc.py" ]
+CMD [ "./pull-bug.sh" ]
