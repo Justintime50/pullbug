@@ -8,4 +8,5 @@ python:
 install: pip install -r requirements.txt
 
 script: 
-    - pylint src/*.py
+    - pylint src/rocket-chat/*.py
+    - pylint src/slack/*.py
