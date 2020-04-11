@@ -3,6 +3,8 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# For Rocket Chat & GitLab
+
 # Setup variables
 load_dotenv()
 AUTH = os.getenv("GITLAB_API_KEY")
@@ -25,9 +27,11 @@ for stale_request in DATA:
     else:
         user = f"<{DATA[i]['assignee']['web_url']}|{DATA[i]['assignee']['username']}>"
 
-    print(f"Merge Request: {DATA[i]['title']}\nDescription: {DATA[i]['description']}\nWaiting on: {user}\n")
-    message = f"*Merge Request:* <{DATA[i]['web_url']}|{DATA[i]['title']}>\n*Description:* {DATA[i]['description']}\n*Waiting on:* {user}\n"
-    # Send Slack message
+    description = (DATA[i]['description'][:100] + '...') if len(DATA[i]['description']) > 100 else DATA[i]['description']
+
+    print(f"Merge Request: {DATA[i]['title']}\nDescription: {description}\nWaiting on: {user}\n")
+    message = f"*Merge Request:* <{DATA[i]['web_url']}|{DATA[i]['title']}>\n*Description:* {description}\n*Waiting on:* {user}\n"
+    # Send Rocket Chat message
     try:
         CHAT_ENDPOINT = requests.post(ROCKET_CHAT_URL, data={'text':message})
     except IndexError:
