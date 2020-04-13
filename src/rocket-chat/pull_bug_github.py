@@ -1,6 +1,7 @@
 """Pull Bug is great at bugging you to merge or close your pull/merge requests."""
 import json
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 
@@ -10,8 +11,11 @@ from dotenv import load_dotenv
 load_dotenv()
 AUTH = os.getenv("GITHUB_API_KEY")
 OWNER = os.getenv("GITHUB_OWNER")
-STATE = "open"
+STATE = os.getenv("GITHUB_STATE")
 ROCKET_CHAT_URL = os.getenv("ROCKET_CHAT_URL")
+if AUTH is None or OWNER is None or STATE is None or ROCKET_CHAT_URL is None:
+    print("You are missing required environment variables, please correct this and run the script again.")
+    sys.exit()
 
 # Grab all repos of the owner
 HEADERS = {
