@@ -29,6 +29,8 @@ for repo in REPOS:
     for pull_request in PULL_REQUESTS:
         # TODO: Check assignee array instead of a single record # pylint: disable=fixme
         # TODO: Check requested_reviewers array also # pylint: disable=fixme
+        if 'wip' in pull_request['title'] or 'Wip' in pull_request['title'] or 'WIP' in pull_request['title']:
+            continue
         if pull_request['assignee'] is None:
             user = "No assignee"
         else:

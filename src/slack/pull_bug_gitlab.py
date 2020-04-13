@@ -43,6 +43,9 @@ DATA = RESPONSE.json()
 i = 0
 send_message(SLACK_CLIENT, ":bug: *The following merge requests on GitLab are still open and need your help!*\n")
 for stale_request in DATA:
+    if 'wip' in DATA[i]['title'] or 'Wip' in DATA[i]['title'] or 'WIP' in DATA[i]['title']:
+        i += 1
+        continue
     if DATA[i]['assignee'] is None:
         user = "No assignee"
     else:
