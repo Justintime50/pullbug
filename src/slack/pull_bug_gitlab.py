@@ -1,6 +1,7 @@
 """Pull Bug is great at bugging you to merge or close your pull/merge requests."""
 import os
 import logging
+import sys
 import requests
 from dotenv import load_dotenv
 import slack
@@ -10,17 +11,20 @@ import slack
 # Setup variables
 load_dotenv()
 AUTH = os.getenv("GITLAB_API_KEY")
-SCOPE = "all"
-STATE = "opened"
+SCOPE = os.getenv("GITLAB_SCOPE")
+STATE = os.getenv("GITLAB_STATE")
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
-SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 GITLAB_API_URL = os.getenv("GITLAB_API_URL")
+if AUTH is None or SCOPE is None or STATE is None or SLACK_BOT_TOKEN is None or GITLAB_API_URL is None:
+    print("You are missing required environment variables, please correct this and run the script again.")
+    sys.exit()
 
 # Setup endpoint
 HEADERS = {'Authorization': f'Bearer {AUTH}'}
 RESPONSE = requests.get(f"{GITLAB_API_URL}/merge_requests?scope={SCOPE}&state={STATE}", headers=HEADERS)
 
 # Setup Slack client
+SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 def send_message(slack_client, msg):
     """Send Slack messages via a bot"""
     logging.debug("Authorized Slack Client")

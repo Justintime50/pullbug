@@ -1,5 +1,6 @@
 """Pull Bug is great at bugging you to merge or close your pull/merge requests."""
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 
@@ -8,10 +9,13 @@ from dotenv import load_dotenv
 # Setup variables
 load_dotenv()
 AUTH = os.getenv("GITLAB_API_KEY")
-SCOPE = "all"
-STATE = "opened"
+SCOPE = os.getenv("GITLAB_SCOPE")
+STATE = os.getenv("GITLAB_STATE")
 GITLAB_API_URL = os.getenv("GITLAB_API_URL")
 ROCKET_CHAT_URL = os.getenv("ROCKET_CHAT_URL")
+if AUTH is None or SCOPE is None or STATE is None or GITLAB_API_URL is None or ROCKET_CHAT_URL is None:
+    print("You are missing required environment variables, please correct this and run the script again.")
+    sys.exit()
 
 # Setup endpoint
 HEADERS = {'Authorization': f'Bearer {AUTH}'}

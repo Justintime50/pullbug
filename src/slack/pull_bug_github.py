@@ -2,6 +2,7 @@
 import json
 import os
 import logging
+import sys
 import requests
 from dotenv import load_dotenv
 import slack
@@ -12,12 +13,15 @@ import slack
 load_dotenv()
 AUTH = os.getenv("GITHUB_API_KEY")
 OWNER = os.getenv("GITHUB_OWNER")
-STATE = "open"
+STATE = os.getenv("GITHUB_STATE")
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
-SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 ROCKET_CHAT_URL = os.getenv("ROCKET_CHAT_URL")
+if AUTH is None or OWNER is None or STATE is None or SLACK_BOT_TOKEN is None or ROCKET_CHAT_URL is None:
+    print("You are missing required environment variables, please correct this and run the script again.")
+    sys.exit()
 
 # Setup Slack client
+SLACK_CLIENT = slack.WebClient(SLACK_BOT_TOKEN)
 def send_message(slack_client, msg):
     """Send Slack messages via a bot"""
     logging.debug("Authorized Slack Client")
