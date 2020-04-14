@@ -28,17 +28,14 @@ pip3 install -r requirements.txt
 Pull Bug is intended to be run on a cron, launch agent, or via Docker at whatever interval you'd like to be notified via Slack or Rocket Chat.
 
 ```bash
-# Run the following for GitLab notifications via Slack
-python3 src/slack/pull_bug_gitlab.py
+# All functions that can be run
+pullbug_s.pull_bug_gitlab() # sends messages from GitLab to Slack
+pullbug_s.pull_bug_github() # sends messages from GitHub to Slack
+pullbug_rc.pull_bug_gitlab() # sends messages from GitLab to Rocket Chat
+pullbug_rc.pull_bug_github() # Sends messages from GitHub to Rocket Chat
 
-# Run the following for GitHub via Slack
-python3 src/slack/pull_bug_github.py
-
-# Run the following for GitLab via Rocket Chat
-python3 src/rocket-chat/pull_bug_gitlab.py
-
-# Run the following for GitHub via Rocket Chat
-python3 src/rocket-chat/pull_bug_github.py
+# Run our example
+python3 example.py
 
 # Run the following for Docker (environment variables must be set in docker-compose.yml)
 docker-compose up -d
