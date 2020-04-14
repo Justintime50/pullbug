@@ -3,10 +3,14 @@ services:
     pull-bug:
         build: .
         environment:
-            - GITHUB_API_KEY=
-            - GITHUB_OWNER=
-            - GITLAB_API_URL=https://gitlab.com/api/v4
-            - GITLAB_API_KEY=
-            - SLACK_BOT_TOKEN=
-            - SLACK_CHANNEL=
-            - ROCKET_CHAT_URL=
+        - IGNORE_WIP=true
+        - GITHUB_API_KEY=
+        - GITHUB_OWNER=
+        - GITHUB_STATE=open
+        - GITLAB_API_URL=https://gitlab.com/api/v4
+        - GITLAB_API_KEY=
+        - GITLAB_STATE=opened
+        - GITLAB_SCOPE=all
+        - SLACK_BOT_TOKEN=
+        - SLACK_CHANNEL=
+        - ROCKET_CHAT_URL=
