@@ -11,7 +11,9 @@ Pull Bug is great at bugging you to merge or close your pull/merge requests.
 
 </div>
 
-Pull Bug can be run on a cron to notify you on Slack or Rocket Chat of all open pull and merge requests from GitHub or GitLab. This tool ensures requests never go stale as it constantly bugs you to merge or close your work. This is perfect for finding old stale requests and staying on top of current ones.
+Pull Bug is a script that can be run on a cron to notify you on Slack or Rocket Chat of all open pull and merge requests from GitHub or GitLab. This tool ensures requests never go unnoticed as it constantly bugs you to merge or close your work. This is perfect for finding old stale requests and staying on top of current ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Rocket Chat integration](https://rocket.chat/docs/developer-guides/rest-api/integration/create/) and you're all set to be bugged by Pull Bug.
+
+**NOTE:** Pull Bug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket Chat.
 
 ## Install
 
@@ -27,13 +29,22 @@ pip3 install -r requirements.txt
 
 Pull Bug is intended to be run on a cron, launch agent, or via Docker at whatever interval you'd like to be notified via Slack or Rocket Chat.
 
-```bash
-# All functions that can be run
-pullbug_s.pull_bug_gitlab() # sends messages from GitLab to Slack
-pullbug_s.pull_bug_github() # sends messages from GitHub to Slack
-pullbug_rc.pull_bug_gitlab() # sends messages from GitLab to Rocket Chat
-pullbug_rc.pull_bug_github() # Sends messages from GitHub to Rocket Chat
+Pick and choose for your needs. Build only GitLab/GitHub messages, combine them into one. Send to Slack or Rocket Chat - maybe both!
 
+```bash
+# Build messages
+github_message = pullbug.Requests.github()
+gitlab_message = pullbug.Requests.gitlab()
+message = github_message + gitlab_message
+
+# Send messages
+pullbug.Messages.rocket_chat(message)
+pullbug.Messages.slack(message)
+```
+
+### Commands
+
+```bash
 # Run our example
 python3 example.py
 
@@ -41,4 +52,12 @@ python3 example.py
 docker-compose up -d
 ```
 
-**NOTE:** Pull Bug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket Chat.
+## Development
+
+```bash
+# Install dev dependencies
+pip3 install -r requirements.txt
+
+# Run linting
+pylint pullbug/*.py
+```
