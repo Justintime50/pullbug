@@ -1,3 +1,6 @@
 .env
 .DS_Store
 __pycache__
+build
+dist
+pullbug.egg-info

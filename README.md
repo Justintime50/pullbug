@@ -18,11 +18,11 @@ Pull Bug is a script that can be run on a cron to notify you on Slack or Rocket 
 ## Install
 
 ```bash
+# Install Pull Bug
+pip3 install pullbug
+
 # Copy and fill out the .env file
 cp .env.example .env
-
-# Install Python packages
-pip3 install -r requirements.txt
 ```
 
 ## Usage
@@ -31,7 +31,9 @@ Pull Bug is intended to be run on a cron, launch agent, or via Docker at whateve
 
 Pick and choose for your needs. Build only GitLab/GitHub messages, combine them into one. Send to Slack or Rocket Chat - maybe both!
 
-```bash
+```python
+import pullbug
+
 # Build messages
 github_message = pullbug.Requests.github()
 gitlab_message = pullbug.Requests.gitlab()
