@@ -47,8 +47,8 @@ pullbug.Messages.slack(message)
 ### Commands
 
 ```bash
-# Run our example
-python3 example.py
+# Run our examples
+python3 examples/slack.py
 
 # Run the following for Docker (environment variables must be set in docker-compose.yml)
 docker-compose up -d
