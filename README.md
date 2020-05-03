@@ -4,7 +4,7 @@
 
 Pull Bug is great at bugging you to merge or close your pull/merge requests.
 
-[![Build Status](https://travis-ci.org/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.org/Justintime50/pull-bug)
+[![Build Status](https://travis-ci.com/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.com/Justintime50/pull-bug)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 <img src="assets/showcase.png">
