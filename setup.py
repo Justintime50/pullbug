@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-REQUIRES = [
+REQUIREMENTS = [
     'requests >= 1.0.0',
     'slackclient >= 2.0.1',
     'python-dotenv >= 0.10.0'
@@ -24,6 +24,11 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=REQUIRES,
+    install_requires=REQUIREMENTS,
+    extras_require={
+        'dev': [
+            'pylint >= 2.5.0',
+        ]
+    },
     python_requires='>=3.6',
 )

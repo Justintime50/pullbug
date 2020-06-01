@@ -2,7 +2,7 @@
 
 # Pull Bug
 
-Pull Bug is great at bugging you to merge or close your pull/merge requests.
+🐛 Pull Bug is great at bugging you to merge or close your pull/merge requests.
 
 [![Build Status](https://travis-ci.com/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.com/Justintime50/pull-bug)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
@@ -58,7 +58,7 @@ docker-compose up -d
 
 ```bash
 # Install dev dependencies
-pip3 install -r requirements.txt
+pip3 install -e .[dev]
 
 # Run linting
 pylint pullbug/*.py
