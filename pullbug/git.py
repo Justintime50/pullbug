@@ -23,6 +23,7 @@ class Git():
     def github(cls):
         """Query your GitHub instance for Pull Requests"""
         # Grab all repos of the GITHUB_OWNER
+        print('Bugging GitHub...')
         if not Git.GITHUB_API_KEY:
             sys.exit('No GitHub token set. Please correct and try again.')
         headers = {
@@ -39,12 +40,14 @@ class Git():
         # Grab all pull requests from each repo
         message = '\n:bug: *The following pull requests on GitHub are still open and' + \
             'need your help!*\n'
+        pulled = False
         for repo in repos:
             try:
                 pull_response = requests.get(
                     f"https://api.github.com/repos/{Git.GITHUB_OWNER}/{repo['name']}/" +
                     f"pulls?state={Git.GITHUB_STATE}", headers=headers).text
                 pull_requests = json.loads(pull_response)
+                print(f"{repo['name']} bugged!")
             except requests.exceptions.RequestException as response_error:
                 sys.exit(response_error)
 
@@ -56,6 +59,7 @@ class Git():
                     if 'wip' in pull_request['title'] or 'Wip' in pull_request['title'] \
                             or 'WIP' in pull_request['title']:
                         continue
+                pulled = True
 
                 # Craft the message
                 if pull_request['assignee'] is None:
@@ -70,15 +74,15 @@ class Git():
                     f"{pull_request['title']}>\n*Description:* {description}\n" + \
                     f"*Waiting on:* {user}\n"
 
-        if message == '\n:bug: *The following pull requests on GitHub are still open and' + \
-                'need your help!*\n':
-            message = '\n:bug: *Pull Bug has nothing to pull from GitHub!\n'
+        if pulled is False:
+            message = '\n:bug: Pull Bug has nothing to pull from GitHub!\n'
 
         return message
 
     @classmethod
     def gitlab(cls):
         """Query your GitLab instance for Merge Requests"""
+        print('Bugging GitLab...')
         # Grab all repos
         if not Git.GITLAB_API_KEY:
             sys.exit('Not GitLab token set. Please correct and try again.')
@@ -87,7 +91,8 @@ class Git():
         }
         try:
             response = requests.get(
-                f"{Git.GITLAB_API_URL}/merge_requests?scope={Git.GITLAB_SCOPE}&state={Git.GITLAB_STATE}",
+                f"{Git.GITLAB_API_URL}/merge_requests?scope={Git.GITLAB_SCOPE}" +
+                f"&state={Git.GITLAB_STATE}",
                 headers=headers)
             merge_requests = response.json()
         except requests.exceptions.RequestException as response_error:
@@ -96,12 +101,14 @@ class Git():
         # Iterate over each merge request
         message = '\n:bug: *The following merge requests on GitLab are' + \
             'still open and need your help!*\n'
+        pulled = False
         for merge_request in merge_requests:
             # If MR is a WIP and this setting is enabled, ignore it
             if Git.IGNORE_WIP == 'true':
                 if 'wip' in merge_request['title'] or 'Wip' in merge_request['title'] \
                         or 'WIP' in merge_request['title']:
                     continue
+            pulled = True
 
             # Craft the message
             if merge_request['assignee'] is None:
@@ -115,8 +122,7 @@ class Git():
             message += f"\n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|" + \
                 f"{merge_request['title']}>\n*Description:* {description}\n*Waiting on:* {user}\n"
 
-        if message == '\n:bug: *The following pull requests on GitLab are still open and' + \
-                'need your help!*\n':
-            message = '\n:bug: *Pull Bug has nothing to pull from GitLab!\n'
+        if pulled is False:
+            message = '\n:bug: Pull Bug has nothing to pull from GitLab!\n'
 
         return message

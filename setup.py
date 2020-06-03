@@ -11,7 +11,7 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='1.2.0',
+    version='1.3.0',
     description='Pull Bug is great at bugging you to merge or close your pull/merge requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",
