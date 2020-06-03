@@ -59,7 +59,7 @@ docker-compose up -d
 
 ```bash
 # Install dev dependencies
-pip3 install -e .[dev]
+pip3 install -e ."[dev]"
 
 # Run linting
 pylint pullbug/*.py

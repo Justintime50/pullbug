@@ -8,6 +8,7 @@
 * Fixed line-too-long linting errors
 * Added helpful information to `.env.example`
 * Closed #8 - added a custom message when there is nothing to pull
+* Added additional output during script execution to show progress
 
 ## v1.2.0 (2020-04-14)
 
