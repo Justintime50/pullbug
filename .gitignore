@@ -4,3 +4,6 @@ __pycache__
 build
 dist
 pullbug.egg-info
+venv
+htmlcov
+.coverage

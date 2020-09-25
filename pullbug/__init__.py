@@ -1,3 +1,3 @@
-"""Import Pull Bug Modules"""
-from .git import Git
-from .messages import Messages
+# flake8: noqa
+from pullbug.git import Git
+from pullbug.messages import Messages
