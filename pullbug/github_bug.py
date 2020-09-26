@@ -1,73 +1,97 @@
 import os
-import json
-import sys
 import requests
-from dotenv import load_dotenv
+import logging
+from pullbug.logger import PullBugLogger
 
 
-load_dotenv()
-GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 GITHUB_OWNER = os.getenv('GITHUB_OWNER')
 GITHUB_STATE = os.getenv('GITHUB_STATE')
+GITHUB_CONTEXT = os.getenv('GITHUB_CONTEXT', 'orgs')
+IGNORE_WIP = os.getenv('IGNORE_WIP')
+HEADERS = {
+    'Authorization': f'token {GITHUB_TOKEN}',
+    'Content-Type': 'application/json; charset=utf-8'
+}
+LOGGER = logging.getLogger(__name__)
 
 
 class GithubBug():
     @classmethod
     def run(cls):
-        """Query your GitHub instance for Pull Requests"""
-        # Grab all repos of the GITHUB_OWNER
-        print('Bugging GitHub...')
-        if not GITHUB_API_KEY:
-            sys.exit('No GitHub token set. Please correct and try again.')
-        headers = {
-            'Authorization': f'token {GITHUB_API_KEY}',
-            'Content-Type': 'application/json; charset=utf-8'
-        }
+        """Run the logic to get PR's from GitHub and
+        send that data via message.
+        """
+        PullBugLogger.setup_logging(LOGGER)
+        repos = cls.get_repos()
+        pull_requests = cls.get_pull_requests(repos)
+        cls.iterate_pull_requests(pull_requests)
+        # TODO: Send message
+
+    @classmethod
+    def get_repos(cls):
+        """Get all repos of the GITHUB_OWNER.
+        """
+        LOGGER.info('Bugging GitHub for repos...')
         try:
             repos_response = requests.get(
-                f'https://api.github.com/orgs/{GITHUB_OWNER}/repos', headers=headers).text
-            repos = json.loads(repos_response)
+                f'https://api.github.com/{GITHUB_CONTEXT}/{GITHUB_OWNER}/repos',
+                headers=HEADERS
+            )
+            LOGGER.info('GitHub repos retrieved!')
+            return repos_response.json()
         except requests.exceptions.RequestException as response_error:
-            sys.exit(response_error)
+            LOGGER.warning(
+                f'Could not retrieve GitHub repos: {response_error}'
+            )
+            raise requests.exceptions.RequestException(response_error)
 
-        # Grab all pull requests from each repo
-        message = '\n:bug: *The following pull requests on GitHub are still open and' + \
-            'need your help!*\n'
-        pulled = False
+    @classmethod
+    def get_pull_requests(cls, repos):
+        """Grab all pull requests from each repo.
+        """
+        LOGGER.info('Bugging GitHub for pull requests...')
         for repo in repos:
             try:
                 pull_response = requests.get(
-                    f"https://api.github.com/repos/{GITHUB_OWNER}/{repo['name']}/" +
-                    f"pulls?state={GITHUB_STATE}", headers=headers).text
-                pull_requests = json.loads(pull_response)
-                print(f"{repo['name']} bugged!")
+                    f"https://api.github.com/repos/{GITHUB_OWNER}/{repo['name']}/pulls?state={GITHUB_STATE}",
+                    headers=HEADERS
+                )
+                LOGGER.info(f"{repo['name']} bugged!")
+                return pull_response.json()
             except requests.exceptions.RequestException as response_error:
-                sys.exit(response_error)
+                LOGGER.warning(
+                    f'Could not retrieve GitHub pull requests for {repo["name"]}: {response_error}'
+                )
+                raise requests.exceptions.RequestException(response_error)
 
-            for pull_request in pull_requests:
-                # TODO: Check assignee array instead of a single record # pylint: disable=fixme
-                # TODO: Check requested_reviewers array also # pylint: disable=fixme
-                # If PR is a WIP and this setting is enabled, ignore it
-                if IGNORE_WIP == 'true':
-                    if 'wip' in pull_request['title'] or 'Wip' in pull_request['title'] \
-                            or 'WIP' in pull_request['title']:
-                        continue
-                pulled = True
+    @classmethod
+    def iterate_pull_requests(cls, pull_requests):
+        """Iterate through each pull request of a repo
+        and send a message to Slack if a PR exists.
+        """
+        for pull_request in pull_requests:
+            # TODO: Check assignee array instead of a single record  # noqa
+            # TODO: Check requested_reviewers array also  # noqa
+            if IGNORE_WIP != 'true' and 'WIP' not in pull_request['title'].upper():
+                cls.prepare_message(pull_request)
 
-                # Craft the message
-                if pull_request['assignee'] is None:
-                    user = "No assignee"
-                else:
-                    user = f"<{pull_request['assignee']['html_url']}|" \
-                        f"{pull_request['assignee']['login']}>"
-                # Truncate description after 100 characters
-                description = (pull_request['body'][:100] + '...') if len(
-                    pull_request['body']) > 100 else pull_request['body']
-                message += f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
-                    f"{pull_request['title']}>\n*Description:* {description}\n" + \
-                    f"*Waiting on:* {user}\n"
+    @classmethod
+    def prepare_message(cls, pull_request):
+        """Prepare the message to send to Slack.
+        """
+        # TODO: Fix the message (re-introduce the pulled = True variable)
+        message = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
 
-        if pulled is False:
-            message = '\n:bug: Pull Bug has nothing to pull from GitHub!\n'
+        if pull_request['assignee'] is None:
+            user = "No assignee"
+        else:
+            user = f"<{pull_request['assignee']['html_url']}|{pull_request['assignee']['login']}>"
+        # Truncate description after 100 characters
+        description = (pull_request['body'][:100] + '...') if len(
+            pull_request['body']) > 100 else pull_request['body']
+        message += f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
+            f"{pull_request['title']}>\n*Description:* {description}\n" + \
+            f"*Waiting on:* {user}\n"
 
         return message

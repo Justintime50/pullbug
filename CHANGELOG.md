@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.0.0 ()
+
+* Added context for GitHub, you can now get personal pull requests in addition to orgs
+* Added logging both to console and to a file. Logs will rollover when their size gets too big
+
 ## v1.3.0 (2020-06-01)
 
 * Removed requirements.txt and added dependencies to setup.py

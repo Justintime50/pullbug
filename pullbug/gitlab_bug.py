@@ -4,7 +4,6 @@ import sys
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
 GITLAB_API_KEY = os.getenv('GITLAB_API_KEY')
 GITLAB_API_URL = os.getenv('GITLAB_API_URL')
 GITLAB_SCOPE = os.getenv('GITLAB_SCOPE')
@@ -15,7 +14,9 @@ IGNORE_WIP = os.getenv('IGNORE_WIP')
 class GitlabBug():
     @classmethod
     def run(cls):
-        """Query your GitLab instance for Merge Requests"""
+        """Query your GitLab instance for Merge Requests
+        """
+        load_dotenv()
         print('Bugging GitLab...')
         # Grab all repos
         if not GITLAB_API_KEY:
