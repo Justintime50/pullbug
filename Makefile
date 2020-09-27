@@ -32,6 +32,6 @@ test:
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
-	venv/bin/pytest --cov=pullbug --cov-report=html
+	venv/bin/pytest --cov=pullbug --cov-branch --cov-report=html
 
 .PHONY: help install clean lint test coverage

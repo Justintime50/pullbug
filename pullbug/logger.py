@@ -11,7 +11,7 @@ LOG_FILE = os.path.join(LOG_PATH, 'pullbug.log')
 
 class PullBugLogger():
     @classmethod
-    def setup_logging(cls, logger):
+    def _setup_logging(cls, logger):
         """Setup project logging (to console and log file).
         """
         if not os.path.exists(LOG_PATH):

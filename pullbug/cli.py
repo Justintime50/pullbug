@@ -12,3 +12,5 @@ class PullBug():
         load_dotenv()
         if not GITHUB_API_KEY:
             sys.exit('No GitHub token set. Please correct and try again.')
+        if not GITLAB_API_KEY:
+            sys.exit('Not GitLab token set. Please correct and try again.')

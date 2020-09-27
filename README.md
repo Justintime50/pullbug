@@ -70,4 +70,7 @@ pylint pullbug/*.py
 
 ## TODO
 
+Document all env variables
 - GITHUB_CONTEXT: 'users', 'orgs'
+- GITLAB_SCOPE: created_by_me, assigned_to_me or all. Defaults to created_by_me
+- GITLAB_STATE: opened, closed, locked, or merged
