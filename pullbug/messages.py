@@ -4,9 +4,9 @@ import requests
 import slack
 
 
-ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = os.getenv('SLACK_CHANNEL')
+ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
 LOGGER = logging.getLogger(__name__)
 
 

@@ -12,7 +12,7 @@ REQUIREMENTS = [
 setuptools.setup(
     name='pullbug',
     version='2.0.0',
-    description='Pull Bug is great at bugging you to merge or close your pull/merge requests.',  # noqa
+    description='Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.',  # noqa
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/pull-bug',

@@ -1,8 +1,8 @@
 <div align="center">
 
-# Pull Bug
+# Pull Bug 🐛 
 
-🐛 Pull Bug is great at bugging you to merge or close your pull/merge requests.
+Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.
 
 [![Build Status](https://travis-ci.com/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.com/Justintime50/pull-bug)
 [![Coverage Status](https://coveralls.io/repos/github/Justintime50/pull-bug/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/pull-bug?branch=master)
@@ -74,3 +74,7 @@ Document all env variables
 - GITHUB_CONTEXT: 'users', 'orgs'
 - GITLAB_SCOPE: created_by_me, assigned_to_me or all. Defaults to created_by_me
 - GITLAB_STATE: opened, closed, locked, or merged
+- CHANGE IGNORE_WIP to default to not include WIP
+
+- VALIDATE ARGS FROM ARGPARSE! Only allow input from a list for those that only accept from a list of criteria
+- Handle pagination of results that exceed more than 100 for GitHub

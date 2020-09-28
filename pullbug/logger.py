@@ -19,7 +19,7 @@ class PullBugLogger():
         logger.setLevel(logging.INFO)
         handler = logging.handlers.RotatingFileHandler(
             LOG_FILE,
-            maxBytes=100000,
+            maxBytes=200000,
             backupCount=5
         )
         formatter = logging.Formatter(
