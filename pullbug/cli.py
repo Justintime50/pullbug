@@ -136,7 +136,7 @@ class PullBug():
         if github:
             GithubBug.run(github_owner, github_state, github_context, wip, slack, rocketchat)
         if gitlab:
-            GitlabBug.run(gitlab_scope, gitlab_state, wip)
+            GitlabBug.run(gitlab_scope, gitlab_state, wip, slack, rocketchat)
         LOGGER.info('Pull Bug finished bugging!')
 
     @classmethod

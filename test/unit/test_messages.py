@@ -10,7 +10,7 @@ from pullbug.messages import Messages
 @mock.patch('requests.post')
 def test_rocket_chat_success(mock_request, mock_logger):
     message = 'mock message'
-    Messages.rocket_chat(message)
+    Messages.rocketchat(message)
     mock_request.assert_called_once_with(
         'http://mock-url.com', data={'text': message}
     )
@@ -22,7 +22,7 @@ def test_rocket_chat_success(mock_request, mock_logger):
 def test_rocket_chat_exception(mock_request, mock_logger):
     message = 'mock message'
     with pytest.raises(requests.exceptions.RequestException):
-        Messages.rocket_chat(message)
+        Messages.rocketchat(message)
     mock_logger.warning.assert_called_once_with(
         'Could not send Rocket Chat message: mock-error'
     )

@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Messages():
     @classmethod
-    def rocket_chat(cls, message):
+    def rocketchat(cls, message):
         """Send a Rocket Chat message
         """
         try:

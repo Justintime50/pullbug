@@ -43,7 +43,7 @@ gitlab_message = pullbug.Git.gitlab()
 message = github_message + gitlab_message
 
 # Send messages
-pullbug.Messages.rocket_chat(message)
+pullbug.Messages.rocketchat(message)
 pullbug.Messages.slack(message)
 ```
 
