@@ -1,6 +1,7 @@
 import os
 import requests
 import logging
+import sys
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
 
@@ -26,7 +27,7 @@ class GithubBug():
         if pull_requests == []:
             message = 'No pull requests are available from GitHub.'
             LOGGER.info(message)
-            raise IndexError(message)
+            sys.exit()
         message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
         pull_request_messages = cls.iterate_pull_requests(pull_requests, wip)
         final_message = message_preamble + pull_request_messages

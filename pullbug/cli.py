@@ -54,7 +54,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pull Bug messages to Rocket Chat.'
+            help='Send Pull Bug messages to Rocket.Chat.'
         )
         parser.add_argument(
             '-w',
@@ -62,14 +62,14 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Include "WIP" pull or merge requests.'
+            help='Include "Work in Progress" pull or merge requests.'
         )
         parser.add_argument(
             '-gho',
             '--github_owner',
             required=False,
             type=str,
-            default='',
+            default=None,
             help='The GitHub owner to retrieve pull requests from (can be a user or org).'
         )
         parser.add_argument(
@@ -78,7 +78,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default='open',
-            help='The GitHub state to retrieve pull requests with. (open | closed | all)'
+            help='The GitHub state to retrieve pull requests with. (Default: open | closed | all)'
         )
         parser.add_argument(
             '-ghc',
@@ -86,7 +86,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default='orgs',
-            help='The GitHub context to retrieve pull requests with (users | orgs).'
+            help='The GitHub context to retrieve pull requests with (Default: orgs | users).'
         )
         parser.add_argument(
             '-glst',
@@ -94,7 +94,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default='opened',
-            help='The GitLab state to retrieve merge requests with. (opened | closed | locked | merged)'
+            help='The GitLab state to retrieve merge requests with. (Default: opened | closed | locked | merged)'
         )
         parser.add_argument(
             '-glsc',
@@ -102,7 +102,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default='all',
-            help='The GitLab state to retrieve pull requests with. (created_by_me | assigned_to_me | all)'
+            help='The GitLab state to retrieve pull requests with. (Default: all | created_by_me | assigned_to_me)'
         )
         parser.parse_args(namespace=self)
 
@@ -132,7 +132,7 @@ class PullBug():
         PullBugLogger._setup_logging(LOGGER)
         LOGGER.info('Running Pull Bug...')
         load_dotenv()
-        cls.run_missing_checks
+        cls.run_missing_checks()
         if github:
             GithubBug.run(github_owner, github_state, github_context, wip, slack, rocketchat)
         if gitlab:
@@ -144,6 +144,10 @@ class PullBug():
         """Check that values are set based on
         configuration before proceeding.
         """
+        if not github and not gitlab:
+            message = 'Neither "github" nor "gitlab" flags were passed, one is required. Please correct and try again.'
+            LOGGER.critical(message)
+            raise ValueError(message)
         if github and not GITHUB_TOKEN:
             cls.throw_missing_error('GITHUB_TOKEN')
         if gitlab and not GITLAB_API_KEY:
@@ -165,9 +169,5 @@ class PullBug():
         raise ValueError(message)
 
 
-def main():
-    PullBugCLI().run()
-
-
 if __name__ == '__main__':
-    main()
+    PullBugCLI().run()

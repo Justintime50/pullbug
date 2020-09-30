@@ -34,5 +34,10 @@ setuptools.setup(
             'mock >= 4.0.0',
         ]
     },
+    entry_points={
+        'console_scripts': [
+            'pullbug=pullbug.cli:main'
+        ]
+    },
     python_requires='>=3.6',
 )

@@ -128,7 +128,7 @@ def test_run_rocketchat_message(mock_request, mock_logger, mock_headers,
 def test_run_no_returned_merge_requests(mock_request, mock_logger, mock_headers,
                                         mock_get_merge_requests, mock_iterate_merge_requests,
                                         mock_prepare_message, mock_slack, mock_rocketchat):
-    with pytest.raises(IndexError):
+    with pytest.raises(SystemExit):
         GitlabBug.run(_mock_gitlab_scope, _mock_gitlab_state, False, False, False)
     mock_logger.info.assert_called_with('No merge requests are available from GitLab.')
     mock_get_merge_requests.assert_called_once()
@@ -152,8 +152,8 @@ def test_get_merge_requests_success(mock_request, mock_logger, mock_headers):
     assert mock_logger.info.call_count == 2
 
 
-@mock.patch('pullbug.gitlab_bug.LOGGER')
-@mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
+@ mock.patch('pullbug.gitlab_bug.LOGGER')
+@ mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
 def test_get_repos_exception(mock_request, mock_logger):
     with pytest.raises(requests.exceptions.RequestException):
         GitlabBug.get_merge_requests(_mock_gitlab_scope, _mock_gitlab_state)
@@ -162,7 +162,7 @@ def test_get_repos_exception(mock_request, mock_logger):
     )
 
 
-@mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
+@ mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
 def test_iterate_merge_requests_wip_title(mock_prepare_message, _mock_merge_request):
     _mock_merge_request['title'] = 'wip: mock-merge-request'
     mock_merge_requests = [_mock_merge_request]
@@ -170,7 +170,7 @@ def test_iterate_merge_requests_wip_title(mock_prepare_message, _mock_merge_requ
     mock_prepare_message.assert_called_once()
 
 
-@mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
+@ mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
 def test_iterate_merge_requests_wip_setting_absent(mock_prepare_message, _mock_merge_request):
     _mock_merge_request['title'] = 'wip: mock-merge-request'
     mock_merge_requests = [_mock_merge_request]

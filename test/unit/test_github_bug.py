@@ -49,6 +49,55 @@ def _mock_pull_request(_mock_user, _mock_repo):
     return mock_pull_request
 
 
+@mock.patch('pullbug.cli.GITHUB_TOKEN', '123')
+@mock.patch('pullbug.github_bug.GithubBug.get_pull_requests')
+@mock.patch('pullbug.github_bug.GithubBug.get_repos')
+@mock.patch('pullbug.github_bug.LOGGER')
+def test_run_success(mock_logger, mock_get_repos, mock_pull_request):
+    GithubBug.run('mock-owner', 'open', 'orgs', False, False, False)
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    mock_logger.info.assert_called()
+
+
+@mock.patch('pullbug.cli.GITHUB_TOKEN', '123')
+@mock.patch('pullbug.github_bug.GithubBug.get_pull_requests', return_value=[])
+@mock.patch('pullbug.github_bug.GithubBug.get_repos')
+@mock.patch('pullbug.github_bug.LOGGER')
+def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
+    with pytest.raises(SystemExit):
+        GithubBug.run('mock-owner', 'open', 'orgs', False, False, False)
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    mock_logger.info.assert_called()
+
+
+@mock.patch('pullbug.cli.GITHUB_TOKEN', '123')
+@mock.patch('pullbug.messages.Messages.slack')
+@mock.patch('pullbug.github_bug.GithubBug.get_pull_requests')
+@mock.patch('pullbug.github_bug.GithubBug.get_repos')
+@mock.patch('pullbug.github_bug.LOGGER')
+def test_run_with_slack(mock_logger, mock_get_repos, mock_pull_request, mock_slack):
+    GithubBug.run('mock-owner', 'open', 'orgs', False, True, False)
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    mock_slack.assert_called_once()
+    mock_logger.info.assert_called()
+
+
+@mock.patch('pullbug.cli.GITHUB_TOKEN', '123')
+@mock.patch('pullbug.messages.Messages.rocketchat')
+@mock.patch('pullbug.github_bug.GithubBug.get_pull_requests')
+@mock.patch('pullbug.github_bug.GithubBug.get_repos')
+@mock.patch('pullbug.github_bug.LOGGER')
+def test_run_with_rocketchat(mock_logger, mock_get_repos, mock_pull_request, mock_rocketchat):
+    GithubBug.run('mock-owner', 'open', 'orgs', False, False, True)
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    mock_rocketchat.assert_called_once()
+    mock_logger.info.assert_called()
+
+
 @mock.patch('pullbug.github_bug.GITHUB_TOKEN', _mock_github_token)
 @mock.patch('pullbug.github_bug.GITHUB_HEADERS')
 @mock.patch('pullbug.github_bug.LOGGER')
@@ -73,17 +122,6 @@ def test_get_repos_exception(mock_request, mock_logger, _mock_user, _mock_github
     )
 
 
-# @mock.patch('pullbug.github_bug.LOGGER')
-# @mock.patch('requests.get', return_value=[{'Not Found'}])
-# def test_get_repos_bad_param_exception(mock_request, mock_logger, _mock_user):
-#     bad_param = 'bad-param'
-#     with pytest.raises(ValueError):
-#         GithubBug.get_repos(_mock_user, bad_param)
-#     mock_logger.warning.assert_called_once_with(
-#         f'Could not retrieve GitHub repos due to bad parameter: {_mock_user} | {bad_param}.'
-#     )
-
-
 @mock.patch('pullbug.github_bug.GITHUB_TOKEN', _mock_github_token)
 @mock.patch('pullbug.github_bug.GITHUB_HEADERS')
 @mock.patch('pullbug.github_bug.LOGGER')
@@ -102,12 +140,23 @@ def test_get_pull_requests_success(mock_request, mock_logger, mock_headers, _moc
 
 @mock.patch('pullbug.github_bug.LOGGER')
 @mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
-def test_get_pull_requests_exception(mock_request, mock_logger, _mock_repo):
+def test_get_pull_requests_request_exception(mock_request, mock_logger, _mock_repo):
     mock_repos = [_mock_repo]
     with pytest.raises(requests.exceptions.RequestException):
         GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
     mock_logger.warning.assert_called_once_with(
         f'Could not retrieve GitHub pull requests for {_mock_repo["name"]}: mock-error'
+    )
+
+
+@mock.patch('pullbug.github_bug.LOGGER')
+@mock.patch('requests.get', side_effect=TypeError('mock-error'))
+def test_get_pull_requests_type_error_exception(mock_request, mock_logger, _mock_repo):
+    mock_repos = [_mock_repo]
+    with pytest.raises(TypeError):
+        GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
+    mock_logger.warning.assert_called_once_with(
+        f'Could not retrieve GitHub pull requests due to bad parameter: {_mock_user} | {_mock_github_state}.'
     )
 
 

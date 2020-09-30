@@ -1,6 +1,7 @@
 import os
 import requests
 import logging
+import sys
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
 
@@ -26,7 +27,7 @@ class GitlabBug():
         if merge_requests == []:
             message = 'No merge requests are available from GitLab.'
             LOGGER.info(message)
-            raise IndexError(message)
+            sys.exit()
         message_preamble = '\n:bug: *The following merge requests on GitLab ar still open and need your help!*\n'
         merge_request_messages = cls.iterate_merge_requests(merge_requests, wip)
         final_message = message_preamble + merge_request_messages
@@ -49,7 +50,7 @@ class GitlabBug():
             print(response.json())
             LOGGER.info('GitLab merge requests retrieved!')
             if 'does not have a valid value' in response.text:
-                error = f'Could not retrieve GitLab repos due to bad parameter: {gitlab_scope} | {gitlab_state}.'
+                error = f'Could not retrieve GitLab merge requests due to bad parameter: {gitlab_scope} | {gitlab_state}.'  # noqa
                 LOGGER.warning(error)
                 raise ValueError(error)
         except requests.exceptions.RequestException as response_error:
