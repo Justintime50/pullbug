@@ -6,7 +6,7 @@ Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab 
 
 [![Build Status](https://travis-ci.com/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.com/Justintime50/pull-bug)
 [![Coverage Status](https://coveralls.io/repos/github/Justintime50/pull-bug/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/pull-bug?branch=master)
-[![PyPi](https://img.shields.io/pypi/v/pull-bug)](https://pypi.org/project/pull-bug)
+[![PyPi](https://img.shields.io/pypi/v/pullbug)](https://pypi.org/project/pullbug)
 [![Licence](https://img.shields.io/github/license/justintime50/pull-bug)](LICENSE)
 
 <img src="assets/showcase.png">
