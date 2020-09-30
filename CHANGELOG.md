@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.0.0 (2020-09-29)
+
+* Added context for GitHub, you can now get personal pull requests in addition to orgs
+* Added logging both to console and to a file. Logs will rollover when their size gets too big
+* Added various error handling that was missing
+* Added unit tests and code coverage
+* Bumped character count from 100 to 120 for descriptions on messages
+* Assignees are now checked against the assignee array instead of a single assignee if there are multiple
+* Bumped pagination from 20 to 100 items
+* Updated documentation
+* Various settings now have default values
+* Introduced various new settings that can be altered
+* Various bug fixes
+
 ## v1.3.0 (2020-06-01)
 
 * Removed requirements.txt and added dependencies to setup.py
