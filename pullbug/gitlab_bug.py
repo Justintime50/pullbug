@@ -1,7 +1,6 @@
 import os
 import requests
 import logging
-import sys
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
 
@@ -27,7 +26,7 @@ class GitlabBug():
         if merge_requests == []:
             message = 'No merge requests are available from GitLab.'
             LOGGER.info(message)
-            sys.exit()
+            return message
         message_preamble = '\n:bug: *The following merge requests on GitLab ar still open and need your help!*\n'
         merge_request_messages = cls.iterate_merge_requests(merge_requests, wip)
         final_message = message_preamble + merge_request_messages

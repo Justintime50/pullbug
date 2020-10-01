@@ -61,14 +61,14 @@ def test_run_success(mock_logger, mock_get_repos, mock_pull_request):
 
 
 @mock.patch('pullbug.cli.GITHUB_TOKEN', '123')
+@mock.patch('pullbug.github_bug.GithubBug.iterate_pull_requests')
 @mock.patch('pullbug.github_bug.GithubBug.get_pull_requests', return_value=[])
 @mock.patch('pullbug.github_bug.GithubBug.get_repos')
 @mock.patch('pullbug.github_bug.LOGGER')
-def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
-    with pytest.raises(SystemExit):
-        GithubBug.run('mock-owner', 'open', 'orgs', False, False, False)
+def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request, mock_iterate_pull_requests):
+    GithubBug.run('mock-owner', 'open', 'orgs', False, False, False)
     mock_get_repos.assert_called_once()
-    mock_pull_request.assert_called_once()
+    mock_iterate_pull_requests.assert_not_called()
     mock_logger.info.assert_called()
 
 

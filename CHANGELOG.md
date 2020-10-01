@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.1 (2020-09-30)
+
+* Instead of raising an error when no pull or merge requests can be found, we return that message. This is helpful when a user wanted to use both GitHub and GitLab in a single invocation. The previous implementation would exit the script without running the other.
+
 ## v2.0.0 (2020-09-29)
 
 * Added context for GitHub, you can now get personal pull requests in addition to orgs
