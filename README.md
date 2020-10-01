@@ -16,6 +16,7 @@ Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab 
 Pull Bug can notify you on Slack or Rocket.Chat of all open pull and merge requests from GitHub or GitLab. This tool ensures requests never go unnoticed as it can be setup on a schedule to constantly bug you to merge your work. This is perfect for finding old or stale requests and helps you to stay current on new ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Rocket.Chat](https://rocket.chat/docs/developer-guides/rest-api/integration/create/) integration and you're all set to be bugged by Pull Bug.
 
 **NOTE:** Pull Bug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket.Chat.
+
 **GitLab Users:** If you are not hosting your own GitLab instance and are instead using `gitlab.com`, it's recommended to change the scope to `owner` and provide an owner who has access to all your organizations merge requests.
 
 ## Install

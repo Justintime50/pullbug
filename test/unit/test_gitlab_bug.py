@@ -128,20 +128,18 @@ def test_run_rocketchat_message(mock_request, mock_logger, mock_headers,
 def test_run_no_returned_merge_requests(mock_request, mock_logger, mock_headers,
                                         mock_get_merge_requests, mock_iterate_merge_requests,
                                         mock_prepare_message, mock_slack, mock_rocketchat):
-    with pytest.raises(SystemExit):
-        GitlabBug.run(_mock_gitlab_scope, _mock_gitlab_state, False, False, False)
+    GitlabBug.run(_mock_gitlab_scope, _mock_gitlab_state, False, False, False)
     mock_logger.info.assert_called_with('No merge requests are available from GitLab.')
-    mock_get_merge_requests.assert_called_once()
     mock_iterate_merge_requests.assert_not_called()
     mock_slack.assert_not_called()
     mock_rocketchat.assert_not_called()
 
 
-@mock.patch('pullbug.gitlab_bug.GITLAB_API_KEY', '123')
-@mock.patch('pullbug.gitlab_bug.GITLAB_API_URL', _mock_url)
-@mock.patch('pullbug.gitlab_bug.GITLAB_HEADERS')
-@mock.patch('pullbug.gitlab_bug.LOGGER')
-@mock.patch('requests.get')
+@ mock.patch('pullbug.gitlab_bug.GITLAB_API_KEY', '123')
+@ mock.patch('pullbug.gitlab_bug.GITLAB_API_URL', _mock_url)
+@ mock.patch('pullbug.gitlab_bug.GITLAB_HEADERS')
+@ mock.patch('pullbug.gitlab_bug.LOGGER')
+@ mock.patch('requests.get')
 def test_get_merge_requests_success(mock_request, mock_logger, mock_headers):
     # TODO: Mock this request better and assert additional values
     GitlabBug.get_merge_requests(_mock_gitlab_scope, _mock_gitlab_state)
