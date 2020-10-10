@@ -1,21 +1,21 @@
 <div align="center">
 
-# Pull Bug 🐛 
+# Pullbug 🐛 
 
 Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.
 
-[![Build Status](https://travis-ci.com/Justintime50/pull-bug.svg?branch=master)](https://travis-ci.com/Justintime50/pull-bug)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/pull-bug/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/pull-bug?branch=master)
+[![Build Status](https://travis-ci.com/Justintime50/pullbug.svg?branch=master)](https://travis-ci.com/Justintime50/pullbug)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/pullbug/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/pullbug?branch=master)
 [![PyPi](https://img.shields.io/pypi/v/pullbug)](https://pypi.org/project/pullbug)
-[![Licence](https://img.shields.io/github/license/justintime50/pull-bug)](LICENSE)
+[![Licence](https://img.shields.io/github/license/justintime50/pullbug)](LICENSE)
 
-<img src="assets/showcase.png">
+<img src="assets/showcase.png" alt="Showcase">
 
 </div>
 
-Pull Bug can notify you on Slack or Rocket.Chat of all open pull and merge requests from GitHub or GitLab. This tool ensures requests never go unnoticed as it can be setup on a schedule to constantly bug you to merge your work. This is perfect for finding old or stale requests and helps you to stay current on new ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Rocket.Chat](https://rocket.chat/docs/developer-guides/rest-api/integration/create/) integration and you're all set to be bugged by Pull Bug.
+Pullbug can notify you on Slack or Rocket.Chat of all open pull and merge requests from GitHub or GitLab. This tool ensures requests never go unnoticed as it can be setup on a schedule to constantly bug you to merge your work. This is perfect for finding old or stale requests and helps you to stay current on new ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Rocket.Chat](https://rocket.chat/docs/developer-guides/rest-api/integration/create/) integration and you're all set to be bugged by Pullbug.
 
-**NOTE:** Pull Bug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket.Chat.
+**NOTE:** Pullbug works best if you have link unfurling turned off for GitHub and GitLab on Slack or Rocket.Chat.
 
 **GitLab Users:** If you are not hosting your own GitLab instance and are instead using `gitlab.com`, it's recommended to change the scope to `owner` and provide an owner who has access to all your organizations merge requests.
 
@@ -34,9 +34,9 @@ make help
 
 ## Usage
 
-Pull Bug works best when run on a schedule. Run one-off reports or setup Pull Bug to notify you at whatever interval you'd like to be bugged via Slack or Rocket.Chat about pull or merge requests.
+Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Slack or Rocket.Chat about pull or merge requests.
 
-Pull Bug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull or merge requests to retrieve.
+Pullbug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull or merge requests to retrieve.
 
 ```
 Usage:
@@ -46,8 +46,8 @@ Options:
     -h, --help            show this help message and exit
     -gh, --github         Get bugged about pull requests from GitHub.
     -gl, --gitlab         Get bugged about merge requests from GitLab.
-    -s, --slack           Send Pull Bug messages to Slack.
-    -rc, --rocketchat     Send Pull Bug messages to Rocket.Chat.
+    -s, --slack           Send Pullbug messages to Slack.
+    -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
     -w, --wip             Include "Work in Progress" pull or merge requests.
     -gho GITHUB_OWNER, --github_owner GITHUB_OWNER
                             The GitHub owner to retrieve pull requests from (can be a user or org).

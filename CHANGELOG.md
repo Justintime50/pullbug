@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.2 (2020-10-10)
+
+* Correcting references of "Pull Bug" to "Pullbug"
+
 ## v2.0.1 (2020-09-30)
 
 * Instead of raising an error when no pull or merge requests can be found, we return that message. This is helpful when a user wanted to use both GitHub and GitLab in a single invocation. The previous implementation would exit the script without running the other.
