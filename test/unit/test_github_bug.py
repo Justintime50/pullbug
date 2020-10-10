@@ -117,7 +117,7 @@ def test_get_repos_success(mock_request, mock_logger, mock_headers, _mock_user, 
 def test_get_repos_exception(mock_request, mock_logger, _mock_user, _mock_github_context):
     with pytest.raises(requests.exceptions.RequestException):
         GithubBug.get_repos(_mock_user, _mock_github_context)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         'Could not retrieve GitHub repos: mock-error'
     )
 
@@ -144,7 +144,7 @@ def test_get_pull_requests_request_exception(mock_request, mock_logger, _mock_re
     mock_repos = [_mock_repo]
     with pytest.raises(requests.exceptions.RequestException):
         GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         f'Could not retrieve GitHub pull requests for {_mock_repo["name"]}: mock-error'
     )
 
@@ -155,7 +155,7 @@ def test_get_pull_requests_type_error_exception(mock_request, mock_logger, _mock
     mock_repos = [_mock_repo]
     with pytest.raises(TypeError):
         GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         f'Could not retrieve GitHub pull requests due to bad parameter: {_mock_user} | {_mock_github_state}.'
     )
 

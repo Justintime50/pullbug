@@ -155,7 +155,7 @@ def test_get_merge_requests_success(mock_request, mock_logger, mock_headers):
 def test_get_repos_exception(mock_request, mock_logger):
     with pytest.raises(requests.exceptions.RequestException):
         GitlabBug.get_merge_requests(_mock_gitlab_scope, _mock_gitlab_state)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         'Could not retrieve GitLab merge requests: mock-error'
     )
 
