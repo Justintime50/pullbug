@@ -46,7 +46,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pull Bug messages to Slack.'
+            help='Send Pullbug messages to Slack.'
         )
         parser.add_argument(
             '-rc',
@@ -54,7 +54,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pull Bug messages to Rocket.Chat.'
+            help='Send Pullbug messages to Rocket.Chat.'
         )
         parser.add_argument(
             '-w',
@@ -127,17 +127,17 @@ class PullBug():
     @classmethod
     def run(cls, github, gitlab, slack, rocketchat, wip, github_owner,
             github_state, github_context, gitlab_state, gitlab_scope):
-        """Run Pull Bug based on the configuration.
+        """Run Pullbug based on the configuration.
         """
         PullBugLogger._setup_logging(LOGGER)
-        LOGGER.info('Running Pull Bug...')
+        LOGGER.info('Running Pullbug...')
         load_dotenv()
         cls.run_missing_checks()
         if github:
             GithubBug.run(github_owner, github_state, github_context, wip, slack, rocketchat)
         if gitlab:
             GitlabBug.run(gitlab_scope, gitlab_state, wip, slack, rocketchat)
-        LOGGER.info('Pull Bug finished bugging!')
+        LOGGER.info('Pullbug finished bugging!')
 
     @classmethod
     def run_missing_checks(cls, github, gitlab, slack, rocketchat):
