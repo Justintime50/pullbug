@@ -25,9 +25,9 @@ def test_run_missing_checks_no_github_or_gitlab(mock_logger):
 @mock.patch('pullbug.cli.PullBug.run_missing_checks')
 @mock.patch('pullbug.github_bug.GithubBug.run')
 @mock.patch('pullbug.cli.LOGGER')
-def test_run_github(mock_logger, mock_github, mock_missing_checks):
+def test_run_with_github_arg(mock_logger, mock_github, mock_missing_checks):
     PullBug.run(True, False, False, False, False, 'mock-owner', 'open', 'orgs', 'opened', 'all')
-    mock_missing_checks.assert_called_once()
+    mock_missing_checks.assert_called_once_with(True, False, False, False)
     mock_github.assert_called_once()
     mock_logger.info.assert_called()
 
@@ -36,9 +36,9 @@ def test_run_github(mock_logger, mock_github, mock_missing_checks):
 @mock.patch('pullbug.cli.PullBug.run_missing_checks')
 @mock.patch('pullbug.gitlab_bug.GitlabBug.run')
 @mock.patch('pullbug.cli.LOGGER')
-def test_run_gitlab(mock_logger, mock_gitlab, mock_missing_checks):
+def test_run_with_gitlab_arg(mock_logger, mock_gitlab, mock_missing_checks):
     PullBug.run(False, True, False, False, False, 'mock-owner', 'open', 'orgs', 'opened', 'all')
-    mock_missing_checks.assert_called_once()
+    mock_missing_checks.assert_called_once_with(False, True, False, False)
     mock_gitlab.assert_called_once()
     mock_logger.info.assert_called()
 

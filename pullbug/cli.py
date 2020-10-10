@@ -132,7 +132,7 @@ class PullBug():
         PullBugLogger._setup_logging(LOGGER)
         LOGGER.info('Running Pullbug...')
         load_dotenv()
-        cls.run_missing_checks()
+        cls.run_missing_checks(github, gitlab, slack, rocketchat)
         if github:
             GithubBug.run(github_owner, github_state, github_context, wip, slack, rocketchat)
         if gitlab:
