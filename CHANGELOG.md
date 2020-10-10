@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.0.5 (2020-10-10)
+
+* Fixed bug where arguments weren't being passed properly to the `run_missing_checks` function.
+* Beefed up tests to ensure args were being passed to this function
+
 ## v2.0.4 (2020-10-10)
 
 * Adding missing `main` entrypoint function that was accidentally deleted during code refactor for v2.0.0
