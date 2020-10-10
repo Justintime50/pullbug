@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.6 (2020-10-10)
+
+* Fixing typo in gitlab message
+
 ## v2.0.5 (2020-10-10)
 
 * Fixed bug where arguments weren't being passed properly to the `run_missing_checks` function.

@@ -27,7 +27,7 @@ class GitlabBug():
             message = 'No merge requests are available from GitLab.'
             LOGGER.info(message)
             return message
-        message_preamble = '\n:bug: *The following merge requests on GitLab ar still open and need your help!*\n'
+        message_preamble = '\n:bug: *The following merge requests on GitLab are still open and need your help!*\n'
         merge_request_messages = cls.iterate_merge_requests(merge_requests, wip)
         final_message = message_preamble + merge_request_messages
         if slack:
