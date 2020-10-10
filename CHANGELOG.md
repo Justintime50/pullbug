@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.4 (2020-10-10)
+
+* Adding missing `main` entrypoint function that was accidentally deleted during code refactor for v2.0.0
+
 ## v2.0.3 (2020-10-10)
 
 * Replaced `logger.warning` with `logger.error` as they were used incorrectly (closes #15)
