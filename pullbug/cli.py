@@ -169,5 +169,9 @@ class PullBug():
         raise ValueError(message)
 
 
-if __name__ == '__main__':
+def main():
     PullBugCLI().run()
+
+
+if __name__ == '__main__':
+    main()
