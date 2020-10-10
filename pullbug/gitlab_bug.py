@@ -50,10 +50,10 @@ class GitlabBug():
             LOGGER.info('GitLab merge requests retrieved!')
             if 'does not have a valid value' in response.text:
                 error = f'Could not retrieve GitLab merge requests due to bad parameter: {gitlab_scope} | {gitlab_state}.'  # noqa
-                LOGGER.warning(error)
+                LOGGER.error(error)
                 raise ValueError(error)
         except requests.exceptions.RequestException as response_error:
-            LOGGER.warning(
+            LOGGER.error(
                 f'Could not retrieve GitLab merge requests: {response_error}'
             )
             raise requests.exceptions.RequestException(response_error)

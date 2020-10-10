@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.3 (2020-10-10)
+
+* Replaced `logger.warning` with `logger.error` as they were used incorrectly (closes #15)
+
 ## v2.0.2 (2020-10-10)
 
 * Correcting references of "Pull Bug" to "Pullbug"

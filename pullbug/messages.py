@@ -19,7 +19,7 @@ class Messages():
             requests.post(ROCKET_CHAT_URL, data={'text': message})
             LOGGER.info('Rocket Chat message sent!')
         except requests.exceptions.RequestException as rc_error:
-            LOGGER.warning(f'Could not send Rocket Chat message: {rc_error}')
+            LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')
             raise requests.exceptions.RequestException(rc_error)
 
     @classmethod
@@ -34,7 +34,7 @@ class Messages():
             )
             LOGGER.info('Slack message sent!')
         except slack.errors.SlackApiError as slack_error:
-            LOGGER.warning(f'Could not send Slack message: {slack_error}')
+            LOGGER.error(f'Could not send Slack message: {slack_error}')
             raise slack.errors.SlackApiError(
                 slack_error.response["ok"], slack_error.response['error']
             )

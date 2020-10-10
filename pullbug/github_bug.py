@@ -49,11 +49,11 @@ class GithubBug():
             LOGGER.debug(repos_response.text)
             if 'Not Found' in repos_response.text:
                 error = f'Could not retrieve GitHub repos due to bad parameter: {github_owner} | {github_context}.'
-                LOGGER.warning(error)
+                LOGGER.error(error)
                 raise ValueError(error)
             LOGGER.info('GitHub repos retrieved!')
         except requests.exceptions.RequestException as response_error:
-            LOGGER.warning(
+            LOGGER.error(
                 f'Could not retrieve GitHub repos: {response_error}'
             )
             raise requests.exceptions.RequestException(response_error)
@@ -78,13 +78,13 @@ class GithubBug():
                 else:
                     continue
             except requests.exceptions.RequestException as response_error:
-                LOGGER.warning(
+                LOGGER.error(
                     f'Could not retrieve GitHub pull requests for {repo["name"]}: {response_error}'
                 )
                 raise requests.exceptions.RequestException(response_error)
             except TypeError:
                 error = f'Could not retrieve GitHub pull requests due to bad parameter: {github_owner} | {github_state}.'  # noqa
-                LOGGER.warning(error)
+                LOGGER.error(error)
                 raise TypeError(error)
         LOGGER.info('Pull requests retrieved!')
         return pull_requests

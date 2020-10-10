@@ -23,7 +23,7 @@ def test_rocket_chat_exception(mock_request, mock_logger):
     message = 'mock message'
     with pytest.raises(requests.exceptions.RequestException):
         Messages.rocketchat(message)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         'Could not send Rocket Chat message: mock-error'
     )
 
@@ -49,6 +49,6 @@ def test_slack_exception(mock_slack, mock_logger):
     message = 'mock message'
     with pytest.raises(slack.errors.SlackApiError):
         Messages.slack(message)
-    mock_logger.warning.assert_called_once_with(
+    mock_logger.error.assert_called_once_with(
         "Could not send Slack message: The request to the Slack API failed.\nThe server responded with: {'ok': False, 'error': 'not_authed'}"  # noqa
     )
