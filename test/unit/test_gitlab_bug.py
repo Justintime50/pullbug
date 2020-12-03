@@ -184,15 +184,15 @@ def test_prepare_message(_mock_merge_request, _mock_url, _mock_user, _mock_repo)
     assert f'{_mock_merge_request["web_url"]}|{_mock_merge_request["title"]}' in result
 
 
-def test_prepare_message_no_assignees_data(_mock_merge_request):
+def test_prepare_message_no_assignees_data(_mock_merge_request, _mock_repo):
     _mock_merge_request['assignees'][0]['username'] = None
-    result = GitlabBug.prepare_message(_mock_merge_request)
+    result = GitlabBug.prepare_message(_mock_merge_request, _mock_repo)
     assert '*Waiting on:* No assignee' in result
 
 
-def test_prepare_message_no_assignee(_mock_merge_request):
+def test_prepare_message_no_assignee(_mock_merge_request, _mock_repo):
     _mock_merge_request['assignees'] = []
-    result = GitlabBug.prepare_message(_mock_merge_request)
+    result = GitlabBug.prepare_message(_mock_merge_request, _mock_repo)
     assert '*Waiting on:* No assignee' in result
 
 
