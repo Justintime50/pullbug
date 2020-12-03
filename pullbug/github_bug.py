@@ -125,7 +125,7 @@ class GithubBug():
                                                                   ['body']) > 120 else pull_request['body']
         repository_name = (pull_request['repo'][0]['name'])
 
-        message = f" *Description:* {repository_name}\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
+        message = f" *Repository:* {repository_name}\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
                   f"{pull_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
 
         return message

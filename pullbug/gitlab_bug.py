@@ -76,7 +76,30 @@ class GitlabBug():
         return final_message
 
     @classmethod
-    def prepare_message(cls, merge_request):
+    def get_projects(cls, gitlab_scope, gitlab_state):
+        """Get all projects of the GITLAB_API_URL.
+        """
+        LOGGER.info('Bugging GitLab for projects...')
+        try:
+            response = requests.get(
+                f"{GITLAB_API_URL}/projects?scope={gitlab_scope}&state={gitlab_state}&per_page=100",
+                headers=GITLAB_HEADERS
+            )
+            print(response.json())
+            LOGGER.info('GitLab projects retrieved!')
+            if 'does not have a valid value' in response.text:
+                error = f'Could not retrieve GitLab projects due to bad parameter: {gitlab_scope} | {gitlab_state}.'  # noqa
+                LOGGER.error(error)
+                raise ValueError(error)
+        except requests.exceptions.RequestException as response_error:
+            LOGGER.error(
+                f'Could not retrieve GitLab projects: {response_error}'
+            )
+            raise requests.exceptions.RequestException(response_error)
+        return response.json()
+
+    @classmethod
+    def prepare_message(cls, merge_request, project):
         """Prepare the message with merge request data.
         """
         try:
@@ -93,7 +116,8 @@ class GitlabBug():
         # Truncate description after 120 characters
         description = (merge_request['description'][:120] +
                        '...') if len(merge_request['description']) > 120 else merge_request['description']
-        message = f"\n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|" + \
+        repository_name = (project['name'])
+        message = f"*Repository:* {repository_name} \n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|" + \
             f"{merge_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
 
         return message

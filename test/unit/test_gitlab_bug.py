@@ -135,11 +135,11 @@ def test_run_no_returned_merge_requests(mock_request, mock_logger, mock_headers,
     mock_rocketchat.assert_not_called()
 
 
-@ mock.patch('pullbug.gitlab_bug.GITLAB_API_KEY', '123')
-@ mock.patch('pullbug.gitlab_bug.GITLAB_API_URL', _mock_url)
-@ mock.patch('pullbug.gitlab_bug.GITLAB_HEADERS')
-@ mock.patch('pullbug.gitlab_bug.LOGGER')
-@ mock.patch('requests.get')
+@mock.patch('pullbug.gitlab_bug.GITLAB_API_KEY', '123')
+@mock.patch('pullbug.gitlab_bug.GITLAB_API_URL', _mock_url)
+@mock.patch('pullbug.gitlab_bug.GITLAB_HEADERS')
+@mock.patch('pullbug.gitlab_bug.LOGGER')
+@mock.patch('requests.get')
 def test_get_merge_requests_success(mock_request, mock_logger, mock_headers):
     # TODO: Mock this request better and assert additional values
     GitlabBug.get_merge_requests(_mock_gitlab_scope, _mock_gitlab_state)
@@ -150,8 +150,8 @@ def test_get_merge_requests_success(mock_request, mock_logger, mock_headers):
     assert mock_logger.info.call_count == 2
 
 
-@ mock.patch('pullbug.gitlab_bug.LOGGER')
-@ mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
+@mock.patch('pullbug.gitlab_bug.LOGGER')
+@mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
 def test_get_repos_exception(mock_request, mock_logger):
     with pytest.raises(requests.exceptions.RequestException):
         GitlabBug.get_merge_requests(_mock_gitlab_scope, _mock_gitlab_state)
@@ -160,7 +160,7 @@ def test_get_repos_exception(mock_request, mock_logger):
     )
 
 
-@ mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
+@mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
 def test_iterate_merge_requests_wip_title(mock_prepare_message, _mock_merge_request):
     _mock_merge_request['title'] = 'wip: mock-merge-request'
     mock_merge_requests = [_mock_merge_request]
@@ -168,7 +168,7 @@ def test_iterate_merge_requests_wip_title(mock_prepare_message, _mock_merge_requ
     mock_prepare_message.assert_called_once()
 
 
-@ mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
+@mock.patch('pullbug.gitlab_bug.GitlabBug.prepare_message')
 def test_iterate_merge_requests_wip_setting_absent(mock_prepare_message, _mock_merge_request):
     _mock_merge_request['title'] = 'wip: mock-merge-request'
     mock_merge_requests = [_mock_merge_request]
@@ -177,7 +177,8 @@ def test_iterate_merge_requests_wip_setting_absent(mock_prepare_message, _mock_m
 
 
 def test_prepare_message(_mock_merge_request, _mock_url, _mock_user, _mock_repo):
-    result = GitlabBug.prepare_message(_mock_merge_request)
+    result = GitlabBug.prepare_message(_mock_merge_request, _mock_repo)
+    assert f'{_mock_repo["name"][0]}' in result
     assert 'Merge Request' in result
     assert f'{_mock_merge_request["assignees"][0]["web_url"]}|{_mock_merge_request["assignees"][0]["username"]}' in result  # noqa
     assert f'{_mock_merge_request["web_url"]}|{_mock_merge_request["title"]}' in result
@@ -193,3 +194,13 @@ def test_prepare_message_no_assignee(_mock_merge_request):
     _mock_merge_request['assignees'] = []
     result = GitlabBug.prepare_message(_mock_merge_request)
     assert '*Waiting on:* No assignee' in result
+
+
+@mock.patch('pullbug.gitlab_bug.LOGGER')
+@mock.patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
+def test_get_projects_exception(mock_request, mock_logger):
+    with pytest.raises(requests.exceptions.RequestException):
+        GitlabBug.get_projects(_mock_gitlab_scope, _mock_gitlab_state)
+    mock_logger.error.assert_called_once_with(
+        'Could not retrieve GitLab projects: mock-error'
+    )
