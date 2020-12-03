@@ -68,7 +68,8 @@ class GithubBug():
         for repo in repos:
             try:
                 pull_response = requests.get(
-                    f'https://api.github.com/repos/{github_owner}/{repo["name"]}/pulls?state={github_state}&per_page=100',  # noqa
+                    f'https://api.github.com/repos/{github_owner}/{repo["name"]}/pulls?state={github_state}&per_page=100',
+                    # noqa
                     headers=GITHUB_HEADERS
                 )
                 LOGGER.debug(pull_response.text)
@@ -122,7 +123,9 @@ class GithubBug():
         # Truncate description after 120 characters
         description = (pull_request['body'][:120] + '...') if len(pull_request
                                                                   ['body']) > 120 else pull_request['body']
-        message = f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
-            f"{pull_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
+        repository_name = (pull_request['repo'][0]['name'])
+
+        message = f" *Description:* {repository_name}\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
+                  f"{pull_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
 
         return message

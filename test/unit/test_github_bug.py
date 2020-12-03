@@ -43,6 +43,11 @@ def _mock_pull_request(_mock_user, _mock_repo):
                 'html_url': f'https://github.com/{_mock_user}'
             },
         ],
+        'repo': [
+            {
+                'name': _mock_repo
+            },
+        ],
         'body': 'Mock body of a pull request.',
         'html_url': f'https://github.com/{_mock_user}/{_mock_repo}/pull/1'
     }
@@ -178,6 +183,7 @@ def test_iterate_pull_requests_wip_setting_absent(mock_prepare_message, _mock_pu
 
 def test_prepare_message(_mock_pull_request, _mock_user, _mock_repo):
     result = GithubBug.prepare_message(_mock_pull_request)
+    assert f'{_mock_pull_request["repo"][0]["name"]}' in result
     assert 'Pull Request' in result
     assert f'{_mock_pull_request["assignees"][0]["html_url"]}|{_mock_pull_request["assignees"][0]["login"]}' in result
     assert f'{_mock_pull_request["html_url"]}|{_mock_pull_request["title"]}' in result
