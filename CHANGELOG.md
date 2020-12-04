@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.1.0 (2020-12-03)
+
+* Adds Discord support. Now you can send Pullbug messages to a Discord webhook.
+
 ## v2.0.6 (2020-10-10)
 
 * Fixing typo in gitlab message

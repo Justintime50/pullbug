@@ -11,8 +11,8 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='2.0.6',
-    description='Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.',  # noqa
+    version='2.1.0',
+    description='Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests or GitLab merge requests.',  # noqa
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/pull-bug',

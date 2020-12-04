@@ -4,19 +4,34 @@ import requests
 import slack
 
 
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = os.getenv('SLACK_CHANNEL')
-ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
 LOGGER = logging.getLogger(__name__)
 
 
 class Messages():
     @classmethod
+    def discord(cls, message):
+        """Send a Discord message
+        """
+        try:
+            # TODO: Discord has a hard limit of 2000 characters per message
+            # break up long messages and send separately if necessary
+            # TODO: Discord has sad formatting, fix links on messages
+            requests.post(DISCORD_WEBHOOK_URL, json={'content': message[:2000]})
+            LOGGER.info('Discord message sent!')
+        except requests.exceptions.RequestException as discord_error:
+            LOGGER.error(f'Could not send Discord message: {discord_error}')
+            raise requests.exceptions.RequestException(discord_error)
+
+    @classmethod
     def rocketchat(cls, message):
         """Send a Rocket Chat message
         """
         try:
-            requests.post(ROCKET_CHAT_URL, data={'text': message})
+            requests.post(ROCKET_CHAT_URL, json={'text': message})
             LOGGER.info('Rocket Chat message sent!')
         except requests.exceptions.RequestException as rc_error:
             LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')

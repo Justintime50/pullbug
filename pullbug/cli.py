@@ -10,6 +10,7 @@ from pullbug.gitlab_bug import GitlabBug
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 GITLAB_API_KEY = os.getenv('GITLAB_API_KEY')
 GITLAB_API_URL = os.getenv('GITLAB_API_URL', 'https://gitlab.com/api/v4')
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = os.getenv('SLACK_CHANNEL')
 ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
@@ -39,6 +40,14 @@ class PullBugCLI():
             action='store_true',
             default=False,
             help='Get bugged about merge requests from GitLab.'
+        )
+        parser.add_argument(
+            '-d',
+            '--discord',
+            required=False,
+            action='store_true',
+            default=False,
+            help='Send Pullbug messages to Discord.'
         )
         parser.add_argument(
             '-s',
@@ -112,6 +121,7 @@ class PullBugCLI():
         PullBug.run(
             github=self.github,
             gitlab=self.gitlab,
+            discord=self.discord,
             slack=self.slack,
             rocketchat=self.rocketchat,
             wip=self.wip,
@@ -125,22 +135,22 @@ class PullBugCLI():
 
 class PullBug():
     @classmethod
-    def run(cls, github, gitlab, slack, rocketchat, wip, github_owner,
+    def run(cls, github, gitlab, discord, slack, rocketchat, wip, github_owner,
             github_state, github_context, gitlab_state, gitlab_scope):
         """Run Pullbug based on the configuration.
         """
         PullBugLogger._setup_logging(LOGGER)
         LOGGER.info('Running Pullbug...')
         load_dotenv()
-        cls.run_missing_checks(github, gitlab, slack, rocketchat)
+        cls.run_missing_checks(github, gitlab, discord, slack, rocketchat)
         if github:
-            GithubBug.run(github_owner, github_state, github_context, wip, slack, rocketchat)
+            GithubBug.run(github_owner, github_state, github_context, wip, discord, slack, rocketchat)
         if gitlab:
-            GitlabBug.run(gitlab_scope, gitlab_state, wip, slack, rocketchat)
+            GitlabBug.run(gitlab_scope, gitlab_state, wip, discord, slack, rocketchat)
         LOGGER.info('Pullbug finished bugging!')
 
     @classmethod
-    def run_missing_checks(cls, github, gitlab, slack, rocketchat):
+    def run_missing_checks(cls, github, gitlab, discord, slack, rocketchat):
         """Check that values are set based on
         configuration before proceeding.
         """
@@ -152,6 +162,8 @@ class PullBug():
             cls.throw_missing_error('GITHUB_TOKEN')
         if gitlab and not GITLAB_API_KEY:
             cls.throw_missing_error('GITLAB_API_KEY')
+        if discord and not DISCORD_WEBHOOK_URL:
+            cls.throw_missing_error('DISCORD_WEBHOOK_URL')
         if slack and not SLACK_BOT_TOKEN:
             cls.throw_missing_error('SLACK_BOT_TOKEN')
         if slack and not SLACK_CHANNEL:

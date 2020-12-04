@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 class GitlabBug():
     @classmethod
-    def run(cls, gitlab_scope, gitlab_state, wip, slack, rocketchat):
+    def run(cls, gitlab_scope, gitlab_state, wip, discord, slack, rocketchat):
         """Run the logic to get MR's from GitLab and
         send that data via message.
         """
@@ -30,6 +30,8 @@ class GitlabBug():
         message_preamble = '\n:bug: *The following merge requests on GitLab are still open and need your help!*\n'
         merge_request_messages = cls.iterate_merge_requests(merge_requests, wip)
         final_message = message_preamble + merge_request_messages
+        if discord:
+            Messages.discord(final_message)
         if slack:
             Messages.slack(final_message)
         if rocketchat:

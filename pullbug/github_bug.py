@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 class GithubBug():
     @classmethod
-    def run(cls, github_owner, github_state, github_context, wip, slack, rocketchat):
+    def run(cls, github_owner, github_state, github_context, wip, discord, slack, rocketchat):
         """Run the logic to get PR's from GitHub and
         send that data via message.
         """
@@ -30,6 +30,8 @@ class GithubBug():
         message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
         pull_request_messages = cls.iterate_pull_requests(pull_requests, wip)
         final_message = message_preamble + pull_request_messages
+        if discord:
+            Messages.discord(final_message)
         if slack:
             Messages.slack(final_message)
         if rocketchat:
