@@ -22,21 +22,23 @@ class GithubBug():
         PullBugLogger._setup_logging(LOGGER)
         repos = cls.get_repos(github_owner, github_context)
         pull_requests = cls.get_pull_requests(repos, github_owner, github_state)
-        message_preamble = ''
+
         if pull_requests == []:
             message = 'No pull requests are available from GitHub.'
             LOGGER.info(message)
             return message
+
         message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
-        pull_request_messages = cls.iterate_pull_requests(pull_requests, wip)
-        final_message = message_preamble + pull_request_messages
+        messages, discord_messages = cls.iterate_pull_requests(pull_requests, wip, discord, slack, rocketchat)
+        messages.insert(0, message_preamble)
+        discord_messages.insert(0, message_preamble)
         if discord:
-            Messages.discord(final_message)
+            Messages.send_discord_message(discord_messages)
         if slack:
-            Messages.slack(final_message)
+            Messages.send_slack_message(messages)
         if rocketchat:
-            Messages.rocketchat(final_message)
-        LOGGER.info(final_message)
+            Messages.send_rocketchat_message(messages)
+        LOGGER.info(messages)
 
     @classmethod
     def get_repos(cls, github_owner, github_context=''):
@@ -44,22 +46,22 @@ class GithubBug():
         """
         LOGGER.info('Bugging GitHub for repos...')
         try:
-            repos_response = requests.get(
+            response = requests.get(
                 f'https://api.github.com/{github_context}/{github_owner}/repos?per_page=100',
                 headers=GITHUB_HEADERS
             )
-            LOGGER.debug(repos_response.text)
-            if 'Not Found' in repos_response.text:
+            LOGGER.debug(response.text)
+            LOGGER.info('GitHub repos retrieved!')
+            if 'Not Found' in response.text:
                 error = f'Could not retrieve GitHub repos due to bad parameter: {github_owner} | {github_context}.'
                 LOGGER.error(error)
                 raise ValueError(error)
-            LOGGER.info('GitHub repos retrieved!')
         except requests.exceptions.RequestException as response_error:
             LOGGER.error(
                 f'Could not retrieve GitHub repos: {response_error}'
             )
             raise requests.exceptions.RequestException(response_error)
-        return repos_response.json()
+        return response.json()
 
     @classmethod
     def get_pull_requests(cls, repos, github_owner, github_state):
@@ -92,39 +94,17 @@ class GithubBug():
         return pull_requests
 
     @classmethod
-    def iterate_pull_requests(cls, pull_requests, wip):
+    def iterate_pull_requests(cls, pull_requests, wip, discord, slack, rocketchat):
         """Iterate through each pull request of a repo
-        and send a message to Slack if a PR exists.
+        and build the message array.
         """
-        final_message = ''
+        message_array = []
+        discord_message_array = []
         for pull_request in pull_requests:
             if not wip and 'WIP' in pull_request['title'].upper():
                 continue
             else:
-                message = cls.prepare_message(pull_request)
-                final_message += message
-        return final_message
-
-    @classmethod
-    def prepare_message(cls, pull_request):
-        """Prepare the message with pull request data.
-        """
-        # TODO: Check requested_reviewers array also
-        try:
-            if pull_request['assignees'][0]['login']:
-                users = ''
-                for assignee in pull_request['assignees']:
-                    user = f"<{assignee['html_url']}|{assignee['login']}>"
-                    users += user + ' '
-            else:
-                users = 'No assignee'
-        except IndexError:
-            users = 'No assignee'
-
-        # Truncate description after 120 characters
-        description = (pull_request['body'][:120] + '...') if len(pull_request
-                                                                  ['body']) > 120 else pull_request['body']
-        message = f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|" + \
-            f"{pull_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
-
-        return message
+                message, discord_message = Messages.prepare_github_message(pull_request, discord, slack, rocketchat)
+                message_array.append(message)
+                discord_message_array.append(discord_message)
+        return message_array, discord_message_array

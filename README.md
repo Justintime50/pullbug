@@ -65,7 +65,7 @@ Environment Variables:
     GITHUB_TOKEN        The GitHub Token used to authenticate with the GitHub API.
     GITLAB_API_KEY      The GitLab API Key used to authenticate with the GitLab API.
     GITLAB_API_URL      The GitLab API url for your GitLab instance. Default: https://gitlab.com/api/v4.
-    DISCORD_WEBHOOK_URL The Discord webhook url to send a message to. Will look like: https://discord.com/api/webhooks/channel_id/webhook_id\
+    DISCORD_WEBHOOK_URL The Discord webhook url to send a message to. Will look like: https://discord.com/api/webhooks/channel_id/webhook_id
     SLACK_BOT_TOKEN     The Slackbot Token used to authenticate with Slack.
     SLACK_CHANNEL       The Slack channel to post a message to.
     ROCKET_CHAT_URL     The Rocket.Chat url of the room to post a message to.
