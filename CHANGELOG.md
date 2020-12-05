@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.1.0 (2020-12-03)
+
+* Adds Discord support. Now you can send Pullbug messages to a Discord webhook (closes #17)
+* Completely rewrote the message module. Messages are now an array of messages built from PR/MR data. This allows messages to be broken up easily into batches for chat services such as Discord which may require multiple batches of messages due to character limit
+* The repo name is now included in each message with a link to the repo (closes #16)
+* Reworked tests to be more clean and uniform
+* Various bug fixes and code refactor for better performance and maintainability
+
 ## v2.0.6 (2020-10-10)
 
 * Fixing typo in gitlab message

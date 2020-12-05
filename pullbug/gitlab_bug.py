@@ -16,25 +16,29 @@ LOGGER = logging.getLogger(__name__)
 
 class GitlabBug():
     @classmethod
-    def run(cls, gitlab_scope, gitlab_state, wip, slack, rocketchat):
+    def run(cls, gitlab_scope, gitlab_state, wip, discord, slack, rocketchat):
         """Run the logic to get MR's from GitLab and
         send that data via message.
         """
         PullBugLogger._setup_logging(LOGGER)
         merge_requests = cls.get_merge_requests(gitlab_scope, gitlab_state)
-        message_preamble = ''
+
         if merge_requests == []:
             message = 'No merge requests are available from GitLab.'
             LOGGER.info(message)
             return message
+
         message_preamble = '\n:bug: *The following merge requests on GitLab are still open and need your help!*\n'
-        merge_request_messages = cls.iterate_merge_requests(merge_requests, wip)
-        final_message = message_preamble + merge_request_messages
+        messages, discord_messages = cls.iterate_merge_requests(merge_requests, wip, discord, slack, rocketchat)
+        messages.insert(0, message_preamble)
+        discord_messages.insert(0, message_preamble)
+        if discord:
+            Messages.send_discord_message(discord_messages)
         if slack:
-            Messages.slack(final_message)
+            Messages.send_slack_message(messages)
         if rocketchat:
-            Messages.rocketchat(final_message)
-        LOGGER.info(final_message)
+            Messages.send_rocketchat_message(messages)
+        LOGGER.info(messages)
 
     @classmethod
     def get_merge_requests(cls, gitlab_scope, gitlab_state):
@@ -46,7 +50,7 @@ class GitlabBug():
                 f"{GITLAB_API_URL}/merge_requests?scope={gitlab_scope}&state={gitlab_state}&per_page=100",
                 headers=GITLAB_HEADERS
             )
-            print(response.json())
+            LOGGER.debug(response.text)
             LOGGER.info('GitLab merge requests retrieved!')
             if 'does not have a valid value' in response.text:
                 error = f'Could not retrieve GitLab merge requests due to bad parameter: {gitlab_scope} | {gitlab_state}.'  # noqa
@@ -60,40 +64,19 @@ class GitlabBug():
         return response.json()
 
     @classmethod
-    def iterate_merge_requests(cls, merge_requests, wip):
-        """Iterate through each merge request and send
-        a message to Slack if a PR exists.
+    def iterate_merge_requests(cls, merge_requests, wip, discord, slack, rocketchat):
+        """Iterate through each merge request of a repo
+        and build the message array.
         """
-        final_message = ''
+        message_array = []
+        discord_message_array = []
         for merge_request in merge_requests:
             # TODO: There is a "work_in_progress" key in the response
             # that could be used? https://docs.gitlab.com/ee/api/merge_requests.html
             if not wip and 'WIP' in merge_request['title'].upper():
                 continue
             else:
-                message = cls.prepare_message(merge_request)
-                final_message += message
-        return final_message
-
-    @classmethod
-    def prepare_message(cls, merge_request):
-        """Prepare the message with merge request data.
-        """
-        try:
-            if merge_request['assignees'][0]['username']:
-                users = ''
-                for assignee in merge_request['assignees']:
-                    user = f"<{assignee['web_url']}|{assignee['username']}>"
-                    users += user + ' '
-            else:
-                users = 'No assignee'
-        except IndexError:
-            users = 'No assignee'
-
-        # Truncate description after 120 characters
-        description = (merge_request['description'][:120] +
-                       '...') if len(merge_request['description']) > 120 else merge_request['description']
-        message = f"\n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|" + \
-            f"{merge_request['title']}>\n*Description:* {description}\n*Waiting on:* {users}\n"
-
-        return message
+                message, discord_message = Messages.prepare_gitlab_message(merge_request, discord, slack, rocketchat)
+                message_array.append(message)
+                discord_message_array.append(discord_message)
+        return message_array, discord_message_array

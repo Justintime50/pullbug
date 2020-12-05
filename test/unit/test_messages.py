@@ -5,14 +5,37 @@ import slack
 from pullbug.messages import Messages
 
 
+@mock.patch('pullbug.messages.DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/channel_id/webhook_id')
+@mock.patch('pullbug.messages.LOGGER')
+@mock.patch('requests.post')
+def test_discord_success(mock_request, mock_logger):
+    message = 'mock message'
+    Messages.send_discord_message([message])
+    mock_request.assert_called_once_with(
+        'https://discord.com/api/webhooks/channel_id/webhook_id', json={'content': message}
+    )
+    mock_logger.info.assert_called_once_with('Discord message sent!')
+
+
+@mock.patch('pullbug.messages.LOGGER')
+@mock.patch('requests.post', side_effect=requests.exceptions.RequestException('mock-error'))
+def test_discord_exception(mock_request, mock_logger):
+    message = 'mock message'
+    with pytest.raises(requests.exceptions.RequestException):
+        Messages.send_discord_message(message)
+    mock_logger.error.assert_called_once_with(
+        'Could not send Discord message: mock-error'
+    )
+
+
 @mock.patch('pullbug.messages.ROCKET_CHAT_URL', 'http://mock-url.com')
 @mock.patch('pullbug.messages.LOGGER')
 @mock.patch('requests.post')
 def test_rocket_chat_success(mock_request, mock_logger):
     message = 'mock message'
-    Messages.rocketchat(message)
+    Messages.send_rocketchat_message(message)
     mock_request.assert_called_once_with(
-        'http://mock-url.com', data={'text': message}
+        'http://mock-url.com', json={'text': message}
     )
     mock_logger.info.assert_called_once_with('Rocket Chat message sent!')
 
@@ -22,7 +45,7 @@ def test_rocket_chat_success(mock_request, mock_logger):
 def test_rocket_chat_exception(mock_request, mock_logger):
     message = 'mock message'
     with pytest.raises(requests.exceptions.RequestException):
-        Messages.rocketchat(message)
+        Messages.send_rocketchat_message(message)
     mock_logger.error.assert_called_once_with(
         'Could not send Rocket Chat message: mock-error'
     )
@@ -34,7 +57,7 @@ def test_rocket_chat_exception(mock_request, mock_logger):
 @mock.patch('slack.WebClient.chat_postMessage')
 def test_slack_success(mock_slack, mock_logger):
     message = 'mock message'
-    Messages.slack(message)
+    Messages.send_slack_message(message)
     mock_slack.assert_called_once_with(channel='mock-channel', text=message)
     mock_logger.info.assert_called_once_with('Slack message sent!')
 
@@ -48,7 +71,33 @@ def test_slack_success(mock_slack, mock_logger):
 def test_slack_exception(mock_slack, mock_logger):
     message = 'mock message'
     with pytest.raises(slack.errors.SlackApiError):
-        Messages.slack(message)
+        Messages.send_slack_message(message)
     mock_logger.error.assert_called_once_with(
         "Could not send Slack message: The request to the Slack API failed.\nThe server responded with: {'ok': False, 'error': 'not_authed'}"  # noqa
     )
+
+
+def test_prepare_github_message(_mock_pull_request, _mock_user, _mock_repo):
+    result, discord_result = Messages.prepare_github_message(_mock_pull_request, False, False, False)
+    assert 'Pull Request' in result
+    assert f'{_mock_pull_request["assignees"][0]["html_url"]}|{_mock_pull_request["assignees"][0]["login"]}' in result
+    assert f'{_mock_pull_request["html_url"]}|{_mock_pull_request["title"]}' in result
+
+
+def test_prepare_github_message_no_assignee(_mock_pull_request):
+    _mock_pull_request['assignees'] = []
+    result, discord_result = Messages.prepare_github_message(_mock_pull_request, False, False, False)
+    assert '*Waiting on:*' in result
+
+
+def test_prepare_gitlab_message(_mock_merge_request, _mock_url, _mock_user, _mock_repo):
+    result, discord_result = Messages.prepare_gitlab_message(_mock_merge_request, False, False, False)
+    assert 'Merge Request' in result
+    assert f'{_mock_merge_request["assignees"][0]["web_url"]}|{_mock_merge_request["assignees"][0]["username"]}' in result  # noqa
+    assert f'{_mock_merge_request["web_url"]}|{_mock_merge_request["title"]}' in result
+
+
+def test_prepare_gitlab_message_no_assignee(_mock_merge_request):
+    _mock_merge_request['assignees'] = []
+    result, discord_result = Messages.prepare_gitlab_message(_mock_merge_request, False, False, False)
+    assert '*Waiting on:*' in result
