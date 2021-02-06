@@ -5,7 +5,7 @@
 Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests or GitLab merge requests.
 
 [![Build Status](https://github.com/Justintime50/pullbug/workflows/build/badge.svg)](https://github.com/Justintime50/pullbug/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/pullbug/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/pullbug?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/pullbug/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/pullbug?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/pullbug)](https://pypi.org/project/pullbug)
 [![Licence](https://img.shields.io/github/license/justintime50/pullbug)](LICENSE)
 
