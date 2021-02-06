@@ -3,7 +3,6 @@ import pytest
 import requests
 from pullbug.github_bug import GithubBug
 
-
 GITHUB_TOKEN = '123'
 
 

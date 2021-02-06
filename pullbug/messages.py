@@ -1,10 +1,10 @@
-import re
+import logging
 import math
 import os
-import logging
+import re
+
 import requests
 import slack
-
 
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
