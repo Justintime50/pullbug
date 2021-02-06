@@ -1,5 +1,5 @@
-import pytest
 import mock
+import pytest
 from pullbug.cli import PullBug
 
 

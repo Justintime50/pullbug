@@ -1,11 +1,12 @@
 import argparse
-import os
 import logging
+import os
+
 from dotenv import load_dotenv
-from pullbug.logger import PullBugLogger
+
 from pullbug.github_bug import GithubBug
 from pullbug.gitlab_bug import GitlabBug
-
+from pullbug.logger import PullBugLogger
 
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 GITLAB_API_KEY = os.getenv('GITLAB_API_KEY')

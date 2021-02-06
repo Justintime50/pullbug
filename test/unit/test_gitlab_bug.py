@@ -3,7 +3,6 @@ import pytest
 import requests
 from pullbug.gitlab_bug import GitlabBug
 
-
 GITLAB_API_KEY = '123'
 MOCK_URL = 'http://mock-url.com'
 

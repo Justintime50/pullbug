@@ -1,9 +1,10 @@
-import os
-import requests
 import logging
+import os
+
+import requests
+
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
-
 
 GITLAB_API_KEY = os.getenv('GITLAB_API_KEY')
 GITLAB_API_URL = os.getenv('GITLAB_API_URL', 'https://gitlab.com/api/v4')

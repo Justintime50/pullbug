@@ -1,6 +1,8 @@
-import os
-import requests
 import logging
+import os
+
+import requests
+
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
 
