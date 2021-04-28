@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 class GitlabBug():
     @classmethod
-    def run(cls, gitlab_scope, gitlab_state, wip, discord, slack, rocketchat):
+    def run(cls, gitlab_scope='all', gitlab_state='opened', wip=False, discord=False, slack=False, rocketchat=False):
         """Run the logic to get MR's from GitLab and
         send that data via message.
         """

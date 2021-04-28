@@ -22,7 +22,6 @@ class PullBugCLI():
     def __init__(self):
         """Initiate CLI args.
         """
-        # TODO: Validate all these with a set list of options
         parser = argparse.ArgumentParser(
             description='Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.'  # noqa
         )
@@ -80,7 +79,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default=None,
-            help='The GitHub owner to retrieve pull requests from (can be a user or org).'
+            help='The GitHub owner to retrieve pull requests from (can be a user or organization).'
         )
         parser.add_argument(
             '-ghs',
@@ -88,7 +87,8 @@ class PullBugCLI():
             required=False,
             type=str,
             default='open',
-            help='The GitHub state to retrieve pull requests with. (Default: open | closed | all)'
+            choices=['open', 'closed', 'all'],
+            help='The GitHub state to retrieve pull requests with.'
         )
         parser.add_argument(
             '-ghc',
@@ -96,7 +96,8 @@ class PullBugCLI():
             required=False,
             type=str,
             default='orgs',
-            help='The GitHub context to retrieve pull requests with (Default: orgs | users).'
+            choices=['orgs', 'users'],
+            help='The GitHub context to retrieve pull requests with.'
         )
         parser.add_argument(
             '-glst',
@@ -104,7 +105,8 @@ class PullBugCLI():
             required=False,
             type=str,
             default='opened',
-            help='The GitLab state to retrieve merge requests with. (Default: opened | closed | locked | merged)'
+            choices=['opened', 'closed', 'locked', 'merged'],
+            help='The GitLab state to retrieve merge requests with.'
         )
         parser.add_argument(
             '-glsc',
@@ -112,7 +114,8 @@ class PullBugCLI():
             required=False,
             type=str,
             default='all',
-            help='The GitLab state to retrieve pull requests with. (Default: all | created_by_me | assigned_to_me)'
+            choices=['all', 'created_by_me', 'assigned_to_me'],
+            help='The GitLab state to retrieve pull requests with.'
         )
         parser.parse_args(namespace=self)
 

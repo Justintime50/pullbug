@@ -40,7 +40,7 @@ class Messages():
                 LOGGER.error(f'Could not send Discord message: {discord_error}')
                 raise requests.exceptions.RequestException(discord_error)
 
-    @ classmethod
+    @classmethod
     def send_rocketchat_message(cls, message):
         """Send a Rocket Chat message
 
@@ -55,7 +55,7 @@ class Messages():
             LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')
             raise requests.exceptions.RequestException(rc_error)
 
-    @ classmethod
+    @classmethod
     def send_slack_message(cls, message):
         """Send Slack messages via a bot.
 
@@ -76,7 +76,7 @@ class Messages():
                 slack_error.response["ok"], slack_error.response['error']
             )
 
-    @ classmethod
+    @classmethod
     def prepare_github_message(cls, pull_request, discord, slack, rocketchat):
         """Prepares a GitHub message with a single pull request's data.
         This will then be appended to an array of messages.
@@ -88,15 +88,14 @@ class Messages():
         description_max_length = 120
         users = ''
         discord_users = ''
-        try:
-            if pull_request['assignees'][0]['login']:
-                for assignee in pull_request['assignees']:
-                    discord_user = f"{assignee['login']} (<{assignee['html_url']}>)"
-                    user = f"<{assignee['html_url']}|{assignee['login']}>"
-                    users += user + ' '
-                    discord_users += discord_user + ' '
-        except IndexError:
-            pass
+        if pull_request.get('assignees'):
+            for assignee in pull_request['assignees']:
+                discord_user = f"{assignee['login']} (<{assignee['html_url']}>)"
+                user = f"<{assignee['html_url']}|{assignee['login']}>"
+                users += user + ' '
+                discord_users += discord_user + ' '
+        else:
+            users = 'NA'
 
         description = (pull_request.get('body')[:description_max_length] +
                        '...') if len(pull_request['body']) > description_max_length else pull_request.get('body')
@@ -113,7 +112,7 @@ class Messages():
 
         return message, discord_message
 
-    @ classmethod
+    @classmethod
     def prepare_gitlab_message(cls, merge_request, discord, slack, rocketchat):
         """Prepare a GitLab message with a single merge request's data.
         This will then be appended to an array of messages.
@@ -126,15 +125,14 @@ class Messages():
         discord_users = ''
         re_repo_name = re.compile('(?P<group_name>[\\w-]+)/(?P<repo_name>[\\w-]+)!(?P<merge_request_num>\\d+)')
         re_match = re_repo_name.search(merge_request['references']['full'])
-        try:
-            if merge_request['assignees'][0]['username']:
-                for assignee in merge_request['assignees']:
-                    user = f"<{assignee['web_url']}|{assignee['username']}>"
-                    discord_user = f"{assignee['username']} (<{assignee['web_url']}>)"
-                    users += user + ' '
-                    discord_users += discord_user + ' '
-        except IndexError:
-            pass
+        if merge_request.get('assignees'):
+            for assignee in merge_request['assignees']:
+                user = f"<{assignee['web_url']}|{assignee['username']}>"
+                discord_user = f"{assignee['username']} (<{assignee['web_url']}>)"
+                users += user + ' '
+                discord_users += discord_user + ' '
+        else:
+            users = 'NA'
 
         description = (merge_request.get('description')[:description_max_length] +
                        '...') if len(merge_request['description']) > description_max_length else merge_request.get('description')  # noqa

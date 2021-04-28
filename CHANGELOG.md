@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.2.0 (2021-04-27)
+
+* Command line arguments are now validated at runtime and their defaults have been set in code (closes #22)
+* If there is no assignee to a pull request, we will now populate the `waiting on` message with `NA` instead of leaving it blank
+* Small code refactor and improved test coverage
+
 ## v2.1.0 (2020-12-03)
 
 * Adds Discord support. Now you can send Pullbug messages to a Discord webhook (closes #17)
