@@ -84,3 +84,9 @@ def _mock_merge_request(_mock_user, _mock_repo, _mock_url):
             'full': 'my-group/my-project!1'
         },
     }
+
+
+class MockResponse():
+    def __init__(self, json=None, text=None):
+        self.json = json
+        self.text = text

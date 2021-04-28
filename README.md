@@ -51,15 +51,15 @@ Options:
     -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
     -w, --wip             Include "Work in Progress" pull or merge requests.
     -gho GITHUB_OWNER, --github_owner GITHUB_OWNER
-                            The GitHub owner to retrieve pull requests from (can be a user or org).
-    -ghs GITHUB_STATE, --github_state GITHUB_STATE
-                            The GitHub state to retrieve pull requests with. (Default: open | closed | all)
-    -ghc GITHUB_CONTEXT, --github_context GITHUB_CONTEXT
-                            The GitHub context to retrieve pull requests with (Default: orgs | users).
-    -glst GITLAB_STATE, --gitlab_state GITLAB_STATE
-                            The GitLab state to retrieve merge requests with. (Default: opened | closed | locked | merged)
-    -glsc GITLAB_SCOPE, --gitlab_scope GITLAB_SCOPE
-                            The GitLab state to retrieve pull requests with. (Default: all | created_by_me | assigned_to_me)
+                            The GitHub owner to retrieve pull requests from (can be a user or organization).
+    -ghs {open,closed,all}, --github_state {open,closed,all}
+                            The GitHub state to retrieve pull requests with.
+    -ghc {orgs,users}, --github_context {orgs,users}
+                            The GitHub context to retrieve pull requests with.
+    -glst {opened,closed,locked,merged}, --gitlab_state {opened,closed,locked,merged}
+                            The GitLab state to retrieve merge requests with.
+    -glsc {all,created_by_me,assigned_to_me}, --gitlab_scope {all,created_by_me,assigned_to_me}
+                            The GitLab state to retrieve pull requests with.
 
 Environment Variables:
     GITHUB_TOKEN        The GitHub Token used to authenticate with the GitHub API.

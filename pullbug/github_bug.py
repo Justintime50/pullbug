@@ -7,7 +7,6 @@ from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
 
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-GITHUB_OWNER = os.getenv('GITHUB_OWNER')
 GITHUB_HEADERS = {
     'Authorization': f'token {GITHUB_TOKEN}',
     'Content-Type': 'application/json; charset=utf-8'
@@ -17,7 +16,8 @@ LOGGER = logging.getLogger(__name__)
 
 class GithubBug():
     @classmethod
-    def run(cls, github_owner, github_state, github_context, wip, discord, slack, rocketchat):
+    def run(cls, github_owner=None, github_state='open', github_context='orgs', wip=False,
+            discord=False, slack=False, rocketchat=False):
         """Run the logic to get PR's from GitHub and
         send that data via message.
         """
@@ -44,7 +44,7 @@ class GithubBug():
 
     @classmethod
     def get_repos(cls, github_owner, github_context=''):
-        """Get all repos of the GITHUB_OWNER.
+        """Get all repos of the github_owner.
         """
         LOGGER.info('Bugging GitHub for repos...')
         try:
@@ -82,6 +82,7 @@ class GithubBug():
                     for single_pull_request in pull_response.json():
                         pull_requests.append(single_pull_request)
                 else:
+                    # Repo has no pull requests
                     continue
             except requests.exceptions.RequestException as response_error:
                 LOGGER.error(
