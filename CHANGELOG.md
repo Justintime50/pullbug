@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.3.0 (2021-05-31)
+
+* Pin dependencies
+* Fix typos in classmethod decorators
+
 ## v2.2.0 (2021-04-27)
 
 * Command line arguments are now validated at runtime and their defaults have been set in code (closes #22)

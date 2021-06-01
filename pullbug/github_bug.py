@@ -77,8 +77,8 @@ class GithubBug():
                     f'https://api.github.com/repos/{github_owner}/{repo["name"]}/pulls?state={github_state}&per_page=100',  # noqa
                     headers=GITHUB_HEADERS
                 )
-                LOGGER.debug(pull_response.text)
-                if pull_response.json():
+                if pull_response and pull_response.json():
+                    LOGGER.debug(pull_response.text)
                     for single_pull_request in pull_response.json():
                         pull_requests.append(single_pull_request)
                 else:

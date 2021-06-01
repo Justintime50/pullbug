@@ -128,7 +128,25 @@ def test_get_pull_requests_success(mock_request, mock_logger, mock_headers, _moc
         headers=mock_headers
     )
     assert mock_logger.info.call_count == 2
+    # assert len(result) > 0  # TODO: Assert a mock value actually makes it in
     assert isinstance(result, list)
+
+
+@mock.patch('pullbug.github_bug.GITHUB_TOKEN', GITHUB_TOKEN)
+@mock.patch('pullbug.github_bug.GITHUB_HEADERS')
+@mock.patch('pullbug.github_bug.LOGGER')
+@mock.patch('requests.get', return_value=None)
+def test_get_pull_requests_success_no_pull_requests(mock_request, mock_logger, mock_headers, _mock_repo, _mock_github_state, _mock_user):  # noqa
+    # TODO: Mock this request better and assert additional values
+    mock_repos = [_mock_repo]
+    result = GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
+
+    mock_request.assert_called_once_with(
+        f'https://api.github.com/repos/{_mock_user}/{_mock_repo["name"]}/pulls?state={_mock_github_state}&per_page=100',
+        headers=mock_headers
+    )
+    assert isinstance(result, list)
+    assert len(result) == 0
 
 
 @mock.patch('pullbug.github_bug.LOGGER')
