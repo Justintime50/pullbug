@@ -9,7 +9,7 @@ Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests 
 [![PyPi](https://img.shields.io/pypi/v/pullbug)](https://pypi.org/project/pullbug)
 [![Licence](https://img.shields.io/github/license/justintime50/pullbug)](LICENSE)
 
-<img src="assets/showcase.png" alt="Showcase">
+<img src="https://raw.githubusercontent.com/justintime50/assets/main/src/pullbug/showcase.png" alt="Showcase">
 
 </div>
 
