@@ -9,15 +9,23 @@ from pullbug.messages import Messages
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 GITHUB_HEADERS = {
     'Authorization': f'token {GITHUB_TOKEN}',
-    'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8',
 }
 LOGGER = logging.getLogger(__name__)
 
 
-class GithubBug():
+class GithubBug:
     @classmethod
-    def run(cls, github_owner=None, github_state='open', github_context='orgs', wip=False,
-            discord=False, slack=False, rocketchat=False):
+    def run(
+        cls,
+        github_owner=None,
+        github_state='open',
+        github_context='orgs',
+        wip=False,
+        discord=False,
+        slack=False,
+        rocketchat=False,
+    ):
         """Run the logic to get PR's from GitHub and
         send that data via message.
         """
@@ -28,6 +36,7 @@ class GithubBug():
         if pull_requests == []:
             message = 'No pull requests are available from GitHub.'
             LOGGER.info(message)
+
             return message
 
         message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
@@ -44,13 +53,11 @@ class GithubBug():
 
     @classmethod
     def get_repos(cls, github_owner, github_context=''):
-        """Get all repos of the github_owner.
-        """
+        """Get all repos of the github_owner."""
         LOGGER.info('Bugging GitHub for repos...')
         try:
             response = requests.get(
-                f'https://api.github.com/{github_context}/{github_owner}/repos?per_page=100',
-                headers=GITHUB_HEADERS
+                f'https://api.github.com/{github_context}/{github_owner}/repos?per_page=100', headers=GITHUB_HEADERS
             )
             LOGGER.debug(response.text)
             LOGGER.info('GitHub repos retrieved!')
@@ -59,23 +66,21 @@ class GithubBug():
                 LOGGER.error(error)
                 raise ValueError(error)
         except requests.exceptions.RequestException as response_error:
-            LOGGER.error(
-                f'Could not retrieve GitHub repos: {response_error}'
-            )
+            LOGGER.error(f'Could not retrieve GitHub repos: {response_error}')
             raise requests.exceptions.RequestException(response_error)
+
         return response.json()
 
     @classmethod
     def get_pull_requests(cls, repos, github_owner, github_state):
-        """Grab all pull requests from each repo.
-        """
+        """Grab all pull requests from each repo."""
         LOGGER.info('Bugging GitHub for pull requests...')
         pull_requests = []
         for repo in repos:
             try:
                 pull_response = requests.get(
                     f'https://api.github.com/repos/{github_owner}/{repo["name"]}/pulls?state={github_state}&per_page=100',  # noqa
-                    headers=GITHUB_HEADERS
+                    headers=GITHUB_HEADERS,
                 )
                 if pull_response and pull_response.json():
                     LOGGER.debug(pull_response.text)
@@ -85,15 +90,16 @@ class GithubBug():
                     # Repo has no pull requests
                     continue
             except requests.exceptions.RequestException as response_error:
-                LOGGER.error(
-                    f'Could not retrieve GitHub pull requests for {repo["name"]}: {response_error}'
-                )
+                LOGGER.error(f'Could not retrieve GitHub pull requests for {repo["name"]}: {response_error}')
                 raise requests.exceptions.RequestException(response_error)
             except TypeError:
-                error = f'Could not retrieve GitHub pull requests due to bad parameter: {github_owner} | {github_state}.'  # noqa
+                error = (
+                    f'Could not retrieve GitHub pull requests due to bad parameter: {github_owner} | {github_state}.'
+                )
                 LOGGER.error(error)
                 raise TypeError(error)
         LOGGER.info('Pull requests retrieved!')
+
         return pull_requests
 
     @classmethod
@@ -110,4 +116,5 @@ class GithubBug():
                 message, discord_message = Messages.prepare_github_message(pull_request, discord, slack, rocketchat)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
+
         return message_array, discord_message_array

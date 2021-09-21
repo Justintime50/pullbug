@@ -18,10 +18,9 @@ ROCKET_CHAT_URL = os.getenv('ROCKET_CHAT_URL')
 LOGGER = logging.getLogger(__name__)
 
 
-class PullBugCLI():
+class PullBugCLI:
     def __init__(self):
-        """Initiate CLI args.
-        """
+        """Initiate CLI args."""
         parser = argparse.ArgumentParser(
             description='Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.'  # noqa
         )
@@ -31,7 +30,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Get bugged about pull requests from GitHub.'
+            help='Get bugged about pull requests from GitHub.',
         )
         parser.add_argument(
             '-gl',
@@ -39,7 +38,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Get bugged about merge requests from GitLab.'
+            help='Get bugged about merge requests from GitLab.',
         )
         parser.add_argument(
             '-d',
@@ -47,7 +46,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pullbug messages to Discord.'
+            help='Send Pullbug messages to Discord.',
         )
         parser.add_argument(
             '-s',
@@ -55,7 +54,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pullbug messages to Slack.'
+            help='Send Pullbug messages to Slack.',
         )
         parser.add_argument(
             '-rc',
@@ -63,7 +62,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Send Pullbug messages to Rocket.Chat.'
+            help='Send Pullbug messages to Rocket.Chat.',
         )
         parser.add_argument(
             '-w',
@@ -71,7 +70,7 @@ class PullBugCLI():
             required=False,
             action='store_true',
             default=False,
-            help='Include "Work in Progress" pull or merge requests.'
+            help='Include "Work in Progress" pull or merge requests.',
         )
         parser.add_argument(
             '-gho',
@@ -79,7 +78,7 @@ class PullBugCLI():
             required=False,
             type=str,
             default=None,
-            help='The GitHub owner to retrieve pull requests from (can be a user or organization).'
+            help='The GitHub owner to retrieve pull requests from (can be a user or organization).',
         )
         parser.add_argument(
             '-ghs',
@@ -88,7 +87,7 @@ class PullBugCLI():
             type=str,
             default='open',
             choices=['open', 'closed', 'all'],
-            help='The GitHub state to retrieve pull requests with.'
+            help='The GitHub state to retrieve pull requests with.',
         )
         parser.add_argument(
             '-ghc',
@@ -97,7 +96,7 @@ class PullBugCLI():
             type=str,
             default='orgs',
             choices=['orgs', 'users'],
-            help='The GitHub context to retrieve pull requests with.'
+            help='The GitHub context to retrieve pull requests with.',
         )
         parser.add_argument(
             '-glst',
@@ -106,7 +105,7 @@ class PullBugCLI():
             type=str,
             default='opened',
             choices=['opened', 'closed', 'locked', 'merged'],
-            help='The GitLab state to retrieve merge requests with.'
+            help='The GitLab state to retrieve merge requests with.',
         )
         parser.add_argument(
             '-glsc',
@@ -115,13 +114,12 @@ class PullBugCLI():
             type=str,
             default='all',
             choices=['all', 'created_by_me', 'assigned_to_me'],
-            help='The GitLab state to retrieve pull requests with.'
+            help='The GitLab state to retrieve pull requests with.',
         )
         parser.parse_args(namespace=self)
 
     def run(self):
-        """Send command line args to the main run function.
-        """
+        """Send command line args to the main run function."""
         PullBug.run(
             github=self.github,
             gitlab=self.gitlab,
@@ -137,12 +135,23 @@ class PullBugCLI():
         )
 
 
-class PullBug():
+class PullBug:
     @classmethod
-    def run(cls, github, gitlab, discord, slack, rocketchat, wip, github_owner,
-            github_state, github_context, gitlab_state, gitlab_scope):
-        """Run Pullbug based on the configuration.
-        """
+    def run(
+        cls,
+        github,
+        gitlab,
+        discord,
+        slack,
+        rocketchat,
+        wip,
+        github_owner,
+        github_state,
+        github_context,
+        gitlab_state,
+        gitlab_scope,
+    ):
+        """Run Pullbug based on the configuration."""
         PullBugLogger._setup_logging(LOGGER)
         LOGGER.info('Running Pullbug...')
         load_dotenv()

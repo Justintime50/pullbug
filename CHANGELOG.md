@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.4.0 (2021-09-20)
+
+* Drops support for Python 3.6
+* Swaps `mock` library for builtin `unittest.mock` library
+* Formats entire project with `Black`
+
 ## v2.3.0 (2021-05-31)
 
 * Pin dependencies
