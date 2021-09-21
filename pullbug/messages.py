@@ -14,7 +14,7 @@ GITLAB_API_URL = os.getenv('GITLAB_API_URL', 'https://gitlab.com/api/v4')
 LOGGER = logging.getLogger(__name__)
 
 
-class Messages():
+class Messages:
     @classmethod
     def send_discord_message(cls, message):
         """Send a Discord message.
@@ -67,14 +67,12 @@ class Messages():
         try:
             slack_client.chat_postMessage(
                 channel=SLACK_CHANNEL,
-                text=slack_message
+                text=slack_message,
             )
             LOGGER.info('Slack message sent!')
         except slack.errors.SlackApiError as slack_error:
             LOGGER.error(f'Could not send Slack message: {slack_error}')
-            raise slack.errors.SlackApiError(
-                slack_error.response["ok"], slack_error.response['error']
-            )
+            raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
     @classmethod
     def prepare_github_message(cls, pull_request, discord, slack, rocketchat):
@@ -97,8 +95,11 @@ class Messages():
         else:
             users = 'NA'
 
-        description = (pull_request.get('body')[:description_max_length] +
-                       '...') if len(pull_request['body']) > description_max_length else pull_request.get('body')
+        description = (
+            (pull_request.get('body')[:description_max_length] + '...')
+            if len(pull_request['body']) > description_max_length
+            else pull_request.get('body')
+        )
         message = (
             f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|{pull_request['title']}>"
             f"\n*Repo:* <{pull_request['base']['repo']['html_url']}|{pull_request['base']['repo']['name']}>"
@@ -134,8 +135,11 @@ class Messages():
         else:
             users = 'NA'
 
-        description = (merge_request.get('description')[:description_max_length] +
-                       '...') if len(merge_request['description']) > description_max_length else merge_request.get('description')  # noqa
+        description = (
+            (merge_request.get('description')[:description_max_length] + '...')
+            if len(merge_request['description']) > description_max_length
+            else merge_request.get('description')
+        )
         message = (
             f"\n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|{merge_request['title']}>"
             f"\n*Repo:* <{GITLAB_API_URL}/{re_match['group_name']}/{re_match['repo_name']}|{re_match['repo_name']}>"

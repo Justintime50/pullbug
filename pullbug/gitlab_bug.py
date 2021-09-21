@@ -10,12 +10,12 @@ GITLAB_API_KEY = os.getenv('GITLAB_API_KEY')
 GITLAB_API_URL = os.getenv('GITLAB_API_URL', 'https://gitlab.com/api/v4')
 IGNORE_WIP = os.getenv('IGNORE_WIP')
 GITLAB_HEADERS = {
-    'authorization': f'Bearer {GITLAB_API_KEY}'
+    'authorization': f'Bearer {GITLAB_API_KEY}',
 }
 LOGGER = logging.getLogger(__name__)
 
 
-class GitlabBug():
+class GitlabBug:
     @classmethod
     def run(cls, gitlab_scope='all', gitlab_state='opened', wip=False, discord=False, slack=False, rocketchat=False):
         """Run the logic to get MR's from GitLab and
@@ -43,25 +43,25 @@ class GitlabBug():
 
     @classmethod
     def get_merge_requests(cls, gitlab_scope, gitlab_state):
-        """Get all repos of the GITLAB_API_URL.
-        """
+        """Get all repos of the GITLAB_API_URL."""
         LOGGER.info('Bugging GitLab for merge requests...')
         try:
             response = requests.get(
                 f"{GITLAB_API_URL}/merge_requests?scope={gitlab_scope}&state={gitlab_state}&per_page=100",
-                headers=GITLAB_HEADERS
+                headers=GITLAB_HEADERS,
             )
             LOGGER.debug(response.text)
             LOGGER.info('GitLab merge requests retrieved!')
             if 'does not have a valid value' in response.text:
-                error = f'Could not retrieve GitLab merge requests due to bad parameter: {gitlab_scope} | {gitlab_state}.'  # noqa
+                error = (
+                    f'Could not retrieve GitLab merge requests due to bad parameter: {gitlab_scope} | {gitlab_state}.'
+                )
                 LOGGER.error(error)
                 raise ValueError(error)
         except requests.exceptions.RequestException as response_error:
-            LOGGER.error(
-                f'Could not retrieve GitLab merge requests: {response_error}'
-            )
+            LOGGER.error(f'Could not retrieve GitLab merge requests: {response_error}')
             raise requests.exceptions.RequestException(response_error)
+
         return response.json()
 
     @classmethod
@@ -80,4 +80,5 @@ class GitlabBug():
                 message, discord_message = Messages.prepare_gitlab_message(merge_request, discord, slack, rocketchat)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
+
         return message_array, discord_message_array
