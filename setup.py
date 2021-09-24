@@ -6,7 +6,6 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'requests == 2.*',
     'slackclient == 2.*',
-    'python-dotenv == 0.19.*',  # TODO: Remove once we convert env variables to CLI args
 ]
 
 DEV_REQUIREMENTS = [
