@@ -16,7 +16,7 @@ class GithubBug:
         github_owner=None,
         github_state='open',
         github_context='orgs',
-        wip=False,
+        drafts=False,
         discord=False,
         discord_url=None,
         slack=False,
@@ -31,7 +31,7 @@ class GithubBug:
         self.github_owner = github_owner
         self.github_state = github_state
         self.github_context = github_context
-        self.wip = wip
+        self.drafts = drafts
         self.discord = discord
         self.discord_url = discord_url
         self.slack = slack
@@ -105,7 +105,8 @@ class GithubBug:
         message_array = []
         discord_message_array = []
         for pull_request in pull_requests:
-            if not self.wip and 'WIP' in pull_request.title.upper():
+            if pull_request.draft and not self.drafts:
+                # Exclude drafts if the user doesn't want them included
                 continue
             else:
                 message, discord_message = Messages.prepare_github_message(pull_request)

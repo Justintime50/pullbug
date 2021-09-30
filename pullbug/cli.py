@@ -102,12 +102,12 @@ class PullBugCLI:
             help='The Rocket.Chat URL to send messages to.',
         )
         parser.add_argument(
-            '-w',
-            '--wip',
+            '-dr',
+            '--drafts',
             required=False,
             action='store_true',
             default=False,
-            help='Include "Work in Progress" pull or merge requests.',
+            help='Include draft pull requests.',
         )
         parser.add_argument(
             '-l',
@@ -130,7 +130,7 @@ class PullBugCLI:
             self.github_owner,
             self.github_state,
             self.github_context,
-            self.wip,
+            self.drafts,
             self.discord,
             self.discord_url,
             self.slack,

@@ -32,9 +32,9 @@ make help
 
 ## Usage
 
-Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Discord, Slack, or Rocket.Chat about pull or merge requests.
+Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Discord, Slack, or Rocket.Chat about pull requests.
 
-Pullbug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull or merge requests to retrieve.
+Pullbug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull requests to retrieve.
 
 ```
 Usage:
@@ -49,6 +49,7 @@ Options:
     --github_state {open,closed,all}
                             The GitHub state to retrieve pull requests with.
     -gc {orgs,users}, --github_context {orgs,users}
+                            The GitHub context to retrieve pull requests with.
     -d, --discord         Send Pullbug messages to Discord.
     -du DISCORD_URL, --discord_url DISCORD_URL
                             The Discord webhook URL to send messages to.
@@ -60,7 +61,7 @@ Options:
     -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
     -ru ROCKETCHAT_URL, --rocketchat_url ROCKETCHAT_URL
                             The Rocket.Chat URL to send messages to.
-    -w, --wip             Include "Work in Progress" pull or merge requests.
+    -dr, --drafts         Include draft pull requests.
     -l LOCATION, --location LOCATION
                             The location of the Pullbug logs and files.
 ```

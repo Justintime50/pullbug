@@ -6,6 +6,7 @@
 
 * Completely removes `GitLab` support as I no longer use the platform and can't reliably test its functionality nor have a desire to maintain that piece. For those looking to still use Pullbug's GitLab feature, you can use any version of Pullbug prior to `v3.0.0`
 * Replaces all env variables with CLI args for a more uniform experience, various shortcodes for flags were changed or removed as a part of this process (closes #24)
+* Replaces the `--wip` flag with `--drafts` to use the newer GitHub draft boolean to determine if a pull request is a draft or not (closes #28)
 
 ### Other Changes
 

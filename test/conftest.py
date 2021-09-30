@@ -45,18 +45,6 @@ def _mock_url():
     return 'http://mock-url.com'
 
 
-@pytest.fixture
-def _mock_merge_request(_mock_user, _mock_repo, _mock_url):
-    return {
-        'title': 'mock-pull-request',
-        'description': 'Mock description',
-        'assignees': [{'username': _mock_user, 'web_url': f'https://github.com/{_mock_user}'}],
-        'body': 'Mock body of a pull request.',
-        'web_url': f'{_mock_url}/{_mock_user}/{_mock_repo}/pull/1',
-        'references': {'short': '!1', 'relative': '!1', 'full': 'my-group/my-project!1'},
-    }
-
-
 class MockResponse:
     def __init__(self, json=None, text=None):
         self.json = json
