@@ -42,14 +42,16 @@ Usage:
 
 Options:
     -h, --help            show this help message and exit
-    --github_token GITHUB_TOKEN
+    -p, --pulls           Bug GitHub for Pull Requests.
+    -i, --issues          Bug GitHub for Issues.
+    -gt GITHUB_TOKEN, --github_token GITHUB_TOKEN
                             The token to authenticate with GitHub.
     -go GITHUB_OWNER, --github_owner GITHUB_OWNER
-                            The GitHub owner to retrieve pull requests from (can be a user or organization).
-    --github_state {open,closed,all}
-                            The GitHub state to retrieve pull requests with.
+                            The GitHub owner to retrieve pull requests or issues for (can be a user or organization).
+    -gs {open,closed,all}, --github_state {open,closed,all}
+                            The GitHub state to retrieve pull requests or issues for.
     -gc {orgs,users}, --github_context {orgs,users}
-                            The GitHub context to retrieve pull requests with.
+                            The GitHub context to retrieve pull requests or issues for.
     -d, --discord         Send Pullbug messages to Discord.
     -du DISCORD_URL, --discord_url DISCORD_URL
                             The Discord webhook URL to send messages to.

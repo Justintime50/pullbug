@@ -65,8 +65,8 @@ class Messages:
             raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
     @staticmethod
-    def prepare_github_message(pull_request):
-        """Prepares a GitHub message with a single pull request's data.
+    def prepare_pulls_message(pull_request):
+        """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
 
         Slack & RocketChat can use the same format while Discord requires
@@ -100,6 +100,43 @@ class Messages:
             f"\n:arrow_heading_up: **Pull Request:** {pull_request.title} (<{pull_request.html_url}>)"
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Description:** {description}\n**Waiting on:** {discord_users}\n"
+        )
+
+        return message, discord_message
+
+    @staticmethod
+    def prepare_issues_message(issue):
+        """Prepares a GitHub issue message with a single issue's data.
+        This will then be appended to an array of messages.
+
+        Slack & RocketChat can use the same format while Discord requires
+        some tweaking.
+        """
+        description_max_length = 120
+        users = ''
+        discord_users = ''
+
+        if issue.assignees:
+            for assignee in issue.assignees:
+                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
+                user = f"<{assignee.html_url}|{assignee.login}>"
+                users += user + ' '
+                discord_users += discord_user + ' '
+        else:
+            users = 'NA'
+
+        description = (
+            issue.body[:description_max_length] + '...' if len(issue.body) > description_max_length else issue.body
+        )
+        message = (
+            f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
+            f"\n*Repo:* <{issue.repository.html_url}|{issue.repository.name}>"
+            f"\n*Description:* {description}\n*Assigned to:* {users}\n"
+        )
+        discord_message = (
+            f"\n:exclamation: **Issue:** {issue.title} (<{issue.html_url}>)"
+            f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
+            f"\n**Description:** {description}\n**Assigned to:** {discord_users}\n"
         )
 
         return message, discord_message
