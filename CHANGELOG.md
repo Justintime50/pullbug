@@ -10,6 +10,7 @@
 
 ### Other Changes
 
+* Added new `--repos` flag to filter repos you want pull requests for (closes #23)
 * Switched from raw API calls to PyGithub which allows us to properly handle pagination (closes #14)
 * Replace all `classmethods` with instance or static methods
 

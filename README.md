@@ -61,6 +61,8 @@ Options:
     -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
     -ru ROCKETCHAT_URL, --rocketchat_url ROCKETCHAT_URL
                             The Rocket.Chat URL to send messages to.
+    -r REPOS, --repos REPOS
+                            A comma-separated list of repos to run Pullbug against.
     -dr, --drafts         Include draft pull requests.
     -l LOCATION, --location LOCATION
                             The location of the Pullbug logs and files.
