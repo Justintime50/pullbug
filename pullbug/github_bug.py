@@ -16,7 +16,6 @@ class GithubBug:
         github_owner=None,
         github_state='open',
         github_context='orgs',
-        drafts=False,
         discord=False,
         discord_url=None,
         slack=False,
@@ -24,6 +23,8 @@ class GithubBug:
         slack_channel=None,
         rocketchat=False,
         rocketchat_url=None,
+        repos=None,
+        drafts=False,
         location=os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
@@ -31,7 +32,6 @@ class GithubBug:
         self.github_owner = github_owner
         self.github_state = github_state
         self.github_context = github_context
-        self.drafts = drafts
         self.discord = discord
         self.discord_url = discord_url
         self.slack = slack
@@ -39,6 +39,8 @@ class GithubBug:
         self.slack_channel = slack_channel
         self.rocketchat = rocketchat
         self.rocketchat_url = rocketchat_url
+        self.repos = repos.lower().split(',') if repos else ''
+        self.drafts = drafts
         self.location = location
 
         # Internal variables
@@ -80,6 +82,10 @@ class GithubBug:
             # Can't determine github_context
             pass
         LOGGER.info('GitHub repos retrieved!')
+
+        if self.repos:
+            formatted_repos_list = [repo.strip() for repo in self.repos]
+            repos = [repo for repo in repos if repo.name.lower() in formatted_repos_list]
 
         return repos
 

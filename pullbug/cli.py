@@ -102,6 +102,14 @@ class PullBugCLI:
             help='The Rocket.Chat URL to send messages to.',
         )
         parser.add_argument(
+            '-r',
+            '--repos',
+            required=False,
+            type=str,
+            default=None,
+            help='A comma-separated list of repos to run Pullbug against.',
+        )
+        parser.add_argument(
             '-dr',
             '--drafts',
             required=False,
@@ -130,7 +138,6 @@ class PullBugCLI:
             self.github_owner,
             self.github_state,
             self.github_context,
-            self.drafts,
             self.discord,
             self.discord_url,
             self.slack,
@@ -138,6 +145,8 @@ class PullBugCLI:
             self.slack_channel,
             self.rocketchat,
             self.rocketchat_url,
+            self.repos,
+            self.drafts,
             self.location,
         )
         github_bug.run()
