@@ -51,7 +51,12 @@ class GithubBug:
         """Run the logic to get PR's from GitHub and send that data via message."""
         PullBugLogger._setup_logging(LOGGER, self.location)
         repos = self.get_repos()
-        pull_requests = self.get_pull_requests(repos)
+
+        # if self.pulls:
+        #     pull_requests = self.get_pull_requests(repos)
+        # elif self.issues:
+        issues = self.get_issues(repos)
+        print(issues)  # TODO: REMOVE ME ONCE WE HAVE MESSAGES SETUP
 
         if pull_requests == []:
             message = 'No pull requests are available from GitHub.'
@@ -105,6 +110,23 @@ class GithubBug:
         flat_pull_requests_list = [pull_request for pull_request in pull_requests for pull_request in pull_request]
 
         return flat_pull_requests_list
+
+    def get_issues(self, repos):
+        """Grab all issues from each repo and return a flat list of issues."""
+        LOGGER.info('Bugging GitHub for issues...')
+        issues = []
+        for repo in repos:
+            repo_issues = repo.get_issues(state=self.github_state)
+            if repo_issues:
+                issues.append(repo_issues)
+            else:
+                # Repo has no issues
+                continue
+        LOGGER.info('Issues retrieved!')
+
+        flat_issues_list = [issue for issue in issues for issue in issue]
+
+        return flat_issues_list
 
     def iterate_pull_requests(self, pull_requests):
         """Iterate through each pull request of a repo and build the message array."""
