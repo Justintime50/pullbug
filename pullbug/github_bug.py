@@ -12,10 +12,12 @@ LOGGER = logging.getLogger(__name__)
 class GithubBug:
     def __init__(
         self,
+        pulls=False,
+        issues=False,
         github_token=None,
         github_owner=None,
         github_state='open',
-        github_context='orgs',
+        github_context=None,
         discord=False,
         discord_url=None,
         slack=False,
@@ -28,6 +30,8 @@ class GithubBug:
         location=os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
+        self.pulls = pulls
+        self.issues = issues
         self.github_token = github_token
         self.github_owner = github_owner
         self.github_state = github_state
@@ -51,25 +55,35 @@ class GithubBug:
         """Run the logic to get PR's from GitHub and send that data via message."""
         PullBugLogger._setup_logging(LOGGER, self.location)
         repos = self.get_repos()
-        pull_requests = self.get_pull_requests(repos)
 
-        if pull_requests == []:
-            message = 'No pull requests are available from GitHub.'
-            LOGGER.info(message)
-            # TODO: Do we want to send this message here?
-        else:
-            message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
-            messages, discord_messages = self.iterate_pull_requests(pull_requests)
-            messages.insert(0, message_preamble)
-            discord_messages.insert(0, message_preamble)
+        if self.pulls:
+            pull_requests = self.get_pull_requests(repos)
+            if pull_requests == []:
+                message = 'No pull requests are available from GitHub.'
+                LOGGER.info(message)
+                # TODO: Do we want to send this message here?
+            else:
+                message_preamble = (
+                    '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
+                )
+                messages, discord_messages = self.iterate_pull_requests(pull_requests)
+                messages.insert(0, message_preamble)
+                discord_messages.insert(0, message_preamble)
 
-            if self.discord:
-                Messages.send_discord_message(discord_messages)
-            if self.slack:
-                Messages.send_slack_message(messages)
-            if self.rocketchat:
-                Messages.send_rocketchat_message(messages)
-            LOGGER.info(messages)
+                self.send_messages(messages, discord_messages)
+        elif self.issues:
+            issues = self.get_issues(repos)
+            if issues == []:
+                message = 'No issues are available from GitHub.'
+                LOGGER.info(message)
+                # TODO: Do we want to send this message here?
+            else:
+                message_preamble = '\n:bug: *The following issues on GitHub are still open and need your help!*\n'
+                messages, discord_messages = self.iterate_issues(issues)
+                messages.insert(0, message_preamble)
+                discord_messages.insert(0, message_preamble)
+
+                self.send_messages(messages, discord_messages)
 
     def get_repos(self):
         """Get all repos of the github_owner."""
@@ -106,6 +120,23 @@ class GithubBug:
 
         return flat_pull_requests_list
 
+    def get_issues(self, repos):
+        """Grab all issues from each repo and return a flat list of issues."""
+        LOGGER.info('Bugging GitHub for issues...')
+        issues = []
+        for repo in repos:
+            repo_issues = repo.get_issues(state=self.github_state)
+            if repo_issues:
+                issues.append(repo_issues)
+            else:
+                # Repo has no issues
+                continue
+        LOGGER.info('Issues retrieved!')
+
+        flat_issues_list = [issue for issue in issues for issue in issue]
+
+        return flat_issues_list
+
     def iterate_pull_requests(self, pull_requests):
         """Iterate through each pull request of a repo and build the message array."""
         message_array = []
@@ -115,8 +146,29 @@ class GithubBug:
                 # Exclude drafts if the user doesn't want them included
                 continue
             else:
-                message, discord_message = Messages.prepare_github_message(pull_request)
+                message, discord_message = Messages.prepare_pulls_message(pull_request)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
 
         return message_array, discord_message_array
+
+    @staticmethod
+    def iterate_issues(issues):
+        """Iterate through each issue of a repo and build the message array."""
+        message_array = []
+        discord_message_array = []
+        for issues in issues:
+            message, discord_message = Messages.prepare_issues_message(issues)
+            message_array.append(message)
+            discord_message_array.append(discord_message)
+
+        return message_array, discord_message_array
+
+    def send_messages(self, messages, discord_messages):
+        if self.discord:
+            Messages.send_discord_message(discord_messages)
+        if self.slack:
+            Messages.send_slack_message(messages)
+        if self.rocketchat:
+            Messages.send_rocketchat_message(messages)
+        LOGGER.info(messages)

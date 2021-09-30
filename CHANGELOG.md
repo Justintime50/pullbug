@@ -7,10 +7,13 @@
 * Completely removes `GitLab` support as I no longer use the platform and can't reliably test its functionality nor have a desire to maintain that piece. For those looking to still use Pullbug's GitLab feature, you can use any version of Pullbug prior to `v3.0.0`
 * Replaces all env variables with CLI args for a more uniform experience, various shortcodes for flags were changed or removed as a part of this process (closes #24)
 * Replaces the `--wip` flag with `--drafts` to use the newer GitHub draft boolean to determine if a pull request is a draft or not (closes #28)
+* Now requires the `--github_context` flag for explicit logic routing
+* Now requires the `--pulls` or `--issues` flag for explicit logic routing
 
 ### Other Changes
 
 * Added new `--repos` flag to filter repos you want pull requests for (closes #23)
+* Added new `--issues` flag to bug GitHub for issues instead of pull requests. No includes `--pulls` flag to help differentiate
 * Switched from raw API calls to PyGithub which allows us to properly handle pagination (closes #14)
 * Replace all `classmethods` with instance or static methods
 
