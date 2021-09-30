@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 from pullbug.github_bug import GithubBug
 from pullbug.gitlab_bug import GitlabBug
@@ -158,6 +159,14 @@ class PullBugCLI:
             default=False,
             help='Include "Work in Progress" pull or merge requests.',
         )
+        parser.add_argument(
+            '-l',
+            '--location',
+            required=False,
+            type=str,
+            default=os.path.expanduser('~/pullbug'),
+            help='The location of the Pullbug logs and files.',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
@@ -181,6 +190,7 @@ class PullBugCLI:
             rocketchat=self.rocketchat,
             rocketchat_url=self.rocketchat_url,
             wip=self.wip,
+            location=self.location,
         )
 
 
@@ -205,6 +215,7 @@ class PullBug:
         rocketchat,
         rocketchat_url,
         wip,
+        location,
     ):
         """Run Pullbug based on the configuration."""
         PullBugLogger._setup_logging(LOGGER)
