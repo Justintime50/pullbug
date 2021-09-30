@@ -74,6 +74,8 @@ Options:
     -ru ROCKETCHAT_URL, --rocketchat_url ROCKETCHAT_URL
                             The Rocket.Chat URL to send messages to.
     -w, --wip             Include "Work in Progress" pull or merge requests.
+    -l LOCATION, --location LOCATION
+                            The location of the Pullbug logs and files.
 ```
 
 ## Development
