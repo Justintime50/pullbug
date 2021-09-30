@@ -49,21 +49,21 @@ class GitlabBug:
         if merge_requests == []:
             message = 'No merge requests are available from GitLab.'
             LOGGER.info(message)
-            return message
-
-        message_preamble = '\n:bug: *The following merge requests on GitLab are still open and need your help!*\n'
-        messages, discord_messages = self.iterate_merge_requests(
-            merge_requests, self.wip, self.discord, self.slack, self.rocketchat
-        )
-        messages.insert(0, message_preamble)
-        discord_messages.insert(0, message_preamble)
-        if self.discord:
-            Messages.send_discord_message(discord_messages)
-        if self.slack:
-            Messages.send_slack_message(messages)
-        if self.rocketchat:
-            Messages.send_rocketchat_message(messages)
-        LOGGER.info(messages)
+            # TODO: Do we want to send this message here?
+        else:
+            message_preamble = '\n:bug: *The following merge requests on GitLab are still open and need your help!*\n'
+            messages, discord_messages = self.iterate_merge_requests(
+                merge_requests, self.wip, self.discord, self.slack, self.rocketchat
+            )
+            messages.insert(0, message_preamble)
+            discord_messages.insert(0, message_preamble)
+            if self.discord:
+                Messages.send_discord_message(discord_messages)
+            if self.slack:
+                Messages.send_slack_message(messages)
+            if self.rocketchat:
+                Messages.send_rocketchat_message(messages)
+            LOGGER.info(messages)
 
     def get_merge_requests(self):
         """Get all repos of the GITLAB_API_URL."""
@@ -100,9 +100,7 @@ class GitlabBug:
             if not self.wip and 'WIP' in merge_request['title'].upper():
                 continue
             else:
-                message, discord_message = Messages.prepare_gitlab_message(
-                    merge_request, self.discord, self.slack, self.rocketchat
-                )
+                message, discord_message = Messages.prepare_gitlab_message(merge_request)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
 

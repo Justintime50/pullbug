@@ -65,7 +65,8 @@ class Messages:
             LOGGER.error(f'Could not send Slack message: {slack_error}')
             raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
-    def prepare_github_message(self, pull_request, discord, slack, rocketchat):
+    @staticmethod
+    def prepare_github_message(pull_request):
         """Prepares a GitHub message with a single pull request's data.
         This will then be appended to an array of messages.
 
@@ -77,34 +78,34 @@ class Messages:
         users = ''
         discord_users = ''
 
-        if pull_request.get('assignees'):
-            for assignee in pull_request['assignees']:
-                discord_user = f"{assignee['login']} (<{assignee['html_url']}>)"
-                user = f"<{assignee['html_url']}|{assignee['login']}>"
+        if pull_request.assignees:
+            for assignee in pull_request.assignees:
+                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
+                user = f"<{assignee.html_url}|{assignee.login}>"
                 users += user + ' '
                 discord_users += discord_user + ' '
         else:
             users = 'NA'
 
         description = (
-            (pull_request.get('body')[:description_max_length] + '...')
-            if len(pull_request['body']) > description_max_length
-            else pull_request.get('body')
+            pull_request.body[:description_max_length] + '...'
+            if len(pull_request.body) > description_max_length
+            else pull_request.body
         )
         message = (
-            f"\n:arrow_heading_up: *Pull Request:* <{pull_request['html_url']}|{pull_request['title']}>"
-            f"\n*Repo:* <{pull_request['base']['repo']['html_url']}|{pull_request['base']['repo']['name']}>"
+            f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
+            f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
             f"\n*Description:* {description}\n*Waiting on:* {users}\n"
         )
         discord_message = (
-            f"\n:arrow_heading_up: **Pull Request:** {pull_request['title']} (<{pull_request['html_url']}>)"
-            f"\n**Repo:** {pull_request['base']['repo']['name']} (<{pull_request['base']['repo']['html_url']}>)"
+            f"\n:arrow_heading_up: **Pull Request:** {pull_request.title} (<{pull_request.html_url}>)"
+            f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Description:** {description}\n**Waiting on:** {discord_users}\n"
         )
 
         return message, discord_message
 
-    def prepare_gitlab_message(self, merge_request, discord, slack, rocketchat):
+    def prepare_gitlab_message(self, merge_request):
         """Prepare a GitLab message with a single merge request's data.
         This will then be appended to an array of messages.
 
