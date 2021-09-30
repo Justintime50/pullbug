@@ -4,6 +4,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
+    'PyGithub == 1.*',
     'requests == 2.*',
     'slackclient == 2.*',
 ]

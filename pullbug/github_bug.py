@@ -1,7 +1,7 @@
 import logging
 import os
 
-import requests
+from github import Github
 
 from pullbug.logger import PullBugLogger
 from pullbug.messages import Messages
@@ -46,11 +46,11 @@ class GithubBug:
             'Authorization': f'token {self.github_token}',
             'Content-Type': 'application/json; charset=utf-8',
         }
+        # TODO: We could eventually allow non-authenticated access
+        self.github_instance = Github(self.github_token) if self.github_token else Github()
 
     def run(self):
-        """Run the logic to get PR's from GitHub and
-        send that data via message.
-        """
+        """Run the logic to get PR's from GitHub and send that data via message."""
         PullBugLogger._setup_logging(LOGGER, self.location)
         repos = self.get_repos()
         pull_requests = self.get_pull_requests(repos)
@@ -77,56 +77,33 @@ class GithubBug:
     def get_repos(self):
         """Get all repos of the github_owner."""
         LOGGER.info('Bugging GitHub for repos...')
-        try:
-            response = requests.get(
-                f'https://api.github.com/{self.github_context}/{self.github_owner}/repos?per_page=100',
-                headers=self.github_headers,
-            )
-            LOGGER.debug(response.text)
-            LOGGER.info('GitHub repos retrieved!')
-            if 'Not Found' in response.text:
-                error = (
-                    f'Could not retrieve GitHub repos due to bad parameter: {self.github_owner} |'
-                    f' {self.github_context}.'
-                )
-                LOGGER.error(error)
-                raise ValueError(error)
-        except requests.exceptions.RequestException as response_error:
-            LOGGER.error(f'Could not retrieve GitHub repos: {response_error}')
-            raise requests.exceptions.RequestException(response_error)
+        if self.github_context == 'orgs':
+            repos = self.github_instance.get_organization(self.github_owner).get_repos()
+        elif self.github_context == 'users':
+            repos = self.github_instance.get_user(self.github_owner).get_repos()
+        else:
+            # Can't determine github_context
+            pass
+        LOGGER.info('GitHub repos retrieved!')
 
-        return response.json()
+        return repos
 
     def get_pull_requests(self, repos):
         """Grab all pull requests from each repo."""
         LOGGER.info('Bugging GitHub for pull requests...')
         pull_requests = []
         for repo in repos:
-            try:
-                pull_response = requests.get(
-                    f'https://api.github.com/repos/{self.github_owner}/{repo["name"]}/pulls?state={self.github_state}&per_page=100',  # noqa
-                    headers=self.github_headers,
-                )
-                if pull_response and pull_response.json():
-                    LOGGER.debug(pull_response.text)
-                    for single_pull_request in pull_response.json():
-                        pull_requests.append(single_pull_request)
-                else:
-                    # Repo has no pull requests
-                    continue
-            except requests.exceptions.RequestException as response_error:
-                LOGGER.error(f'Could not retrieve GitHub pull requests for {repo["name"]}: {response_error}')
-                raise requests.exceptions.RequestException(response_error)
-            except TypeError:
-                error = (
-                    f'Could not retrieve GitHub pull requests due to bad parameter: {self.github_owner} |'
-                    f' {self.github_state}.'
-                )
-                LOGGER.error(error)
-                raise TypeError(error)
+            repo_pull_requests = repo.get_pulls(state=self.github_state)
+            if repo_pull_requests:
+                pull_requests.append(repo_pull_requests)  # This is a list of lists
+            else:
+                # Repo has no pull requests
+                continue
         LOGGER.info('Pull requests retrieved!')
 
-        return pull_requests
+        flat_pull_requests_list = [pull_request for pull_request in pull_requests for pull_request in pull_request]
+
+        return flat_pull_requests_list
 
     def iterate_pull_requests(self, pull_requests):
         """Iterate through each pull request of a repo
@@ -135,7 +112,7 @@ class GithubBug:
         message_array = []
         discord_message_array = []
         for pull_request in pull_requests:
-            if not self.wip and 'WIP' in pull_request['title'].upper():
+            if not self.wip and 'WIP' in pull_request.title.upper():
                 continue
             else:
                 message, discord_message = Messages.prepare_github_message(
