@@ -40,35 +40,40 @@ Pullbug is highly customizable allowing you to mix and match version control sof
 
 ```
 Usage:
-    GITHUB_TOKEN=123... SLACK_BOT_TOKEN=123... SLACK_CHANNEL=my-channel pullbug --github --github_owner my_org --slack
+    pullbug --github_token 123... --github --github_owner justintime50
 
 Options:
     -h, --help            show this help message and exit
     -gh, --github         Get bugged about pull requests from GitHub.
-    -gl, --gitlab         Get bugged about merge requests from GitLab.
-    -d, --discord         Send Pullbug messages to Discord.
-    -s, --slack           Send Pullbug messages to Slack.
-    -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
-    -w, --wip             Include "Work in Progress" pull or merge requests.
-    -gho GITHUB_OWNER, --github_owner GITHUB_OWNER
+    --github_token GITHUB_TOKEN
+                            The token to authenticate with GitHub.
+    -go GITHUB_OWNER, --github_owner GITHUB_OWNER
                             The GitHub owner to retrieve pull requests from (can be a user or organization).
-    -ghs {open,closed,all}, --github_state {open,closed,all}
+    --github_state {open,closed,all}
                             The GitHub state to retrieve pull requests with.
-    -ghc {orgs,users}, --github_context {orgs,users}
+    -gc {orgs,users}, --github_context {orgs,users}
                             The GitHub context to retrieve pull requests with.
-    -glst {opened,closed,locked,merged}, --gitlab_state {opened,closed,locked,merged}
+    -gl, --gitlab         Get bugged about merge requests from GitLab.
+    --gitlab_token GITLAB_TOKEN
+                            The API key to authenticate with GitLab.
+    -gu GITLAB_URL, --gitlab_url GITLAB_URL
+                            The URL of the GitLab instance to use.
+    --gitlab_state {opened,closed,locked,merged}
                             The GitLab state to retrieve merge requests with.
-    -glsc {all,created_by_me,assigned_to_me}, --gitlab_scope {all,created_by_me,assigned_to_me}
+    --gitlab_scope {all,created_by_me,assigned_to_me}
                             The GitLab state to retrieve pull requests with.
-
-Environment Variables:
-    GITHUB_TOKEN        The GitHub Token used to authenticate with the GitHub API.
-    GITLAB_API_KEY      The GitLab API Key used to authenticate with the GitLab API.
-    GITLAB_API_URL      The GitLab API url for your GitLab instance. Default: https://gitlab.com/api/v4.
-    DISCORD_WEBHOOK_URL The Discord webhook url to send a message to. Will look like: https://discord.com/api/webhooks/channel_id/webhook_id
-    SLACK_BOT_TOKEN     The Slackbot Token used to authenticate with Slack.
-    SLACK_CHANNEL       The Slack channel to post a message to.
-    ROCKET_CHAT_URL     The Rocket.Chat url of the room to post a message to.
+    -d, --discord         Send Pullbug messages to Discord.
+    -du DISCORD_URL, --discord_url DISCORD_URL
+                            The Discord webhook URL to send messages to.
+    -s, --slack           Send Pullbug messages to Slack.
+    -st SLACK_TOKEN, --slack_token SLACK_TOKEN
+                            The Slackbot token to authenticate with Slack.
+    -sc SLACK_CHANNEL, --slack_channel SLACK_CHANNEL
+                            The Slack channel to send messages to.
+    -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
+    -ru ROCKETCHAT_URL, --rocketchat_url ROCKETCHAT_URL
+                            The Rocket.Chat URL to send messages to.
+    -w, --wip             Include "Work in Progress" pull or merge requests.
 ```
 
 ## Development

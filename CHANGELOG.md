@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+* Replaces all env variables with CLI args for a more uniform experience, various shortcodes for flags were changed or removed as a part of this process (closes #24)
+* Replace all `classmethods` with instance or static methods
+
 ## v2.4.0 (2021-09-20)
 
 * Drops support for Python 3.6

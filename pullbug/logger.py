@@ -2,20 +2,19 @@ import logging
 import logging.handlers
 import os
 
-PULLBUG_LOCATION = os.path.expanduser(os.getenv('PULLBUG_LOCATION', '~/pullbug'))
-LOG_PATH = os.path.join(PULLBUG_LOCATION, 'logs')
-LOG_FILE = os.path.join(LOG_PATH, 'pullbug.log')
-
 
 class PullBugLogger:
-    @classmethod
-    def _setup_logging(cls, logger):
+    def _setup_logging(self, logger):
         """Setup project logging (to console and log file)."""
-        if not os.path.exists(LOG_PATH):
-            os.makedirs(LOG_PATH)
+        log_path = os.path.join(self.location, 'logs')
+        log_file = os.path.join(log_path, 'pullbug.log')
+
+        if not os.path.exists(log_path):
+            os.makedirs(log_path)
+
         logger.setLevel(logging.INFO)
         handler = logging.handlers.RotatingFileHandler(
-            LOG_FILE,
+            log_file,
             maxBytes=200000,
             backupCount=5,
         )
