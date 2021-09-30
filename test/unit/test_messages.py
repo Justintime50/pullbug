@@ -92,20 +92,3 @@ def test_prepare_github_message_no_assignee(_mock_pull_request):
     result, discord_result = Messages.prepare_github_message(_mock_pull_request, False, False, False)
 
     assert '*Waiting on:* NA' in result
-
-
-def test_prepare_gitlab_message(_mock_merge_request, _mock_url, _mock_user, _mock_repo):
-    result, discord_result = Messages.prepare_gitlab_message(_mock_merge_request, False, False, False)
-
-    assert 'Merge Request' in result
-    assert (
-        f'{_mock_merge_request["assignees"][0]["web_url"]}|{_mock_merge_request["assignees"][0]["username"]}' in result
-    )
-    assert f'{_mock_merge_request["web_url"]}|{_mock_merge_request["title"]}' in result
-
-
-def test_prepare_gitlab_message_no_assignee(_mock_merge_request):
-    _mock_merge_request['assignees'] = []
-    result, discord_result = Messages.prepare_gitlab_message(_mock_merge_request, False, False, False)
-
-    assert '*Waiting on:* NA' in result

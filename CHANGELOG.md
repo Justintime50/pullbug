@@ -2,7 +2,14 @@
 
 ## NEXT RELEASE
 
+### Breaking Changes
+
+* Completely removes `GitLab` support as I no longer use the platform and can't reliably test its functionality nor have a desire to maintain that piece. For those looking to still use Pullbug's GitLab feature, you can use any version of Pullbug prior to `v3.0.0`
 * Replaces all env variables with CLI args for a more uniform experience, various shortcodes for flags were changed or removed as a part of this process (closes #24)
+
+### Other Changes
+
+* Switched from raw API calls to PyGithub which allows us to properly handle pagination (closes #14)
 * Replace all `classmethods` with instance or static methods
 
 ## v2.4.0 (2021-09-20)

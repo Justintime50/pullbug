@@ -3,7 +3,6 @@ import logging
 import os
 
 from pullbug.github_bug import GithubBug
-from pullbug.gitlab_bug import GitlabBug
 from pullbug.logger import PullBugLogger
 
 LOGGER = logging.getLogger(__name__)
@@ -12,17 +11,7 @@ LOGGER = logging.getLogger(__name__)
 class PullBugCLI:
     def __init__(self):
         parser = argparse.ArgumentParser(
-            description=(
-                'Get bugged via Slack or RocketChat to merge your GitHub pull requests or GitLab merge requests.'
-            )
-        )
-        parser.add_argument(
-            '-gh',
-            '--github',
-            required=False,
-            action='store_true',
-            default=False,
-            help='Get bugged about pull requests from GitHub.',
+            description='Get bugged via Slack or RocketChat to merge your GitHub pull requests.'
         )
         parser.add_argument(
             '--github_token',
@@ -55,45 +44,6 @@ class PullBugCLI:
             default='orgs',
             choices=['orgs', 'users'],
             help='The GitHub context to retrieve pull requests with.',
-        )
-        parser.add_argument(
-            '-gl',
-            '--gitlab',
-            required=False,
-            action='store_true',
-            default=False,
-            help='Get bugged about merge requests from GitLab.',
-        )
-        parser.add_argument(
-            '--gitlab_token',
-            required=False,
-            type=str,
-            default=None,
-            help='The API key to authenticate with GitLab.',
-        )
-        parser.add_argument(
-            '-gu',
-            '--gitlab_url',
-            required=False,
-            type=str,
-            default='https://gitlab.com/api/v4',
-            help='The URL of the GitLab instance to use.',
-        )
-        parser.add_argument(
-            '--gitlab_state',
-            required=False,
-            type=str,
-            default='opened',
-            choices=['opened', 'closed', 'locked', 'merged'],
-            help='The GitLab state to retrieve merge requests with.',
-        )
-        parser.add_argument(
-            '--gitlab_scope',
-            required=False,
-            type=str,
-            default='all',
-            choices=['all', 'created_by_me', 'assigned_to_me'],
-            help='The GitLab state to retrieve pull requests with.',
         )
         parser.add_argument(
             '-d',
@@ -174,42 +124,30 @@ class PullBugCLI:
         PullBugLogger._setup_logging(LOGGER, self.location)
         LOGGER.info('Running Pullbug...')
         self.run_missing_checks()
-        if self.github:
-            github_bug = GithubBug(
-                self.github_token,
-                self.github_owner,
-                self.github_state,
-                self.github_context,
-                self.wip,
-                self.discord,
-                self.discord_url,
-                self.slack,
-                self.slack_token,
-                self.slack_channel,
-                self.rocketchat,
-                self.rocketchat_url,
-                self.location,
-            )
 
-            github_bug.run()
-        if self.gitlab:
-            gitlab_bug = GitlabBug(
-                self.gitlab_scope, self.gitlab_state, self.wip, self.discord, self.slack, self.rocketchat
-            )
+        github_bug = GithubBug(
+            self.github_token,
+            self.github_owner,
+            self.github_state,
+            self.github_context,
+            self.wip,
+            self.discord,
+            self.discord_url,
+            self.slack,
+            self.slack_token,
+            self.slack_channel,
+            self.rocketchat,
+            self.rocketchat_url,
+            self.location,
+        )
+        github_bug.run()
 
-            gitlab_bug.run()
         LOGGER.info('Pullbug finished bugging!')
 
     def run_missing_checks(self):
         """Check that values are set based on configuration before proceeding."""
-        if not self.github and not self.gitlab:
-            message = 'Neither "github" nor "gitlab" flags were passed, one is required. Please correct and try again.'
-            LOGGER.critical(message)
-            raise ValueError(message)
-        if self.github and not self.github_token:
+        if not self.github_token:
             self.throw_missing_error('github_token')
-        if self.gitlab and not self.gitlab_token:
-            self.throw_missing_error('gitlab_token')
         if self.discord and not self.discord_url:
             self.throw_missing_error('discord_url')
         if self.slack and not self.slack_token:

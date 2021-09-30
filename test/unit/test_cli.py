@@ -12,16 +12,6 @@ def test_throw_missing_error(mock_logger):
     mock_logger.critical.assert_called_once_with('No GITHUB_TOKEN set. Please correct and try again.')
 
 
-@patch('pullbug.cli.LOGGER')
-def test_run_missing_checks_no_github_or_gitlab(mock_logger):
-    with pytest.raises(ValueError):
-        PullBug.run_missing_checks(False, False, False, False, False)
-
-    mock_logger.critical.assert_called_once_with(
-        'Neither "github" nor "gitlab" flags were passed, one is required. Please correct and try again.'
-    )
-
-
 @patch('pullbug.cli.GITHUB_TOKEN', '123')
 @patch('pullbug.cli.PullBug.run_missing_checks')
 @patch('pullbug.github_bug.GithubBug.run')
@@ -31,18 +21,6 @@ def test_run_with_github_arg(mock_logger, mock_github, mock_missing_checks):
 
     mock_missing_checks.assert_called_once_with(True, False, False, False, False)
     mock_github.assert_called_once()
-    mock_logger.info.assert_called()
-
-
-@patch('pullbug.cli.GITHUB_TOKEN', '123')
-@patch('pullbug.cli.PullBug.run_missing_checks')
-@patch('pullbug.gitlab_bug.GitlabBug.run')
-@patch('pullbug.cli.LOGGER')
-def test_run_with_gitlab_arg(mock_logger, mock_gitlab, mock_missing_checks):
-    PullBug.run(False, True, False, False, False, False, 'mock-owner', 'open', 'orgs', 'opened', 'all')
-
-    mock_missing_checks.assert_called_once_with(False, True, False, False, False)
-    mock_gitlab.assert_called_once()
     mock_logger.info.assert_called()
 
 
@@ -61,15 +39,6 @@ def test_run_missing_checks_no_github_token(mock_logger):
     message = 'No GITHUB_TOKEN set. Please correct and try again.'
     with pytest.raises(ValueError):
         PullBug.run_missing_checks(True, False, False, False, False)
-
-    mock_logger.critical.assert_called_once_with(message)
-
-
-@patch('pullbug.cli.LOGGER')
-def test_run_missing_checks_no_gitlab_api_key(mock_logger):
-    message = 'No GITLAB_API_KEY set. Please correct and try again.'
-    with pytest.raises(ValueError):
-        PullBug.run_missing_checks(False, True, False, False, False)
 
     mock_logger.critical.assert_called_once_with(message)
 

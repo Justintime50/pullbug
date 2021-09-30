@@ -1,6 +1,5 @@
 import logging
 import math
-import re
 
 import requests
 import slack
@@ -102,47 +101,5 @@ class Messages:
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Description:** {description}\n**Waiting on:** {discord_users}\n"
         )
-
-        return message, discord_message
-
-    def prepare_gitlab_message(self, merge_request):
-        """Prepare a GitLab message with a single merge request's data.
-        This will then be appended to an array of messages.
-
-        Slack & RocketChat can use the same format while Discord requires
-        some tweaking.
-        """
-        description_max_length = 120
-        users = ''
-        discord_users = ''
-        re_repo_name = re.compile('(?P<group_name>[\\w-]+)/(?P<repo_name>[\\w-]+)!(?P<merge_request_num>\\d+)')
-        re_match = re_repo_name.search(merge_request['references']['full'])
-
-        if merge_request.get('assignees'):
-            for assignee in merge_request['assignees']:
-                user = f"<{assignee['web_url']}|{assignee['username']}>"
-                discord_user = f"{assignee['username']} (<{assignee['web_url']}>)"
-                users += user + ' '
-                discord_users += discord_user + ' '
-        else:
-            users = 'NA'
-
-        description = (
-            (merge_request.get('description')[:description_max_length] + '...')
-            if len(merge_request['description']) > description_max_length
-            else merge_request.get('description')
-        )
-        # fmt: off
-        message = (
-            f"\n:arrow_heading_up: *Merge Request:* <{merge_request['web_url']}|{merge_request['title']}>"
-            f"\n*Repo:* <{self.gitlab_url}/{re_match['group_name']}/{re_match['repo_name']}|{re_match['repo_name']}>"
-            f"\n*Description:* {description}\n*Waiting on:* {users}\n"
-        )
-        discord_message = (
-            f"\n:arrow_heading_up: **Pull Request:** {merge_request['title']} (<{merge_request['web_url']}>)"
-            f"\n**Repo:** {re_match['repo_name']} (<{self.gitlab_url}/{re_match['group_name']}/{re_match['repo_name']}>)"  # noqa
-            f"\n**Description:** {description}\n**Waiting on:** {discord_users}\n"
-        )
-        # fmt: on
 
         return message, discord_message
