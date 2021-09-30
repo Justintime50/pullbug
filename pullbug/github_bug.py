@@ -42,10 +42,6 @@ class GithubBug:
         self.location = location
 
         # Internal variables
-        self.github_headers = {
-            'Authorization': f'token {self.github_token}',
-            'Content-Type': 'application/json; charset=utf-8',
-        }
         # TODO: We could eventually allow non-authenticated access
         self.github_instance = Github(self.github_token) if self.github_token else Github()
 
@@ -58,21 +54,20 @@ class GithubBug:
         if pull_requests == []:
             message = 'No pull requests are available from GitHub.'
             LOGGER.info(message)
+            # TODO: Do we want to send this message here?
+        else:
+            message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
+            messages, discord_messages = self.iterate_pull_requests(pull_requests)
+            messages.insert(0, message_preamble)
+            discord_messages.insert(0, message_preamble)
 
-            return message  # TODO: Don't return early here, handle this better
-
-        message_preamble = '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
-        messages, discord_messages = self.iterate_pull_requests(pull_requests)
-        messages.insert(0, message_preamble)
-        discord_messages.insert(0, message_preamble)
-
-        if self.discord:
-            Messages.send_discord_message(discord_messages)
-        if self.slack:
-            Messages.send_slack_message(messages)
-        if self.rocketchat:
-            Messages.send_rocketchat_message(messages)
-        LOGGER.info(messages)
+            if self.discord:
+                Messages.send_discord_message(discord_messages)
+            if self.slack:
+                Messages.send_slack_message(messages)
+            if self.rocketchat:
+                Messages.send_rocketchat_message(messages)
+            LOGGER.info(messages)
 
     def get_repos(self):
         """Get all repos of the github_owner."""
@@ -89,13 +84,13 @@ class GithubBug:
         return repos
 
     def get_pull_requests(self, repos):
-        """Grab all pull requests from each repo."""
+        """Grab all pull requests from each repo and return a flat list of pull requests."""
         LOGGER.info('Bugging GitHub for pull requests...')
         pull_requests = []
         for repo in repos:
             repo_pull_requests = repo.get_pulls(state=self.github_state)
             if repo_pull_requests:
-                pull_requests.append(repo_pull_requests)  # This is a list of lists
+                pull_requests.append(repo_pull_requests)
             else:
                 # Repo has no pull requests
                 continue
@@ -106,18 +101,14 @@ class GithubBug:
         return flat_pull_requests_list
 
     def iterate_pull_requests(self, pull_requests):
-        """Iterate through each pull request of a repo
-        and build the message array.
-        """
+        """Iterate through each pull request of a repo and build the message array."""
         message_array = []
         discord_message_array = []
         for pull_request in pull_requests:
             if not self.wip and 'WIP' in pull_request.title.upper():
                 continue
             else:
-                message, discord_message = Messages.prepare_github_message(
-                    pull_request, self.discord, self.slack, self.rocketchat
-                )
+                message, discord_message = Messages.prepare_github_message(pull_request)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
 
