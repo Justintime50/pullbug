@@ -9,7 +9,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Messages:
-    @staticmethod
     def send_discord_message(self, message):
         """Send a Discord message.
 
@@ -34,7 +33,6 @@ class Messages:
                 LOGGER.error(f'Could not send Discord message: {discord_error}')
                 raise requests.exceptions.RequestException(discord_error)
 
-    @staticmethod
     def send_rocketchat_message(self, message):
         """Send a Rocket Chat message.
 
@@ -49,7 +47,6 @@ class Messages:
             LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')
             raise requests.exceptions.RequestException(rc_error)
 
-    @staticmethod
     def send_slack_message(self, message):
         """Send Slack messages via a bot.
 
@@ -68,7 +65,6 @@ class Messages:
             LOGGER.error(f'Could not send Slack message: {slack_error}')
             raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
-    @staticmethod
     def prepare_github_message(self, pull_request, discord, slack, rocketchat):
         """Prepares a GitHub message with a single pull request's data.
         This will then be appended to an array of messages.
@@ -108,7 +104,6 @@ class Messages:
 
         return message, discord_message
 
-    @staticmethod
     def prepare_gitlab_message(self, merge_request, discord, slack, rocketchat):
         """Prepare a GitLab message with a single merge request's data.
         This will then be appended to an array of messages.

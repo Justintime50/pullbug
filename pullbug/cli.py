@@ -170,55 +170,8 @@ class PullBugCLI:
         parser.parse_args(namespace=self)
 
     def run(self):
-        """Send command line args to the main run function."""
-        PullBug.run(
-            github=self.github,
-            github_token=self.github_token,
-            github_owner=self.github_owner,
-            github_state=self.github_state,
-            github_context=self.github_context,
-            gitlab=self.gitlab,
-            gitlab_token=self.gitlab_token,
-            gitlab_url=self.gitlab_url,
-            gitlab_state=self.gitlab_state,
-            gitlab_scope=self.gitlab_scope,
-            discord=self.discord,
-            discord_url=self.discord_url,
-            slack=self.slack,
-            slack_token=self.slack_token,
-            slack_channel=self.slack_channel,
-            rocketchat=self.rocketchat,
-            rocketchat_url=self.rocketchat_url,
-            wip=self.wip,
-            location=self.location,
-        )
-
-
-class PullBug:
-    def run(
-        self,
-        github,
-        github_token,
-        github_owner,
-        github_state,
-        github_context,
-        gitlab,
-        gitlab_token,
-        gitlab_url,
-        gitlab_state,
-        gitlab_scope,
-        discord,
-        discord_url,
-        slack,
-        slack_token,
-        slack_channel,
-        rocketchat,
-        rocketchat_url,
-        wip,
-        location,
-    ):
         """Run Pullbug based on the configuration."""
-        PullBugLogger._setup_logging(LOGGER)
+        PullBugLogger._setup_logging(LOGGER, self.location)
         LOGGER.info('Running Pullbug...')
         self.run_missing_checks()
         if self.github:
@@ -235,10 +188,11 @@ class PullBug:
                 self.slack_channel,
                 self.rocketchat,
                 self.rocketchat_url,
+                self.location,
             )
 
             github_bug.run()
-        if gitlab:
+        if self.gitlab:
             gitlab_bug = GitlabBug(
                 self.gitlab_scope, self.gitlab_state, self.wip, self.discord, self.slack, self.rocketchat
             )
@@ -265,7 +219,6 @@ class PullBug:
         if self.rocketchat and not self.rocketchat_url:
             self.throw_missing_error('rocketchat_url')
 
-    @staticmethod
     def throw_missing_error(missing):
         """Raise an error based on what env variables are missing."""
         message = f'No {missing} set. Please correct and try again.'

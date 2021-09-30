@@ -1,4 +1,5 @@
 import logging
+import os
 
 import requests
 
@@ -23,6 +24,7 @@ class GithubBug:
         slack_channel=None,
         rocketchat=False,
         rocketchat_url=None,
+        location=os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
         self.github_token = github_token
@@ -37,6 +39,7 @@ class GithubBug:
         self.slack_channel = slack_channel
         self.rocketchat = rocketchat
         self.rocketchat_url = rocketchat_url
+        self.location = location
 
         # Internal variables
         self.github_headers = {
@@ -48,7 +51,7 @@ class GithubBug:
         """Run the logic to get PR's from GitHub and
         send that data via message.
         """
-        PullBugLogger._setup_logging(LOGGER)
+        PullBugLogger._setup_logging(LOGGER, self.location)
         repos = self.get_repos()
         pull_requests = self.get_pull_requests(repos)
 

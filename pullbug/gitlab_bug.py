@@ -1,4 +1,5 @@
 import logging
+import os
 
 import requests
 
@@ -23,6 +24,7 @@ class GitlabBug:
         slack_channel=None,
         rocketchat=False,
         rocketchat_url=None,
+        location=os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
         self.gitlab_token = gitlab_token
@@ -37,11 +39,11 @@ class GitlabBug:
         self.slack_channel = slack_channel
         self.rocketchat = rocketchat
         self.rocketchat_url = rocketchat_url
+        self.location = location
 
-    @staticmethod
     def run(self):
         """Run the logic to get MR's from GitLab and send that data via message."""
-        PullBugLogger._setup_logging(LOGGER)
+        PullBugLogger._setup_logging(LOGGER, self.location)
         merge_requests = self.get_merge_requests(self.gitlab_scope, self.gitlab_state)
 
         if merge_requests == []:
@@ -63,7 +65,6 @@ class GitlabBug:
             Messages.send_rocketchat_message(messages)
         LOGGER.info(messages)
 
-    @staticmethod
     def get_merge_requests(self):
         """Get all repos of the GITLAB_API_URL."""
         LOGGER.info('Bugging GitLab for merge requests...')
@@ -89,7 +90,6 @@ class GitlabBug:
 
         return response.json()
 
-    @staticmethod
     def iterate_merge_requests(self, merge_requests):
         """Iterate through each merge request of a repo and build the message array."""
         message_array = []
