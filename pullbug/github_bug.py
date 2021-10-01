@@ -71,7 +71,8 @@ class GithubBug:
                 discord_messages.insert(0, message_preamble)
 
                 self.send_messages(messages, discord_messages)
-        elif self.issues:
+
+        if self.issues:
             issues = self.get_issues(repos)
             if issues == []:
                 message = 'No issues are available from GitHub.'
@@ -166,9 +167,10 @@ class GithubBug:
 
     def send_messages(self, messages, discord_messages):
         if self.discord:
-            Messages.send_discord_message(discord_messages)
+            Messages.send_discord_message(discord_messages, self.discord_url)
         if self.slack:
-            Messages.send_slack_message(messages)
+            Messages.send_slack_message(messages, self.slack_token, self.slack_channel)
         if self.rocketchat:
-            Messages.send_rocketchat_message(messages)
+            Messages.send_rocketchat_message(messages, self.rocketchat_url)
+
         LOGGER.info(messages)

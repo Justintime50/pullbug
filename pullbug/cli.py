@@ -8,7 +8,7 @@ from pullbug.logger import PullBugLogger
 LOGGER = logging.getLogger(__name__)
 
 
-class PullBugCLI:
+class PullBugCli:
     def __init__(self):
         parser = argparse.ArgumentParser(
             description='Get bugged via Slack or RocketChat to merge your GitHub pull requests.'
@@ -198,7 +198,7 @@ class PullBugCLI:
 
 
 def main():
-    PullBugCLI().run()
+    PullBugCli().run()
 
 
 if __name__ == '__main__':
