@@ -82,17 +82,18 @@ class Messages:
         if pull_request.assignees:
             users = discord_users = ''
             for assignee in pull_request.assignees:
-                user = f"<{assignee['html_url']}|{assignee['login']}>"
+                user = f"<{assignee.html_url}|{assignee.login}>"
                 users += user + ' '
-                discord_user = f"{assignee['login']} (<{assignee['html_url']}>)"
+                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
                 discord_users += discord_user + ' '
         else:
             users = discord_users = 'NA'
 
+        pull_request_body = pull_request.body if pull_request.body else ''
         description = (
-            pull_request.body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
-            if len(pull_request.body) > DESCRIPTION_MAX_LENGTH
-            else pull_request.body
+            pull_request_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+            if len(pull_request_body) > DESCRIPTION_MAX_LENGTH
+            else pull_request_body
         )
         message = (
             f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
@@ -125,10 +126,11 @@ class Messages:
         else:
             users = discord_users = 'NA'
 
+        issue_body = issue.body if issue.body else ''
         description = (
-            issue.body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
-            if len(issue.body) > DESCRIPTION_MAX_LENGTH
-            else issue.body
+            issue_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+            if len(issue_body) > DESCRIPTION_MAX_LENGTH
+            else issue_body
         )
         message = (
             f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
