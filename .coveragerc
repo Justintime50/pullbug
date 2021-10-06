@@ -1,4 +1,2 @@
-[report]
-exclude_lines =
-    if __name__ == '__main__':
-    PullBugCLI()
+[run]
+omit = pullbug/cli.py
