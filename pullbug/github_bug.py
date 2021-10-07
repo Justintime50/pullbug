@@ -125,11 +125,12 @@ class GithubBug:
         else:
             # Can't determine github_context
             pass
-        LOGGER.info('GitHub repos retrieved!')
 
         if self.repos:
             formatted_repos_list = [repo.strip() for repo in self.repos]
             repos = [repo for repo in repos if repo.name.lower() in formatted_repos_list]
+
+        LOGGER.info('GitHub repos retrieved!')
 
         return repos
 
@@ -144,9 +145,10 @@ class GithubBug:
             else:
                 # Repo has no pull requests
                 continue
-        LOGGER.info('Pull requests retrieved!')
 
         flat_pull_requests_list = [pull_request for pull_request in pull_requests for pull_request in pull_request]
+
+        LOGGER.info('Pull requests retrieved!')
 
         return flat_pull_requests_list
 
@@ -161,9 +163,10 @@ class GithubBug:
             else:
                 # Repo has no issues
                 continue
-        LOGGER.info('Issues retrieved!')
 
         flat_issues_list = [issue for issue in issues for issue in issue]
+
+        LOGGER.info('Issues retrieved!')
 
         return flat_issues_list
 
