@@ -25,9 +25,6 @@ pip3 install pullbug
 
 # Install locally
 make install
-
-# Get Makefile help
-make help
 ```
 
 ## Usage
@@ -73,14 +70,8 @@ Options:
 ## Development
 
 ```bash
-# Lint the project
-make lint
-
-# Run tests
-make test
-
-# Run test coverage
-make coverage
+# Get an exhaustive list of development tools
+make help
 
 # Run the tool locally
 venv/bin/python pullbug/cli.py --help

@@ -1,4 +1,4 @@
-PYTHON_BINARY := python3 
+PYTHON_BINARY := python3
 VIRTUAL_BIN := venv/bin
 PROJECT_NAME := pullbug
 
@@ -24,14 +24,29 @@ clean:
 
 ## format - Runs the Black Python formatter against the project
 format:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME) --skip-string-normalization --line-length 120 --experimental-string-processing
-	$(VIRTUAL_BIN)/black test --skip-string-normalization --line-length 120 --experimental-string-processing
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME)
+	$(VIRTUAL_BIN)/black test
+
+## format-check - Checks if the project is formatted correctly against the formatting rules
+format-check:
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME) --check
+	$(VIRTUAL_BIN)/black test --check
 
 ## install - Install the project locally
 install:
 	$(PYTHON_BINARY) -m venv ~/.venv/$(PROJECT_NAME)/
 	ln -snf ~/.venv/$(PROJECT_NAME)/ venv
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
+
+## isort - Sorts imports throughout the project
+isort:
+	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)
+	$(VIRTUAL_BIN)/isort test
+
+## isort-check - Checks that imports throughout the project are formatted correctly
+isort-check:
+	$(VIRTUAL_BIN)/isort $(PROJECT_NAME) --check-only
+	$(VIRTUAL_BIN)/isort test --check-only
 
 ## lint - Lint the project
 lint:

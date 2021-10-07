@@ -3,6 +3,7 @@ from unittest.mock import patch
 import pytest
 import requests
 import slack
+
 from pullbug.messages import Messages
 
 
