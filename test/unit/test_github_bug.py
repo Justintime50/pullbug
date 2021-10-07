@@ -1,190 +1,177 @@
-from test.conftest import MockResponse
 from unittest.mock import patch
 
 import pytest
-import requests
 from pullbug.github_bug import GithubBug
 
-GITHUB_TOKEN = '123'
 
-
-@patch('pullbug.cli.GITHUB_TOKEN', GITHUB_TOKEN)
 @patch('pullbug.github_bug.GithubBug.get_pull_requests')
 @patch('pullbug.github_bug.GithubBug.get_repos')
 @patch('pullbug.github_bug.LOGGER')
-def test_run_success(mock_logger, mock_get_repos, mock_pull_request):
-    GithubBug.run('mock-owner', 'open', 'orgs', False, False, False, False)
+def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
+    GithubBug(
+        github_token='123',
+        github_context='users',
+        pulls=True,
+    ).run()
 
     mock_get_repos.assert_called_once()
     mock_pull_request.assert_called_once()
     mock_logger.info.assert_called()
 
 
-@patch('pullbug.cli.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.github_bug.GithubBug.iterate_pull_requests')
-@patch('pullbug.github_bug.GithubBug.get_pull_requests', return_value=[])
+@patch('pullbug.github_bug.GithubBug.get_issues')
 @patch('pullbug.github_bug.GithubBug.get_repos')
 @patch('pullbug.github_bug.LOGGER')
-def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request, mock_iterate_pull_requests):
-    GithubBug.run('mock-owner', 'open', 'orgs', False, False, False, False)
+def test_run_issues(mock_logger, mock_get_repos, mock_issues):
+    GithubBug(
+        github_token='123',
+        github_context='users',
+        issues=True,
+    ).run()
 
     mock_get_repos.assert_called_once()
-    mock_iterate_pull_requests.assert_not_called()
+    mock_issues.assert_called_once()
     mock_logger.info.assert_called()
 
 
-@patch('pullbug.cli.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.messages.Messages.send_discord_message')
-@patch('pullbug.github_bug.GithubBug.get_pull_requests')
+@pytest.mark.parametrize(
+    'pulls, issues, github_token, github_context, discord, discord_url, slack, slack_token, slack_channel, rocketchat,'
+    ' rocketchat_url',
+    [
+        # no pulls
+        (False, False, False, 'users', False, False, False, False, False, False, False),
+        # no github_token
+        (True, False, False, 'users', False, False, False, False, False, False, False),
+        # no github_context
+        (True, False, '123', False, False, False, False, False, False, False, False),
+        # discord but no url
+        (True, False, '123', 'users', True, False, False, False, False, False, False),
+        # slack but no token
+        (True, False, '123', 'users', False, False, True, False, False, False, False),
+        # slack, token, but no channel
+        (True, False, '123', 'users', False, False, True, '123', False, False, False),
+        # rocketchat but no url
+        (True, False, '123', 'users', False, False, False, False, False, True, False),
+    ],
+)
+@patch('pullbug.github_bug.GithubBug.get_issues')
 @patch('pullbug.github_bug.GithubBug.get_repos')
 @patch('pullbug.github_bug.LOGGER')
-def test_run_with_discord(mock_logger, mock_get_repos, mock_pull_request, mock_discord):
-    GithubBug.run('mock-owner', 'open', 'orgs', False, True, False, False)
-
-    mock_get_repos.assert_called_once()
-    mock_pull_request.assert_called_once()
-    mock_discord.assert_called_once()
-    mock_logger.info.assert_called()
-
-
-@patch('pullbug.cli.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.messages.Messages.send_slack_message')
-@patch('pullbug.github_bug.GithubBug.get_pull_requests')
-@patch('pullbug.github_bug.GithubBug.get_repos')
-@patch('pullbug.github_bug.LOGGER')
-def test_run_with_slack(mock_logger, mock_get_repos, mock_pull_request, mock_slack):
-    GithubBug.run('mock-owner', 'open', 'orgs', False, False, True, False)
-
-    mock_get_repos.assert_called_once()
-    mock_pull_request.assert_called_once()
-    mock_slack.assert_called_once()
-    mock_logger.info.assert_called()
-
-
-@patch('pullbug.cli.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.messages.Messages.send_rocketchat_message')
-@patch('pullbug.github_bug.GithubBug.get_pull_requests')
-@patch('pullbug.github_bug.GithubBug.get_repos')
-@patch('pullbug.github_bug.LOGGER')
-def test_run_with_rocketchat(mock_logger, mock_get_repos, mock_pull_request, mock_rocketchat):
-    GithubBug.run('mock-owner', 'open', 'orgs', False, False, False, True)
-
-    mock_get_repos.assert_called_once()
-    mock_pull_request.assert_called_once()
-    mock_rocketchat.assert_called_once()
-    mock_logger.info.assert_called()
-
-
-@patch('pullbug.github_bug.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.github_bug.GITHUB_HEADERS')
-@patch('pullbug.github_bug.LOGGER')
-@patch('requests.get')
-def test_get_repos_success(mock_request, mock_logger, mock_headers, _mock_user, _mock_github_context):
-    # TODO: Mock this request better and assert additional values
-    GithubBug.get_repos(_mock_user, _mock_github_context)
-
-    mock_request.assert_called_once_with(
-        f'https://api.github.com/{_mock_github_context}/{_mock_user}/repos?per_page=100', headers=mock_headers
-    )
-    assert mock_logger.info.call_count == 2
-
-
-@patch('pullbug.github_bug.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.github_bug.GITHUB_HEADERS')
-@patch('pullbug.github_bug.LOGGER')
-@patch('requests.get', return_value=MockResponse(text='Not Found'))
-def test_get_repos_value_exception(mock_request, mock_logger, mock_headers, _mock_user, _mock_github_context):
+def test_run_missing_required_cli_params(
+    mock_logger,
+    mock_get_repos,
+    mock_issues,
+    pulls,
+    issues,
+    github_token,
+    github_context,
+    discord,
+    discord_url,
+    slack,
+    slack_token,
+    slack_channel,
+    rocketchat,
+    rocketchat_url,
+):
     with pytest.raises(ValueError):
-        GithubBug.get_repos(_mock_user, _mock_github_context)
+        GithubBug(
+            pulls=pulls,
+            issues=issues,
+            github_token=github_token,
+            github_context=github_context,
+            discord=discord,
+            discord_url=discord_url,
+            slack=slack,
+            slack_token=slack_token,
+            slack_channel=slack_channel,
+            rocketchat=rocketchat,
+            rocketchat_url=rocketchat_url,
+        ).run()
 
-    mock_logger.error.assert_called_once_with(
-        f'Could not retrieve GitHub repos due to bad parameter: {_mock_user} | {_mock_github_context}.'
-    )
+    # throw_missing_error should get called which logs a critical error
+    mock_logger.critical.assert_called_once()
+
+
+@patch('pullbug.github_bug.Github')
+@patch('pullbug.github_bug.Github.get_repos')
+@patch('pullbug.github_bug.Github.get_user')
+@patch('pullbug.github_bug.LOGGER')
+def test_get_repos_users(mock_logger, mock_get_user, mock_get_repos, mock_github_instance):
+    GithubBug(
+        github_context='users',
+        github_owner='justintime50',
+    ).get_repos()
+
+    mock_logger.call_count == 2
+    # TODO: Assert the get_repos and get_user/org gets called
 
 
 @patch('pullbug.github_bug.LOGGER')
-@patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
-def test_get_repos_requests_exception(mock_request, mock_logger, _mock_user, _mock_github_context):
-    with pytest.raises(requests.exceptions.RequestException):
-        GithubBug.get_repos(_mock_user, _mock_github_context)
+def test_get_pull_requests(mock_logger):
+    pull_requests = GithubBug().get_pull_requests(repos=[])
 
-    mock_logger.error.assert_called_once_with('Could not retrieve GitHub repos: mock-error')
-
-
-@patch('pullbug.github_bug.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.github_bug.GITHUB_HEADERS')
-@patch('pullbug.github_bug.LOGGER')
-@patch('requests.get')
-def test_get_pull_requests_success(mock_request, mock_logger, mock_headers, _mock_repo, _mock_github_state, _mock_user):
-    # TODO: Mock this request better and assert additional values
-    mock_repos = [_mock_repo]
-    result = GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
-
-    mock_request.assert_called_once_with(
-        f'https://api.github.com/repos/{_mock_user}/{_mock_repo["name"]}/pulls?state={_mock_github_state}&per_page=100',
-        headers=mock_headers,
-    )
-    assert mock_logger.info.call_count == 2
-    # assert len(result) > 0  # TODO: Assert a mock value actually makes it in
-    assert isinstance(result, list)
-
-
-@patch('pullbug.github_bug.GITHUB_TOKEN', GITHUB_TOKEN)
-@patch('pullbug.github_bug.GITHUB_HEADERS')
-@patch('pullbug.github_bug.LOGGER')
-@patch('requests.get', return_value=None)
-def test_get_pull_requests_success_no_pull_requests(
-    mock_request, mock_logger, mock_headers, _mock_repo, _mock_github_state, _mock_user
-):  # noqa
-    # TODO: Mock this request better and assert additional values
-    mock_repos = [_mock_repo]
-    result = GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
-
-    mock_request.assert_called_once_with(
-        f'https://api.github.com/repos/{_mock_user}/{_mock_repo["name"]}/pulls?state={_mock_github_state}&per_page=100',
-        headers=mock_headers,
-    )
-    assert isinstance(result, list)
-    assert len(result) == 0
+    assert pull_requests == []
+    mock_logger.info.call_count == 2
+    # TODO: Assert and mock that `get_pulls` gets called
 
 
 @patch('pullbug.github_bug.LOGGER')
-@patch('requests.get', side_effect=requests.exceptions.RequestException('mock-error'))
-def test_get_pull_requests_request_exception(mock_request, mock_logger, _mock_repo, _mock_user, _mock_github_state):
-    mock_repos = [_mock_repo]
-    with pytest.raises(requests.exceptions.RequestException):
-        GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
+def test_get_issues(mock_logger):
+    issues = GithubBug().get_issues(repos=[])
 
-    mock_logger.error.assert_called_once_with(
-        f'Could not retrieve GitHub pull requests for {_mock_repo["name"]}: mock-error'
-    )
+    assert issues == []
+    mock_logger.info.call_count == 2
+    # TODO: Assert and mock that `get_pulls` gets called
 
 
-@patch('pullbug.github_bug.LOGGER')
-@patch('requests.get', side_effect=TypeError('mock-error'))
-def test_get_pull_requests_type_error_exception(mock_request, mock_logger, _mock_repo, _mock_user, _mock_github_state):
-    mock_repos = [_mock_repo]
-    with pytest.raises(TypeError):
-        GithubBug.get_pull_requests(mock_repos, _mock_user, _mock_github_state)
+def test_iterate_pull_requests():
+    messages, discord_messages = GithubBug().iterate_pull_requests(pull_requests=[])
 
-    mock_logger.error.assert_called_once_with(
-        f'Could not retrieve GitHub pull requests due to bad parameter: {_mock_user} | {_mock_github_state}.'
-    )
+    assert messages == []
+    assert discord_messages == []
+    # TODO: Assert the message building functions get called
 
 
-@patch('pullbug.github_bug.Messages.prepare_github_message', return_value=[['mock-message'], ['mock-message']])
-def test_iterate_pull_requests_wip_title(mock_prepare_message, _mock_pull_request):
-    _mock_pull_request['title'] = 'wip: mock-pull-request'
-    mock_pull_requests = [_mock_pull_request]
-    GithubBug.iterate_pull_requests(mock_pull_requests, True, False, False, False)
+def test_iterate_issues():
+    messages, discord_messages = GithubBug().iterate_issues(issues=[])
 
-    mock_prepare_message.assert_called_once()
+    assert messages == []
+    assert discord_messages == []
+    # TODO: Assert the message building functions get called
 
 
-@patch('pullbug.github_bug.Messages.prepare_github_message')
-def test_iterate_pull_requests_wip_setting_absent(mock_prepare_message, _mock_pull_request):
-    _mock_pull_request['title'] = 'wip: mock-pull-request'
-    mock_pull_requests = [_mock_pull_request]
-    GithubBug.iterate_pull_requests(mock_pull_requests, False, False, False, False)
+@patch('pullbug.github_bug.Messages.send_discord_message')
+def test_send_messages_discord(mock_send_discord_message, mock_url):
+    messages = discord_messages = []
 
-    mock_prepare_message.assert_not_called()
+    GithubBug(
+        discord=True,
+        discord_url=mock_url,
+    ).send_messages(messages, discord_messages)
+
+    mock_send_discord_message.assert_called_once_with(messages, mock_url)
+
+
+@patch('pullbug.github_bug.Messages.send_slack_message')
+def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
+    messages = discord_messages = []
+
+    GithubBug(
+        slack=True,
+        slack_token=mock_token,
+        slack_channel=mock_channel,
+    ).send_messages(messages, discord_messages)
+
+    mock_send_slack_message.assert_called_once_with(messages, mock_token, mock_channel)
+
+
+@patch('pullbug.github_bug.Messages.send_rocketchat_message')
+def test_send_messages_rocketchat(mock_send_rocketchat_message, mock_url):
+    messages = discord_messages = []
+
+    GithubBug(
+        rocketchat=True,
+        rocketchat_url=mock_url,
+    ).send_messages(messages, discord_messages)
+
+    mock_send_rocketchat_message.assert_called_once_with(messages, mock_url)

@@ -54,6 +54,9 @@ class GithubBug:
     def run(self):
         """Run the logic to get PR's from GitHub and send that data via message."""
         PullBugLogger._setup_logging(LOGGER, self.location)
+        LOGGER.info('Running Pullbug...')
+        self.run_missing_checks()
+
         repos = self.get_repos()
 
         if self.pulls:
@@ -71,7 +74,8 @@ class GithubBug:
                 discord_messages.insert(0, message_preamble)
 
                 self.send_messages(messages, discord_messages)
-        elif self.issues:
+
+        if self.issues:
             issues = self.get_issues(repos)
             if issues == []:
                 message = 'No issues are available from GitHub.'
@@ -85,6 +89,32 @@ class GithubBug:
 
                 self.send_messages(messages, discord_messages)
 
+        LOGGER.info('Pullbug finished bugging!')
+
+    def run_missing_checks(self):
+        """Check that values are set based on configuration before proceeding."""
+        if not self.pulls and not self.issues:
+            self.throw_missing_error('pulls/issues')
+        if not self.github_token:
+            self.throw_missing_error('github_token')
+        if not self.github_context:
+            self.throw_missing_error('github_context')
+        if self.discord and not self.discord_url:
+            self.throw_missing_error('discord_url')
+        if self.slack and not self.slack_token:
+            self.throw_missing_error('slack_token')
+        if self.slack and not self.slack_channel:
+            self.throw_missing_error('slack_channel')
+        if self.rocketchat and not self.rocketchat_url:
+            self.throw_missing_error('rocketchat_url')
+
+    @staticmethod
+    def throw_missing_error(missing_flag):
+        """Raise an error based on what env variables are missing."""
+        message = f'No {missing_flag} set. Please correct and try again.'
+        LOGGER.critical(message)
+        raise ValueError(message)
+
     def get_repos(self):
         """Get all repos of the github_owner."""
         LOGGER.info('Bugging GitHub for repos...')
@@ -95,11 +125,12 @@ class GithubBug:
         else:
             # Can't determine github_context
             pass
-        LOGGER.info('GitHub repos retrieved!')
 
         if self.repos:
             formatted_repos_list = [repo.strip() for repo in self.repos]
             repos = [repo for repo in repos if repo.name.lower() in formatted_repos_list]
+
+        LOGGER.info('GitHub repos retrieved!')
 
         return repos
 
@@ -114,9 +145,10 @@ class GithubBug:
             else:
                 # Repo has no pull requests
                 continue
-        LOGGER.info('Pull requests retrieved!')
 
         flat_pull_requests_list = [pull_request for pull_request in pull_requests for pull_request in pull_request]
+
+        LOGGER.info('Pull requests retrieved!')
 
         return flat_pull_requests_list
 
@@ -131,9 +163,10 @@ class GithubBug:
             else:
                 # Repo has no issues
                 continue
-        LOGGER.info('Issues retrieved!')
 
         flat_issues_list = [issue for issue in issues for issue in issue]
+
+        LOGGER.info('Issues retrieved!')
 
         return flat_issues_list
 
@@ -166,9 +199,10 @@ class GithubBug:
 
     def send_messages(self, messages, discord_messages):
         if self.discord:
-            Messages.send_discord_message(discord_messages)
+            Messages.send_discord_message(discord_messages, self.discord_url)
         if self.slack:
-            Messages.send_slack_message(messages)
+            Messages.send_slack_message(messages, self.slack_token, self.slack_channel)
         if self.rocketchat:
-            Messages.send_rocketchat_message(messages)
+            Messages.send_rocketchat_message(messages, self.rocketchat_url)
+
         LOGGER.info(messages)

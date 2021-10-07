@@ -1,14 +1,10 @@
 import argparse
-import logging
 import os
 
 from pullbug.github_bug import GithubBug
-from pullbug.logger import PullBugLogger
-
-LOGGER = logging.getLogger(__name__)
 
 
-class PullBugCLI:
+class PullBugCli:
     def __init__(self):
         parser = argparse.ArgumentParser(
             description='Get bugged via Slack or RocketChat to merge your GitHub pull requests.'
@@ -146,11 +142,6 @@ class PullBugCLI:
         parser.parse_args(namespace=self)
 
     def run(self):
-        """Run Pullbug based on the configuration."""
-        PullBugLogger._setup_logging(LOGGER, self.location)
-        LOGGER.info('Running Pullbug...')
-        self.run_missing_checks()
-
         github_bug = GithubBug(
             self.pulls,
             self.issues,
@@ -171,34 +162,9 @@ class PullBugCLI:
         )
         github_bug.run()
 
-        LOGGER.info('Pullbug finished bugging!')
-
-    def run_missing_checks(self):
-        """Check that values are set based on configuration before proceeding."""
-        if not self.pulls and not self.issues:
-            self.throw_missing_error('pulls/issues')
-        if not self.github_token:
-            self.throw_missing_error('github_token')
-        if not self.github_context:
-            self.throw_missing_error('github_context')
-        if self.discord and not self.discord_url:
-            self.throw_missing_error('discord_url')
-        if self.slack and not self.slack_token:
-            self.throw_missing_error('slack_token')
-        if self.slack and not self.slack_channel:
-            self.throw_missing_error('slack_channel')
-        if self.rocketchat and not self.rocketchat_url:
-            self.throw_missing_error('rocketchat_url')
-
-    def throw_missing_error(missing):
-        """Raise an error based on what env variables are missing."""
-        message = f'No {missing} set. Please correct and try again.'
-        LOGGER.critical(message)
-        raise ValueError(message)
-
 
 def main():
-    PullBugCLI().run()
+    PullBugCli().run()
 
 
 if __name__ == '__main__':

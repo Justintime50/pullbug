@@ -6,57 +6,63 @@ import slack
 
 LOGGER = logging.getLogger(__name__)
 
+DESCRIPTION_CONTINUATION = '...'
+DESCRIPTION_MAX_LENGTH = 120
+
 
 class Messages:
-    def send_discord_message(self, message):
+    @staticmethod
+    def send_discord_message(messages, discord_url):
         """Send a Discord message.
 
         Discord has a hard limit of 2000 characters per message,
         as such, we break up the messages into batches, allow for
         breathing room, and send each batch of messages separately.
         """
-        num_of_messages = len(message)
-        max_per_batch = 6
+        num_of_messages = len(messages)
+        max_messages_per_batch = 6
         i = 1
-        new_cutoff = max_per_batch
+        new_cutoff = max_messages_per_batch
         old_cutoff = 0
-        while i <= math.ceil(num_of_messages / max_per_batch):
+        while i <= math.ceil(num_of_messages / max_messages_per_batch):
             i += 1
-            batch_message = ''.join(message[old_cutoff:new_cutoff])
-            new_cutoff += max_per_batch
-            old_cutoff += max_per_batch
+            batch_message = ''.join(messages[old_cutoff:new_cutoff])
+            new_cutoff += max_messages_per_batch
+            old_cutoff += max_messages_per_batch
             try:
-                requests.post(self.discord_url, json={'content': batch_message})
+                requests.post(discord_url, json={'content': batch_message})
                 LOGGER.info('Discord message sent!')
             except requests.exceptions.RequestException as discord_error:
                 LOGGER.error(f'Could not send Discord message: {discord_error}')
                 raise requests.exceptions.RequestException(discord_error)
 
-    def send_rocketchat_message(self, message):
+    @staticmethod
+    def send_rocketchat_message(messages, rocketchat_url):
         """Send a Rocket Chat message.
 
         We truncate the message at 40,000 characters to match Slack
         and improve performance. RC doesn't specify a char limit.
         """
-        rocketchat_message = ''.join(message)[:40000]
+        rocketchat_message = ''.join(messages)[:40000]
         try:
-            requests.post(self.rocketchat_url, json={'text': rocketchat_message})
+            requests.post(rocketchat_url, json={'text': rocketchat_message})
             LOGGER.info('Rocket Chat message sent!')
         except requests.exceptions.RequestException as rc_error:
             LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')
             raise requests.exceptions.RequestException(rc_error)
 
-    def send_slack_message(self, message):
+    @staticmethod
+    def send_slack_message(messages, slack_token, slack_channel):
         """Send Slack messages via a bot.
 
         Slack truncates messages after 40,000 characters so
         we truncate there before sending the request.
         """
-        slack_message = ''.join(message)[:40000]
-        slack_client = slack.WebClient(self.slack_token)
+        slack_message = ''.join(messages)[:40000]
+        slack_client = slack.WebClient(slack_token)
         try:
             slack_client.chat_postMessage(
-                channel=self.slack_channel,
+                channel=slack_channel,
                 text=slack_message,
             )
             LOGGER.info('Slack message sent!')
@@ -73,23 +79,21 @@ class Messages:
         some tweaking.
         """
         # TODO: Check requested_reviewers array also
-        description_max_length = 120
-        users = ''
-        discord_users = ''
-
         if pull_request.assignees:
+            users = discord_users = ''
             for assignee in pull_request.assignees:
-                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
                 user = f"<{assignee.html_url}|{assignee.login}>"
                 users += user + ' '
+                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
                 discord_users += discord_user + ' '
         else:
-            users = 'NA'
+            users = discord_users = 'NA'
 
+        pull_request_body = pull_request.body if pull_request.body else ''
         description = (
-            pull_request.body[:description_max_length] + '...'
-            if len(pull_request.body) > description_max_length
-            else pull_request.body
+            pull_request_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+            if len(pull_request_body) > DESCRIPTION_MAX_LENGTH
+            else pull_request_body
         )
         message = (
             f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
@@ -112,21 +116,21 @@ class Messages:
         Slack & RocketChat can use the same format while Discord requires
         some tweaking.
         """
-        description_max_length = 120
-        users = ''
-        discord_users = ''
-
         if issue.assignees:
+            users = discord_users = ''
             for assignee in issue.assignees:
-                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
                 user = f"<{assignee.html_url}|{assignee.login}>"
                 users += user + ' '
+                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
                 discord_users += discord_user + ' '
         else:
-            users = 'NA'
+            users = discord_users = 'NA'
 
+        issue_body = issue.body if issue.body else ''
         description = (
-            issue.body[:description_max_length] + '...' if len(issue.body) > description_max_length else issue.body
+            issue_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+            if len(issue_body) > DESCRIPTION_MAX_LENGTH
+            else issue_body
         )
         message = (
             f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
