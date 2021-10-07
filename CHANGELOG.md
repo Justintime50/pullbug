@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v3.0.0 (2021-10-06)
 
 ### Breaking Changes
 
@@ -14,7 +14,7 @@
 
 * Added new `--repos` flag to filter repos you want pull requests for (closes #23)
 * Added new `--issues` flag to bug GitHub for issues instead of pull requests. No includes `--pulls` flag to help differentiate (closes #19)
-* Switched from raw API calls to PyGithub which allows us to properly handle pagination (closes #14)
+* Switched from raw API calls to `PyGithub` which allows us to properly handle pagination (closes #14)
 * Replace all `classmethods` with instance or static methods
 * Various bug fixes and code refactor
 
