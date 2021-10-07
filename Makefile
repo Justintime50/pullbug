@@ -22,15 +22,21 @@ clean:
 	rm -rf build
 	rm -rf *.egg-info
 
-## format - Runs the Black Python formatter against the project
-format:
+## black - Runs the Black Python formatter against the project
+black:
 	$(VIRTUAL_BIN)/black $(PROJECT_NAME)
 	$(VIRTUAL_BIN)/black test
 
-## format-check - Checks if the project is formatted correctly against the formatting rules
-format-check:
+## black-check - Checks if the project is formatted correctly against the Black rules
+black-check:
 	$(VIRTUAL_BIN)/black $(PROJECT_NAME) --check
 	$(VIRTUAL_BIN)/black test --check
+
+## format - Runs all formatting tools against the project
+format: black isort lint
+
+## format-check - Checks if the project is formatted correctly against all formatting rules
+format-check: black-check isort-check lint
 
 ## install - Install the project locally
 install:
@@ -43,7 +49,7 @@ isort:
 	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)
 	$(VIRTUAL_BIN)/isort test
 
-## isort-check - Checks that imports throughout the project are formatted correctly
+## isort-check - Checks that imports throughout the project are sorted correctly
 isort-check:
 	$(VIRTUAL_BIN)/isort $(PROJECT_NAME) --check-only
 	$(VIRTUAL_BIN)/isort test --check-only
@@ -57,4 +63,4 @@ lint:
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build coverage clean format install lint test
+.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint test
