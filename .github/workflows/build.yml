@@ -16,6 +16,8 @@ jobs:
         run: make install
       - name: Run linting
         run: make lint
+      - name: Run formatting
+        run: make format
   test:
     runs-on: ubuntu-latest
     strategy:

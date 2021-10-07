@@ -10,6 +10,7 @@ REQUIREMENTS = [
 ]
 
 DEV_REQUIREMENTS = [
+    'black',
     'coveralls == 3.*',
     'flake8',
     'pytest == 6.*',
