@@ -70,7 +70,7 @@ Options:
 ## Development
 
 ```bash
-# Get an exhaustive list of development tools
+# Get a comprehensive list of development tools
 make help
 
 # Run the tool locally
