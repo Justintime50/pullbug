@@ -7,52 +7,52 @@ import slack
 from pullbug.messages import Messages
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.info')
 @patch('requests.post')
 def test_discord_success(mock_request, mock_logger, mock_url, mock_messages):
     Messages.send_discord_message(mock_messages, mock_url)
 
     mock_request.assert_called_once_with(mock_url, json={'content': mock_messages[0]})
-    mock_logger.info.assert_called_once_with('Discord message sent!')
+    mock_logger.assert_called_once_with('Discord message sent!')
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.error')
 @patch('requests.post', side_effect=requests.exceptions.RequestException('mock-error'))
 def test_discord_exception(mock_request, mock_logger, mock_url, mock_messages):
     with pytest.raises(requests.exceptions.RequestException):
         Messages.send_discord_message(mock_messages, mock_url)
 
-    mock_logger.error.assert_called_once_with('Could not send Discord message: mock-error')
+    mock_logger.assert_called_once_with('Could not send Discord message: mock-error')
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.info')
 @patch('requests.post')
 def test_rocket_chat_success(mock_request, mock_logger, mock_url, mock_messages):
     Messages.send_rocketchat_message(mock_messages, mock_url)
 
     mock_request.assert_called_once_with(mock_url, json={'text': mock_messages[0]})
-    mock_logger.info.assert_called_once_with('Rocket Chat message sent!')
+    mock_logger.assert_called_once_with('Rocket Chat message sent!')
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.error')
 @patch('requests.post', side_effect=requests.exceptions.RequestException('mock-error'))
 def test_rocket_chat_exception(mock_request, mock_logger, mock_url, mock_messages):
     with pytest.raises(requests.exceptions.RequestException):
         Messages.send_rocketchat_message(mock_messages, mock_url)
 
-    mock_logger.error.assert_called_once_with('Could not send Rocket Chat message: mock-error')
+    mock_logger.assert_called_once_with('Could not send Rocket Chat message: mock-error')
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.info')
 @patch('slack.WebClient.chat_postMessage')
 def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
     Messages.send_slack_message(mock_messages, mock_token, mock_channel)
 
     mock_slack.assert_called_once_with(channel='mock-channel', text=mock_messages[0])
-    mock_logger.info.assert_called_once_with('Slack message sent!')
+    mock_logger.assert_called_once_with('Slack message sent!')
 
 
-@patch('pullbug.messages.LOGGER')
+@patch('logging.Logger.error')
 @patch(
     'slack.WebClient.chat_postMessage',
     side_effect=slack.errors.SlackApiError(
@@ -63,7 +63,7 @@ def test_slack_exception(mock_slack, mock_logger, mock_messages, mock_token, moc
     with pytest.raises(slack.errors.SlackApiError):
         Messages.send_slack_message(mock_messages, mock_token, mock_channel)
 
-    mock_logger.error.assert_called_once_with(
+    mock_logger.assert_called_once_with(
         "Could not send Slack message: The request to the Slack API failed.\nThe server responded with: {'ok': False, 'error': 'not_authed'}"  # noqa
     )
 

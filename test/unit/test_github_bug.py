@@ -7,7 +7,7 @@ from pullbug.github_bug import GithubBug
 
 @patch('pullbug.github_bug.GithubBug.get_pull_requests')
 @patch('pullbug.github_bug.GithubBug.get_repos')
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.info')
 def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
     GithubBug(
         github_token='123',
@@ -17,12 +17,27 @@ def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
 
     mock_get_repos.assert_called_once()
     mock_pull_request.assert_called_once()
-    mock_logger.info.assert_called()
+    mock_logger.assert_called()
+
+
+@patch('pullbug.github_bug.GithubBug.get_pull_requests', return_value=[])
+@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('logging.Logger.info')
+def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
+    GithubBug(
+        github_token='123',
+        github_context='users',
+        pulls=True,
+    ).run()
+
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    assert mock_logger.call_count == 3
 
 
 @patch('pullbug.github_bug.GithubBug.get_issues')
 @patch('pullbug.github_bug.GithubBug.get_repos')
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.info')
 def test_run_issues(mock_logger, mock_get_repos, mock_issues):
     GithubBug(
         github_token='123',
@@ -32,7 +47,29 @@ def test_run_issues(mock_logger, mock_get_repos, mock_issues):
 
     mock_get_repos.assert_called_once()
     mock_issues.assert_called_once()
-    mock_logger.info.assert_called()
+    mock_logger.assert_called()
+
+
+@patch('pullbug.github_bug.GithubBug.get_issues', return_value=[])
+@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('logging.Logger.info')
+def test_run_no_issues(mock_logger, mock_get_repos, mock_issues):
+    GithubBug(
+        github_token='123',
+        github_context='users',
+        issues=True,
+    ).run()
+
+    mock_get_repos.assert_called_once()
+    mock_issues.assert_called_once()
+    assert mock_logger.call_count == 3
+
+
+@patch('woodchips.Logger')
+def test_setup_logger(mock_logger):
+    GithubBug().setup_logger()
+
+    mock_logger.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -57,7 +94,7 @@ def test_run_issues(mock_logger, mock_get_repos, mock_issues):
 )
 @patch('pullbug.github_bug.GithubBug.get_issues')
 @patch('pullbug.github_bug.GithubBug.get_repos')
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.critical')
 def test_run_missing_required_cli_params(
     mock_logger,
     mock_get_repos,
@@ -90,38 +127,71 @@ def test_run_missing_required_cli_params(
         ).run()
 
     # throw_missing_error should get called which logs a critical error
-    mock_logger.critical.assert_called_once()
+    mock_logger.assert_called_once()
 
 
 @patch('pullbug.github_bug.Github')
 @patch('pullbug.github_bug.Github.get_repos')
 @patch('pullbug.github_bug.Github.get_user')
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.info')
 def test_get_repos_users(mock_logger, mock_get_user, mock_get_repos, mock_github_instance):
-    GithubBug(
+    github_bug = GithubBug(
         github_context='users',
+        github_owner='justintime50',
+        repos='justintime50',
+    )
+    repos = github_bug.get_repos()
+
+    mock_logger.call_count == 2
+    assert type(repos) == list
+    # TODO: Assert the get_repos and get_user/org gets called
+
+
+@patch('pullbug.github_bug.Github')
+@patch('pullbug.github_bug.Github.get_repos')
+@patch('pullbug.github_bug.Github.get_organization')
+@patch('logging.Logger.info')
+def test_get_repos_orgs(mock_logger, mock_get_org, mock_get_repos, mock_github_instance):
+    github_bug = GithubBug(
+        github_context='orgs',
+        github_owner='justintime50',
+        repos='justintime50',
+    )
+    repos = github_bug.get_repos()
+
+    mock_logger.call_count == 2
+    assert type(repos) == list
+    # TODO: Assert the get_repos and get_user/org gets called
+
+
+@patch('pullbug.github_bug.Github')
+@patch('pullbug.github_bug.Github.get_repos')
+@patch('pullbug.github_bug.Github.get_organization')
+@patch('logging.Logger.info')
+def test_get_repos_bad_context(mock_logger, mock_get_org, mock_get_repos, mock_github_instance):
+    GithubBug(
+        github_context='bad_context',
         github_owner='justintime50',
     ).get_repos()
 
     mock_logger.call_count == 2
-    # TODO: Assert the get_repos and get_user/org gets called
 
 
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.info')
 def test_get_pull_requests(mock_logger):
     pull_requests = GithubBug().get_pull_requests(repos=[])
 
     assert pull_requests == []
-    mock_logger.info.call_count == 2
+    mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
 
-@patch('pullbug.github_bug.LOGGER')
+@patch('logging.Logger.info')
 def test_get_issues(mock_logger):
     issues = GithubBug().get_issues(repos=[])
 
     assert issues == []
-    mock_logger.info.call_count == 2
+    mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
 

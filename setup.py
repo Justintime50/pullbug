@@ -7,6 +7,7 @@ REQUIREMENTS = [
     'PyGithub == 1.*',
     'requests == 2.*',
     'slackclient == 2.*',
+    'woodchips == 0.2.*',
 ]
 
 DEV_REQUIREMENTS = [
@@ -20,7 +21,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='3.0.0',
+    version='3.1.0',
     description='Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -42,5 +43,5 @@ setuptools.setup(
             'pullbug=pullbug.cli:main',
         ],
     },
-    python_requires='>=3.7',
+    python_requires='>=3.7, <4',
 )

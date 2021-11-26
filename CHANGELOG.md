@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v3.1.0 (2021-11-25)
+
+* Use `woodchips` for logging
+* Adds missing `__all__` variable for importing
+* Adds Python type hinting, stronger tests
+* Small bug fixes
+
 ## v3.0.0 (2021-10-06)
 
 ### Breaking Changes

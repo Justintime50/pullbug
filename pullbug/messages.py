@@ -1,10 +1,12 @@
-import logging
 import math
+from typing import List, Tuple
 
+import github
 import requests
 import slack
+import woodchips
 
-LOGGER = logging.getLogger(__name__)
+LOGGER_NAME = 'pullbug'
 
 DESCRIPTION_CONTINUATION = '...'
 DESCRIPTION_MAX_LENGTH = 120
@@ -12,18 +14,21 @@ DESCRIPTION_MAX_LENGTH = 120
 
 class Messages:
     @staticmethod
-    def send_discord_message(messages, discord_url):
+    def send_discord_message(messages: List[str], discord_url: List[str]):
         """Send a Discord message.
 
         Discord has a hard limit of 2000 characters per message,
         as such, we break up the messages into batches, allow for
         breathing room, and send each batch of messages separately.
         """
+        logger = woodchips.get(LOGGER_NAME)
+
         num_of_messages = len(messages)
         max_messages_per_batch = 6
         i = 1
         new_cutoff = max_messages_per_batch
         old_cutoff = 0
+
         while i <= math.ceil(num_of_messages / max_messages_per_batch):
             i += 1
             batch_message = ''.join(messages[old_cutoff:new_cutoff])
@@ -31,47 +36,53 @@ class Messages:
             old_cutoff += max_messages_per_batch
             try:
                 requests.post(discord_url, json={'content': batch_message})
-                LOGGER.info('Discord message sent!')
+                logger.info('Discord message sent!')
             except requests.exceptions.RequestException as discord_error:
-                LOGGER.error(f'Could not send Discord message: {discord_error}')
+                logger.error(f'Could not send Discord message: {discord_error}')
                 raise requests.exceptions.RequestException(discord_error)
 
     @staticmethod
-    def send_rocketchat_message(messages, rocketchat_url):
+    def send_rocketchat_message(messages: List[str], rocketchat_url: str):
         """Send a Rocket Chat message.
 
         We truncate the message at 40,000 characters to match Slack
         and improve performance. RC doesn't specify a char limit.
         """
+        logger = woodchips.get(LOGGER_NAME)
+
         rocketchat_message = ''.join(messages)[:40000]
+
         try:
             requests.post(rocketchat_url, json={'text': rocketchat_message})
-            LOGGER.info('Rocket Chat message sent!')
+            logger.info('Rocket Chat message sent!')
         except requests.exceptions.RequestException as rc_error:
-            LOGGER.error(f'Could not send Rocket Chat message: {rc_error}')
+            logger.error(f'Could not send Rocket Chat message: {rc_error}')
             raise requests.exceptions.RequestException(rc_error)
 
     @staticmethod
-    def send_slack_message(messages, slack_token, slack_channel):
+    def send_slack_message(messages: List[str], slack_token: str, slack_channel: str):
         """Send Slack messages via a bot.
 
         Slack truncates messages after 40,000 characters so
         we truncate there before sending the request.
         """
+        logger = woodchips.get(LOGGER_NAME)
+
         slack_message = ''.join(messages)[:40000]
         slack_client = slack.WebClient(slack_token)
+
         try:
             slack_client.chat_postMessage(
                 channel=slack_channel,
                 text=slack_message,
             )
-            LOGGER.info('Slack message sent!')
+            logger.info('Slack message sent!')
         except slack.errors.SlackApiError as slack_error:
-            LOGGER.error(f'Could not send Slack message: {slack_error}')
+            logger.error(f'Could not send Slack message: {slack_error}')
             raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
     @staticmethod
-    def prepare_pulls_message(pull_request):
+    def prepare_pulls_message(pull_request: github.PullRequest.PullRequest) -> Tuple[str, str]:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
 
@@ -109,7 +120,7 @@ class Messages:
         return message, discord_message
 
     @staticmethod
-    def prepare_issues_message(issue):
+    def prepare_issues_message(issue: github.Issue.Issue) -> Tuple[str, str]:
         """Prepares a GitHub issue message with a single issue's data.
         This will then be appended to an array of messages.
 
