@@ -14,7 +14,7 @@ DESCRIPTION_MAX_LENGTH = 120
 
 class Messages:
     @staticmethod
-    def send_discord_message(messages: List[str], discord_url: List[str]):
+    def send_discord_message(messages: List[str], discord_url: str):
         """Send a Discord message.
 
         Discord has a hard limit of 2000 characters per message,

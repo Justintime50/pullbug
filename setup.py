@@ -15,13 +15,15 @@ DEV_REQUIREMENTS = [
     'coveralls == 3.*',
     'flake8',
     'isort',
+    'mypy',
     'pytest == 6.*',
     'pytest-cov == 2.*',
+    'types-requests',
 ]
 
 setuptools.setup(
     name='pullbug',
-    version='3.1.0',
+    version='3.1.1',
     description='Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,6 +31,7 @@ setuptools.setup(
     author='Justintime50',
     license='MIT',
     packages=setuptools.find_packages(),
+    package_data={'pullbug': ['py.typed']},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

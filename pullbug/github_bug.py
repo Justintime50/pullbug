@@ -2,7 +2,7 @@ import os
 from typing import List, Optional, Tuple
 
 import woodchips
-from github import Github
+from github import Github, Issue, PullRequest, Repository
 
 from pullbug.messages import Messages
 
@@ -26,7 +26,7 @@ class GithubBug:
         rocketchat: Optional[bool] = False,
         rocketchat_url: Optional[str] = None,
         repos: Optional[str] = None,
-        drafts: Optional[str] = False,
+        drafts: Optional[bool] = False,
         location: str = os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
@@ -127,7 +127,7 @@ class GithubBug:
 
         raise ValueError(message)
 
-    def get_repos(self):
+    def get_repos(self) -> List[Repository.Repository]:
         """Get all repos of the github_owner."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -150,7 +150,7 @@ class GithubBug:
 
         return repos
 
-    def get_pull_requests(self, repos: List) -> List:
+    def get_pull_requests(self, repos: List[Repository.Repository]) -> List[PullRequest.PullRequest]:
         """Grab all pull requests from each repo and return a flat list of pull requests."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -171,7 +171,7 @@ class GithubBug:
 
         return flat_pull_requests_list
 
-    def get_issues(self, repos: List) -> List:
+    def get_issues(self, repos: List[Repository.Repository]) -> List[Issue.Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -192,7 +192,7 @@ class GithubBug:
 
         return flat_issues_list
 
-    def iterate_pull_requests(self, pull_requests: List) -> Tuple[List, List]:
+    def iterate_pull_requests(self, pull_requests: List[PullRequest.PullRequest]) -> Tuple[List[str], List[str]]:
         """Iterate through each pull request of a repo and build the message array."""
         message_array = []
         discord_message_array = []
@@ -209,7 +209,7 @@ class GithubBug:
         return message_array, discord_message_array
 
     @staticmethod
-    def iterate_issues(issues: List) -> Tuple[List[str], List[str]]:
+    def iterate_issues(issues: List[Issue.Issue]) -> Tuple[List[str], List[str]]:
         """Iterate through each issue of a repo and build the message array."""
         message_array = []
         discord_message_array = []
