@@ -5,6 +5,7 @@ import github
 import requests
 import slack
 import woodchips
+from github.Issue import Issue
 
 LOGGER_NAME = 'pullbug'
 
@@ -120,7 +121,7 @@ class Messages:
         return message, discord_message
 
     @staticmethod
-    def prepare_issues_message(issue: github.Issue.Issue) -> Tuple[str, str]:
+    def prepare_issues_message(issue: Issue) -> Tuple[str, str]:
         """Prepares a GitHub issue message with a single issue's data.
         This will then be appended to an array of messages.
 

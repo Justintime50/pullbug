@@ -1,10 +1,25 @@
 import os
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 import woodchips
-from github import Github, Issue, PullRequest, Repository
+from github import Github
+from github.Issue import Issue
+from github.PaginatedList import PaginatedList
+from github.PullRequest import PullRequest
+from github.Repository import Repository
+from typing_extensions import Literal
 
 from pullbug.messages import Messages
+
+GITHUB_STATE_CHOICES = Literal[
+    'all',
+    'closed',
+    'open',
+]
+GITHUB_CONTEXT_CHOICES = Literal[
+    'users',
+    'orgs',
+]
 
 LOGGER_NAME = 'pullbug'
 
@@ -12,12 +27,12 @@ LOGGER_NAME = 'pullbug'
 class GithubBug:
     def __init__(
         self,
+        github_owner: str,
+        github_token: Optional[str] = None,
+        github_state: GITHUB_STATE_CHOICES = 'open',
+        github_context: GITHUB_CONTEXT_CHOICES = 'users',
         pulls: Optional[bool] = False,
         issues: Optional[bool] = False,
-        github_token: Optional[str] = None,
-        github_owner: Optional[str] = None,
-        github_state: Optional[str] = 'open',
-        github_context: Optional[str] = None,
         discord: Optional[bool] = False,
         discord_url: Optional[str] = None,
         slack: Optional[bool] = False,
@@ -30,12 +45,12 @@ class GithubBug:
         location: str = os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
-        self.pulls = pulls
-        self.issues = issues
-        self.github_token = github_token
         self.github_owner = github_owner
+        self.github_token = github_token
         self.github_state = github_state
         self.github_context = github_context
+        self.pulls = pulls
+        self.issues = issues
         self.discord = discord
         self.discord_url = discord_url
         self.slack = slack
@@ -43,7 +58,7 @@ class GithubBug:
         self.slack_channel = slack_channel
         self.rocketchat = rocketchat
         self.rocketchat_url = rocketchat_url
-        self.repos = repos.lower().split(',') if repos else ''
+        self.repos = [repo.strip() for repo in repos.lower().split(',')] if repos else ''
         self.drafts = drafts
         self.location = location
 
@@ -105,10 +120,6 @@ class GithubBug:
         """Check that values are set based on configuration before proceeding."""
         if not self.pulls and not self.issues:
             self.throw_missing_error('pulls/issues')
-        if not self.github_token:
-            self.throw_missing_error('github_token')
-        if not self.github_context:
-            self.throw_missing_error('github_context')
         if self.discord and not self.discord_url:
             self.throw_missing_error('discord_url')
         if self.slack and not self.slack_token:
@@ -127,30 +138,29 @@ class GithubBug:
 
         raise ValueError(message)
 
-    def get_repos(self) -> List[Repository.Repository]:
-        """Get all repos of the github_owner."""
+    def get_repos(self) -> Union[PaginatedList, List[Repository]]:
+        """Get all repos of the `github_owner`."""
         logger = woodchips.get(LOGGER_NAME)
 
         logger.info('Bugging GitHub for repos...')
+
+        repos: Any  # Fixes `mypy` type checking, repos are either a Python list or a GitHub PaginatedList
 
         if self.github_context == 'orgs':
             repos = self.github_instance.get_organization(self.github_owner).get_repos()
         elif self.github_context == 'users':
             repos = self.github_instance.get_user(self.github_owner).get_repos()
-        else:
-            # Can't determine github_context
-            repos = []
-            pass
 
+        # If the user specified a list of repos, let's filter them here
         if self.repos:
-            formatted_repos_list = [repo.strip() for repo in self.repos]
-            repos = [repo for repo in repos if repo.name.lower() in formatted_repos_list]
+            filtered_repos = filter(lambda repo: repo.name.lower() in self.repos, repos)
+            repos = list(filtered_repos)
 
         logger.info('GitHub repos retrieved!')
 
         return repos
 
-    def get_pull_requests(self, repos: List[Repository.Repository]) -> List[PullRequest.PullRequest]:
+    def get_pull_requests(self, repos: Union[PaginatedList, List[Repository]]) -> List[PullRequest]:
         """Grab all pull requests from each repo and return a flat list of pull requests."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -165,13 +175,15 @@ class GithubBug:
                 # Repo has no pull requests
                 continue
 
-        flat_pull_requests_list = [pull_request for pull_request in pull_requests for pull_request in pull_request]
+        flat_pull_requests_list: List = [
+            pull_request for pull_request in pull_requests for pull_request in pull_request
+        ]
 
         logger.info('Pull requests retrieved!')
 
         return flat_pull_requests_list
 
-    def get_issues(self, repos: List[Repository.Repository]) -> List[Issue.Issue]:
+    def get_issues(self, repos: Union[PaginatedList, List[Repository]]) -> List[Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -186,13 +198,13 @@ class GithubBug:
                 # Repo has no issues
                 continue
 
-        flat_issues_list = [issue for issue in issues for issue in issue]
+        flat_issues_list = [type(issue) for issue in issues for issue in issue]
 
         logger.info('Issues retrieved!')
 
         return flat_issues_list
 
-    def iterate_pull_requests(self, pull_requests: List[PullRequest.PullRequest]) -> Tuple[List[str], List[str]]:
+    def iterate_pull_requests(self, pull_requests: PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each pull request of a repo and build the message array."""
         message_array = []
         discord_message_array = []
@@ -209,13 +221,13 @@ class GithubBug:
         return message_array, discord_message_array
 
     @staticmethod
-    def iterate_issues(issues: List[Issue.Issue]) -> Tuple[List[str], List[str]]:
+    def iterate_issues(issues: PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each issue of a repo and build the message array."""
         message_array = []
         discord_message_array = []
 
-        for issues in issues:
-            message, discord_message = Messages.prepare_issues_message(issues)
+        for issue in issues:
+            message, discord_message = Messages.prepare_issues_message(issue)
             message_array.append(message)
             discord_message_array.append(discord_message)
 

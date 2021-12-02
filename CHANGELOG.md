@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.1.1 (2021-12-01)
+
+* `github_owner` is now required, was previously optional by mistake
+* Fixes a bug where iterating over issues may have not worked due to a syntax error
+* Adds `mypy` type checking
+
 ## v3.1.0 (2021-11-25)
 
 * Use `woodchips` for logging

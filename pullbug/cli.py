@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from pullbug.github_bug import GithubBug
+from pullbug.github_bug import GITHUB_CONTEXT_CHOICES, GITHUB_STATE_CHOICES, GithubBug
 
 
 class PullBugCli:
@@ -47,16 +47,16 @@ class PullBugCli:
             required=False,
             type=str,
             default='open',
-            choices=['open', 'closed', 'all'],
+            # choices=list(GITHUB_STATE_CHOICES),
             help='The GitHub state to retrieve pull requests or issues for.',
         )
         parser.add_argument(
             '-gc',
             '--github_context',
-            required=True,
+            required=False,
             type=str,
-            default=None,
-            choices=['orgs', 'users'],
+            default='users',
+            # choices=list(GITHUB_CONTEXT_CHOICES),
             help='The GitHub context to retrieve pull requests or issues for.',
         )
         parser.add_argument(
@@ -143,12 +143,12 @@ class PullBugCli:
 
     def run(self):
         github_bug = GithubBug(
-            self.pulls,
-            self.issues,
-            self.github_token,
             self.github_owner,
+            self.github_token,
             self.github_state,
             self.github_context,
+            self.pulls,
+            self.issues,
             self.discord,
             self.discord_url,
             self.slack,

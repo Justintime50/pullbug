@@ -19,6 +19,7 @@ DEV_REQUIREMENTS = [
     'pytest == 6.*',
     'pytest-cov == 2.*',
     'types-requests',
+    'typing_extensions',  # TODO: Remove once we drop support for Python 3.7
 ]
 
 setuptools.setup(
