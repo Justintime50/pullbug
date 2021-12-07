@@ -1,12 +1,8 @@
 import os
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Tuple
 
 import woodchips
-from github import Github
-from github.Issue import Issue
-from github.PaginatedList import PaginatedList
-from github.PullRequest import PullRequest
-from github.Repository import Repository
+from github import Github, Issue, PaginatedList, PullRequest
 from typing_extensions import Literal
 
 from pullbug.messages import Messages
@@ -28,20 +24,20 @@ class GithubBug:
     def __init__(
         self,
         github_owner: str,
-        github_token: Optional[str] = None,
+        github_token: str = '',
         github_state: GITHUB_STATE_CHOICES = 'open',
         github_context: GITHUB_CONTEXT_CHOICES = 'users',
-        pulls: Optional[bool] = False,
-        issues: Optional[bool] = False,
-        discord: Optional[bool] = False,
-        discord_url: Optional[str] = None,
-        slack: Optional[bool] = False,
-        slack_token: Optional[str] = None,
-        slack_channel: Optional[str] = None,
-        rocketchat: Optional[bool] = False,
-        rocketchat_url: Optional[str] = None,
-        repos: Optional[str] = None,
-        drafts: Optional[bool] = False,
+        pulls: bool = False,
+        issues: bool = False,
+        discord: bool = False,
+        discord_url: str = '',
+        slack: bool = False,
+        slack_token: str = '',
+        slack_channel: str = '',
+        rocketchat: bool = False,
+        rocketchat_url: str = '',
+        repos: str = '',
+        drafts: bool = False,
         location: str = os.path.expanduser('~/pullbug'),
     ):
         # Parameter variables
@@ -138,7 +134,7 @@ class GithubBug:
 
         raise ValueError(message)
 
-    def get_repos(self) -> Union[PaginatedList, List[Repository]]:
+    def get_repos(self) -> PaginatedList.PaginatedList:
         """Get all repos of the `github_owner`."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -160,7 +156,7 @@ class GithubBug:
 
         return repos
 
-    def get_pull_requests(self, repos: Union[PaginatedList, List[Repository]]) -> List[PullRequest]:
+    def get_pull_requests(self, repos: PaginatedList.PaginatedList) -> List[PullRequest.PullRequest]:
         """Grab all pull requests from each repo and return a flat list of pull requests."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -183,7 +179,7 @@ class GithubBug:
 
         return flat_pull_requests_list
 
-    def get_issues(self, repos: Union[PaginatedList, List[Repository]]) -> List[Issue]:
+    def get_issues(self, repos: PaginatedList.PaginatedList) -> List[Issue.Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
         logger = woodchips.get(LOGGER_NAME)
 
@@ -198,13 +194,13 @@ class GithubBug:
                 # Repo has no issues
                 continue
 
-        flat_issues_list = [type(issue) for issue in issues for issue in issue]
+        flat_issues_list = [issue for issue in issues for issue in issue]
 
         logger.info('Issues retrieved!')
 
         return flat_issues_list
 
-    def iterate_pull_requests(self, pull_requests: PaginatedList) -> Tuple[List[str], List[str]]:
+    def iterate_pull_requests(self, pull_requests: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each pull request of a repo and build the message array."""
         message_array = []
         discord_message_array = []
@@ -221,7 +217,7 @@ class GithubBug:
         return message_array, discord_message_array
 
     @staticmethod
-    def iterate_issues(issues: PaginatedList) -> Tuple[List[str], List[str]]:
+    def iterate_issues(issues: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each issue of a repo and build the message array."""
         message_array = []
         discord_message_array = []

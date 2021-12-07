@@ -1,5 +1,6 @@
 import argparse
 import os
+from typing import get_args
 
 from pullbug.github_bug import GITHUB_CONTEXT_CHOICES, GITHUB_STATE_CHOICES, GithubBug
 
@@ -30,7 +31,7 @@ class PullBugCli:
             '--github_token',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='The token to authenticate with GitHub.',
         )
         parser.add_argument(
@@ -38,7 +39,7 @@ class PullBugCli:
             '--github_owner',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='The GitHub owner to retrieve pull requests or issues for (can be a user or organization).',
         )
         parser.add_argument(
@@ -47,7 +48,7 @@ class PullBugCli:
             required=False,
             type=str,
             default='open',
-            # choices=list(GITHUB_STATE_CHOICES),
+            choices=set(get_args(GITHUB_STATE_CHOICES)),
             help='The GitHub state to retrieve pull requests or issues for.',
         )
         parser.add_argument(
@@ -56,7 +57,7 @@ class PullBugCli:
             required=False,
             type=str,
             default='users',
-            # choices=list(GITHUB_CONTEXT_CHOICES),
+            choices=set(get_args(GITHUB_CONTEXT_CHOICES)),
             help='The GitHub context to retrieve pull requests or issues for.',
         )
         parser.add_argument(
@@ -72,7 +73,7 @@ class PullBugCli:
             '--discord_url',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='The Discord webhook URL to send messages to.',
         )
         parser.add_argument(
@@ -88,7 +89,7 @@ class PullBugCli:
             '--slack_token',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='The Slackbot token to authenticate with Slack.',
         )
         parser.add_argument(
@@ -96,7 +97,7 @@ class PullBugCli:
             '--slack_channel',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='The Slack channel to send messages to.',
         )
         parser.add_argument(
@@ -112,7 +113,7 @@ class PullBugCli:
             '--rocketchat_url',
             required=False,
             type=str,
-            default=False,
+            default='',
             help='The Rocket.Chat URL to send messages to.',
         )
         parser.add_argument(
@@ -120,7 +121,7 @@ class PullBugCli:
             '--repos',
             required=False,
             type=str,
-            default=None,
+            default='',
             help='A comma-separated list of repos to run Pullbug against.',
         )
         parser.add_argument(
