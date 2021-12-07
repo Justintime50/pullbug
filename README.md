@@ -45,7 +45,7 @@ Options:
                             The token to authenticate with GitHub.
     -go GITHUB_OWNER, --github_owner GITHUB_OWNER
                             The GitHub owner to retrieve pull requests or issues for (can be a user or organization).
-    -gs {open,closed,all}, --github_state {open,closed,all}
+    -gs {closed,all,open}, --github_state {closed,all,open}
                             The GitHub state to retrieve pull requests or issues for.
     -gc {orgs,users}, --github_context {orgs,users}
                             The GitHub context to retrieve pull requests or issues for.

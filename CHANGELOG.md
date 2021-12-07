@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v3.2.0 (2021-12-07)
+
+* `github_owner` is now required, was previously optional by mistake
+* `github_context` now has a default of `users` restoring previously changed default behavior
+* Fixes a bug where iterating over issues may have not worked due to a syntax error
+* Adds `mypy` type checking
+    * Fixes some typing errors around default values when no parameter is passed (changes strings from `None` to an empty string to better represent the type across the whole app.)
+
 ## v3.1.0 (2021-11-25)
 
 * Use `woodchips` for logging
