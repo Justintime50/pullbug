@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.2.1 (2022-01-26)
+
+* Moved `typed_extensions` to the list of requirements from dev requirements since we import the package in code, fixes `module not found` error
+
 ## v3.2.0 (2021-12-07)
 
 * `github_owner` is now required, was previously optional by mistake

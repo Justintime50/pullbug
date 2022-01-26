@@ -7,6 +7,7 @@ REQUIREMENTS = [
     'PyGithub == 1.*',
     'requests == 2.*',
     'slackclient == 2.*',
+    'typing_extensions',  # TODO: Remove once we drop support for Python 3.7
     'woodchips == 0.2.*',
 ]
 
@@ -19,12 +20,11 @@ DEV_REQUIREMENTS = [
     'pytest == 6.*',
     'pytest-cov == 2.*',
     'types-requests',
-    'typing_extensions',  # TODO: Remove once we drop support for Python 3.7
 ]
 
 setuptools.setup(
     name='pullbug',
-    version='3.2.0',
+    version='3.2.1',
     description='Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",
