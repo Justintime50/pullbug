@@ -2,7 +2,12 @@ import argparse
 import os
 from typing import get_args
 
-from pullbug.github_bug import GITHUB_CONTEXT_CHOICES, GITHUB_STATE_CHOICES, GithubBug
+from pullbug.github_bug import (
+    DEFAULT_BASE_URL,
+    GITHUB_CONTEXT_CHOICES,
+    GITHUB_STATE_CHOICES,
+    GithubBug,
+)
 
 
 class PullBugCli:
@@ -140,6 +145,13 @@ class PullBugCli:
             default=os.path.expanduser('~/pullbug'),
             help='The location of the Pullbug logs and files.',
         )
+        parser.add_argument(
+            '--base_url',
+            required=False,
+            type=str,
+            default=DEFAULT_BASE_URL,
+            help='The base URL of your GitHub instance (useful for enterprise users with custom hostnames).',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
@@ -160,6 +172,7 @@ class PullBugCli:
             self.repos,
             self.drafts,
             self.location,
+            self.base_url,
         )
         github_bug.run()
 

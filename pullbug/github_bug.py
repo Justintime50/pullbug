@@ -17,6 +17,8 @@ GITHUB_CONTEXT_CHOICES = Literal[
     'orgs',
 ]
 
+DEFAULT_BASE_URL = 'https://api.github.com'
+
 LOGGER_NAME = 'pullbug'
 
 
@@ -39,6 +41,7 @@ class GithubBug:
         repos: str = '',
         drafts: bool = False,
         location: str = os.path.expanduser('~/pullbug'),
+        base_url: str = DEFAULT_BASE_URL,
     ):
         # Parameter variables
         self.github_owner = github_owner
@@ -57,10 +60,10 @@ class GithubBug:
         self.repos = [repo.strip() for repo in repos.lower().split(',')] if repos else ''
         self.drafts = drafts
         self.location = location
+        self.base_url = base_url
 
         # Internal variables
-        # TODO: We could eventually allow non-authenticated access
-        self.github_instance = Github(self.github_token) if self.github_token else Github()
+        self.github_instance = Github(login_or_token=self.github_token, base_url=self.base_url)
 
     def run(self):
         """Run the logic to get PR's from GitHub and send that data via message."""

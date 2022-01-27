@@ -65,6 +65,7 @@ Options:
     -dr, --drafts         Include draft pull requests.
     -l LOCATION, --location LOCATION
                             The location of the Pullbug logs and files.
+    --base_url BASE_URL   The base URL of your GitHub instance (useful for enterprise users with custom hostnames).
 ```
 
 ## Development

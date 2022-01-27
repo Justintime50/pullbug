@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+* Added `base_url` paremeter to specify an enterprise GitHub instance if necessary
+* Reworked the `github_token` logic to allow for better unauthenticated usage when no GitHub token is passed
+
 ## v3.2.1 (2022-01-26)
 
 * Moved `typed_extensions` to the list of requirements from dev requirements since we import the package in code, fixes `module not found` error
