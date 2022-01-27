@@ -206,7 +206,7 @@ def test_iterate_issues():
     # TODO: Assert the message building functions get called
 
 
-@patch('pullbug.github_bug.Messages.send_discord_message')
+@patch('pullbug.github_bug.Message.send_discord_message')
 def test_send_messages_discord(mock_send_discord_message, mock_url):
     messages = discord_messages = []
 
@@ -219,7 +219,7 @@ def test_send_messages_discord(mock_send_discord_message, mock_url):
     mock_send_discord_message.assert_called_once_with(messages, mock_url)
 
 
-@patch('pullbug.github_bug.Messages.send_slack_message')
+@patch('pullbug.github_bug.Message.send_slack_message')
 def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
     messages = discord_messages = []
 
@@ -233,7 +233,7 @@ def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
     mock_send_slack_message.assert_called_once_with(messages, mock_token, mock_channel)
 
 
-@patch('pullbug.github_bug.Messages.send_rocketchat_message')
+@patch('pullbug.github_bug.Message.send_rocketchat_message')
 def test_send_messages_rocketchat(mock_send_rocketchat_message, mock_url):
     messages = discord_messages = []
 

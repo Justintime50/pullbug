@@ -43,10 +43,6 @@ def mock_pull_request(mock_user, mock_repo):
     mock_pull_request = MagicMock()
     mock_pull_request.title = 'mock-pull-request'
     mock_pull_request.description = 'Mock description'
-    assignee = MagicMock()
-    assignee.login = mock_user
-    assignee.html_url = f'https://github.com/{mock_user}'
-    mock_pull_request.assignees = [assignee]
     mock_pull_request.body = 'Mock body of a pull request.'
     mock_pull_request.html_url = f'https://github.com/{mock_user}/{mock_repo}/pull/1'
     mock_pull_request.base.repo.name = 'mock-repo'
