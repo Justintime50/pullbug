@@ -26,7 +26,7 @@ class GithubBug:
     def __init__(
         self,
         github_owner: str,
-        github_token: str = '',
+        github_token: str = None,
         github_state: GITHUB_STATE_CHOICES = 'open',
         github_context: GITHUB_CONTEXT_CHOICES = 'users',
         pulls: bool = False,

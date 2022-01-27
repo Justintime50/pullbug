@@ -36,7 +36,7 @@ class PullBugCli:
             '--github_token',
             required=False,
             type=str,
-            default='',
+            default=None,
             help='The token to authenticate with GitHub.',
         )
         parser.add_argument(

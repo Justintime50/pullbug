@@ -81,8 +81,8 @@ def test_setup_logger(mock_logger):
 @pytest.mark.parametrize(
     'pulls, issues, github_token, discord, discord_url, slack, slack_token, slack_channel, rocketchat, rocketchat_url',
     [
-        # no pulls
-        (False, False, False, False, False, False, False, False, False, False),
+        # no pulls (side-effect of testing no github_token)
+        (False, False, None, False, False, False, False, False, False, False),
         # discord but no url
         (True, False, '123', True, False, False, False, False, False, False),
         # slack but no token
