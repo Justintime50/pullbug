@@ -72,19 +72,18 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
     reviewer = MagicMock()
     reviewer.login = mock_user
     reviewer.html_url = f'https://github.com/{mock_user}'
-    reviewers = [reviewer]
+    reviewers = [(reviewer, None)]
 
     result, discord_result = Message.prepare_pulls_message(mock_pull_request, reviewers)
 
     # Message
     assert 'Pull Request' in result
-    assert '' == result
-    assert f'{reviewers[0].html_url}|{reviewers[0].login}' in result
+    assert f'{reviewer.html_url}|{reviewer.login}' in result
     assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in result
 
     # Discord message
     assert 'Pull Request' in discord_result
-    assert f'{reviewers[0].login} (<{reviewers[0].html_url}>)' in discord_result
+    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_result
     assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_result
 
 
