@@ -5,7 +5,7 @@ import woodchips
 from github import Github, Issue, PaginatedList, PullRequest
 from typing_extensions import Literal
 
-from pullbug.messages import Messages
+from pullbug.messages import Message
 
 GITHUB_STATE_CHOICES = Literal[
     'all',
@@ -77,9 +77,8 @@ class GithubBug:
         if self.pulls:
             pull_requests = self.get_pull_requests(repos)
             if pull_requests == []:
-                message = 'No pull requests are available from GitHub.'
-                logger.info(message)
-                # TODO: Do we want to send this message here?
+                messages = discord_messages = ['No pull requests are available from GitHub.']
+                logger.info(messages[0])
             else:
                 message_preamble = (
                     '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
@@ -93,9 +92,8 @@ class GithubBug:
         if self.issues:
             issues = self.get_issues(repos)
             if issues == []:
-                message = 'No issues are available from GitHub.'
-                logger.info(message)
-                # TODO: Do we want to send this message here?
+                messages = discord_messages = ['No issues are available from GitHub.']
+                logger.info(messages[0])
             else:
                 message_preamble = '\n:bug: *The following issues on GitHub are still open and need your help!*\n'
                 messages, discord_messages = self.iterate_issues(issues)
@@ -213,7 +211,11 @@ class GithubBug:
                 # Exclude drafts if the user doesn't want them included
                 continue
             else:
-                message, discord_message = Messages.prepare_pulls_message(pull_request)
+                # NOTE: if a user has "requested changes", they will no longer be
+                # returned as a user whose review was requested
+                pull_request_reviewers = pull_request.get_review_requests()
+
+                message, discord_message = Message.prepare_pulls_message(pull_request, pull_request_reviewers)
                 message_array.append(message)
                 discord_message_array.append(discord_message)
 
@@ -226,7 +228,7 @@ class GithubBug:
         discord_message_array = []
 
         for issue in issues:
-            message, discord_message = Messages.prepare_issues_message(issue)
+            message, discord_message = Message.prepare_issues_message(issue)
             message_array.append(message)
             discord_message_array.append(discord_message)
 
@@ -237,10 +239,10 @@ class GithubBug:
         logger = woodchips.get(LOGGER_NAME)
 
         if self.discord:
-            Messages.send_discord_message(discord_messages, self.discord_url)
+            Message.send_discord_message(discord_messages, self.discord_url)
         if self.slack:
-            Messages.send_slack_message(messages, self.slack_token, self.slack_channel)
+            Message.send_slack_message(messages, self.slack_token, self.slack_channel)
         if self.rocketchat:
-            Messages.send_rocketchat_message(messages, self.rocketchat_url)
+            Message.send_rocketchat_message(messages, self.rocketchat_url)
 
         logger.info(messages)

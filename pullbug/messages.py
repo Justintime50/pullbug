@@ -1,19 +1,20 @@
 import math
 from typing import List, Tuple
 
-import github
 import requests
 import slack
 import woodchips
+from github import PaginatedList, PullRequest
 from github.Issue import Issue
 
 LOGGER_NAME = 'pullbug'
 
 DESCRIPTION_CONTINUATION = '...'
 DESCRIPTION_MAX_LENGTH = 120
+MESSAGE_LENGTH = 40000
 
 
-class Messages:
+class Message:
     @staticmethod
     def send_discord_message(messages: List[str], discord_url: str):
         """Send a Discord message.
@@ -51,7 +52,7 @@ class Messages:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        rocketchat_message = ''.join(messages)[:40000]
+        rocketchat_message = ''.join(messages)[:MESSAGE_LENGTH]
 
         try:
             requests.post(rocketchat_url, json={'text': rocketchat_message})
@@ -69,7 +70,7 @@ class Messages:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        slack_message = ''.join(messages)[:40000]
+        slack_message = ''.join(messages)[:MESSAGE_LENGTH]
         slack_client = slack.WebClient(slack_token)
 
         try:
@@ -83,20 +84,26 @@ class Messages:
             raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
     @staticmethod
-    def prepare_pulls_message(pull_request: github.PullRequest.PullRequest) -> Tuple[str, str]:
+    def prepare_pulls_message(
+        pull_request: PullRequest.PullRequest, reviewers: PaginatedList.PaginatedList
+    ) -> Tuple[str, str]:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
 
         Slack & RocketChat can use the same format while Discord requires
         some tweaking.
         """
-        # TODO: Check requested_reviewers array also
-        if pull_request.assignees:
+        if reviewers:
             users = discord_users = ''
-            for assignee in pull_request.assignees:
-                user = f"<{assignee.html_url}|{assignee.login}>"
+            for reviewer in reviewers:
+                # TODO: Investigate why IndexErrors occur here
+                try:
+                    reviewer_record = reviewer[0]
+                except IndexError:
+                    continue
+                user = f"<{reviewer_record.html_url}|{reviewer_record.login}>"
                 users += user + ' '
-                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
+                discord_user = f"{reviewer_record.login} (<{reviewer_record.html_url}>)"
                 discord_users += discord_user + ' '
         else:
             users = discord_users = 'NA'
@@ -110,12 +117,16 @@ class Messages:
         message = (
             f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
             f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
-            f"\n*Description:* {description}\n*Waiting on:* {users}\n"
+            f"\n*Author:* <{pull_request.user.html_url}|{pull_request.user.login}>"
+            f"\n*Description:* {description}"
+            f"\n*Reviews Requested From:* {users}"
         )
         discord_message = (
             f"\n:arrow_heading_up: **Pull Request:** {pull_request.title} (<{pull_request.html_url}>)"
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
-            f"\n**Description:** {description}\n**Waiting on:** {discord_users}\n"
+            f"\n**Author:** {pull_request.user.html_url} (<{pull_request.user.login}>)"
+            f"\n**Description:** {description}"
+            f"\n**Reviews Requested From:** {discord_users}"
         )
 
         return message, discord_message
