@@ -1,14 +1,13 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v4.0.0 (2022-01-30)
 
-* Removed support to send messages to `Rocket.Chat`
 * Added the `author` to the messages
 * Switched from `assignees` to `requested reviewers` for the `waiting on` portion of the message
 * Added `base_url` paremeter to specify an enterprise GitHub instance if necessary
 * Reworked the `github_token` logic to allow for better unauthenticated usage when no GitHub token is passed
-* Corrects the `Messages` class name to the singular `Message`
-* Renamed all occurances of `GithubBug` to `Pullbug` as Gitlab was removed previously and the distinction between platforms was no longer needed. Also renamed the `github_bug` module to `bug` and made various functions used only for the tool private
+* Removed support to send messages to `Rocket.Chat`
+* Renamed all occurances of `GithubBug` to `Pullbug` as Gitlab was removed previously and the distinction between platforms was no longer needed. Also renamed the `github_bug` module to `bug` and made various functions used only for the tool private. Also corrects the `Messages` class name to the singular `Message`
 
 ## v3.2.1 (2022-01-26)
 
