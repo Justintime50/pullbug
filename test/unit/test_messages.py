@@ -54,7 +54,7 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
     reviewer = MagicMock()
     reviewer.login = mock_user
     reviewer.html_url = f'https://github.com/{mock_user}'
-    reviewers = [(reviewer, None)]
+    reviewers = [reviewer]
 
     result, discord_result = Message.prepare_pulls_message(mock_pull_request, reviewers)
 

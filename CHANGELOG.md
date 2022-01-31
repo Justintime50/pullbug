@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.0.1 (2022-01-31)
+
+* Fix the index error on retrieving requested reviewers
+
 ## v4.0.0 (2022-01-30)
 
 * Added the `author` to the messages

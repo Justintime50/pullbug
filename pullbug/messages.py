@@ -75,17 +75,14 @@ class Message:
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if reviewers:
-            slack_users = discord_users = []
+            slack_users = []
+            discord_users = []
             for reviewer in reviewers:
-                try:
-                    reviewer_record = reviewer[0]
-                except IndexError:
-                    # TODO: Investigate why IndexErrors occur here, they shouldn't but do
-                    continue
-                slack_users.append(f"<{reviewer_record.html_url}|{reviewer_record.login}>")
-                discord_users.append(f"{reviewer_record.login} (<{reviewer_record.html_url}>)")
+                slack_users.append(f"<{reviewer.html_url}|{reviewer.login}>")
+                discord_users.append(f"{reviewer.login} (<{reviewer.html_url}>)")
         else:
-            slack_users = discord_users = ['NA']
+            slack_users = ['NA']
+            discord_users = ['NA']
 
         pull_request_body = pull_request.body if pull_request.body else ''
         description = (
@@ -120,12 +117,14 @@ class Message:
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if issue.assignees:
-            slack_users = discord_users = []
+            slack_users = []
+            discord_users = []
             for assignee in issue.assignees:
                 slack_users.append(f"<{assignee.html_url}|{assignee.login}>")
                 discord_users.append(f"{assignee.login} (<{assignee.html_url}>)")
         else:
-            slack_users = discord_users = ['NA']
+            slack_users = ['NA']
+            discord_users = ['NA']
 
         issue_body = issue.body if issue.body else ''
         description = (

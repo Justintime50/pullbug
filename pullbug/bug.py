@@ -205,11 +205,11 @@ class Pullbug:
                 # Exclude drafts if the user doesn't want them included
                 continue
             else:
-                # NOTE: if a user has "requested changes", they will no longer be
-                # returned as a user whose review was requested
-                pull_request_reviewers = pull_request.get_review_requests()
+                # Only reviewers requested who haven't approved or requested changes will be returned here
+                reviewer_lists = pull_request.get_review_requests()
+                reviewers_requested = reviewer_lists[0]  # index 0 is the list of users, index 1 is a list of teams
 
-                message, discord_message = Message.prepare_pulls_message(pull_request, pull_request_reviewers)
+                message, discord_message = Message.prepare_pulls_message(pull_request, reviewers_requested)
                 slack_message_array.append(message)
                 discord_message_array.append(discord_message)
 
