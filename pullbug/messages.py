@@ -75,19 +75,17 @@ class Message:
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if reviewers:
-            users = discord_users = ''
+            slack_users = discord_users = []
             for reviewer in reviewers:
                 try:
                     reviewer_record = reviewer[0]
                 except IndexError:
                     # TODO: Investigate why IndexErrors occur here, they shouldn't but do
                     continue
-                user = f"<{reviewer_record.html_url}|{reviewer_record.login}>"
-                users += user + ' '
-                discord_user = f"{reviewer_record.login} (<{reviewer_record.html_url}>)"
-                discord_users += discord_user + ' '
+                slack_users.append(f"<{reviewer_record.html_url}|{reviewer_record.login}>")
+                discord_users.append(f"{reviewer_record.login} (<{reviewer_record.html_url}>)")
         else:
-            users = discord_users = 'NA'
+            slack_users = discord_users = ['NA']
 
         pull_request_body = pull_request.body if pull_request.body else ''
         description = (
@@ -101,7 +99,7 @@ class Message:
             f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
             f"\n*Author:* <{pull_request.user.html_url}|{pull_request.user.login}>"
             f"\n*Description:* {description}"
-            f"\n*Reviews Requested From:* {users}"
+            f"\n*Reviews Requested From:* {', '.join(slack_users)}\n"
         )
 
         discord_message = (
@@ -109,7 +107,7 @@ class Message:
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Author:** {pull_request.user.html_url} (<{pull_request.user.login}>)"
             f"\n**Description:** {description}"
-            f"\n**Reviews Requested From:** {discord_users}"
+            f"\n**Reviews Requested From:** {', '.join(discord_users)}\n"
         )
 
         return slack_message, discord_message
@@ -122,14 +120,12 @@ class Message:
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if issue.assignees:
-            users = discord_users = ''
+            slack_users = discord_users = []
             for assignee in issue.assignees:
-                user = f"<{assignee.html_url}|{assignee.login}>"
-                users += user + ' '
-                discord_user = f"{assignee.login} (<{assignee.html_url}>)"
-                discord_users += discord_user + ' '
+                slack_users.append(f"<{assignee.html_url}|{assignee.login}>")
+                discord_users.append(f"{assignee.login} (<{assignee.html_url}>)")
         else:
-            users = discord_users = 'NA'
+            slack_users = discord_users = ['NA']
 
         issue_body = issue.body if issue.body else ''
         description = (
@@ -142,14 +138,14 @@ class Message:
             f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
             f"\n*Repo:* <{issue.repository.html_url}|{issue.repository.name}>"
             f"\n*Description:* {description}"
-            f"\n*Assigned to:* {users}\n"
+            f"\n*Assigned to:* {', '.join(slack_users)}\n"
         )
 
         discord_message = (
             f"\n:exclamation: **Issue:** {issue.title} (<{issue.html_url}>)"
             f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
             f"\n**Description:** {description}"
-            f"\n**Assigned to:** {discord_users}\n"
+            f"\n**Assigned to:** {', '.join(discord_users)}\n"
         )
 
         return slack_message, discord_message
