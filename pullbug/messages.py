@@ -77,10 +77,10 @@ class Message:
         if reviewers:
             users = discord_users = ''
             for reviewer in reviewers:
-                # TODO: Investigate why IndexErrors occur here
                 try:
                     reviewer_record = reviewer[0]
                 except IndexError:
+                    # TODO: Investigate why IndexErrors occur here, they shouldn't but do
                     continue
                 user = f"<{reviewer_record.html_url}|{reviewer_record.login}>"
                 users += user + ' '

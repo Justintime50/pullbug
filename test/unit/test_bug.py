@@ -2,14 +2,14 @@ from unittest.mock import patch
 
 import pytest
 
-from pullbug.github_bug import GithubBug
+from pullbug.bug import Pullbug
 
 
-@patch('pullbug.github_bug.GithubBug.get_pull_requests')
-@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('pullbug.bug.Pullbug.get_pull_requests')
+@patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
 def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         github_token='123',
         github_context='users',
@@ -21,11 +21,11 @@ def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
     mock_logger.assert_called()
 
 
-@patch('pullbug.github_bug.GithubBug.get_pull_requests', return_value=[])
-@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('pullbug.bug.Pullbug.get_pull_requests', return_value=[])
+@patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
 def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         github_token='123',
         github_context='users',
@@ -37,11 +37,11 @@ def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
     assert mock_logger.call_count == 3
 
 
-@patch('pullbug.github_bug.GithubBug.get_issues')
-@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('pullbug.bug.Pullbug.get_issues')
+@patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
 def test_run_issues(mock_logger, mock_get_repos, mock_issues):
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         github_token='123',
         github_context='users',
@@ -53,11 +53,11 @@ def test_run_issues(mock_logger, mock_get_repos, mock_issues):
     mock_logger.assert_called()
 
 
-@patch('pullbug.github_bug.GithubBug.get_issues', return_value=[])
-@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('pullbug.bug.Pullbug.get_issues', return_value=[])
+@patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
 def test_run_no_issues(mock_logger, mock_get_repos, mock_issues):
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         github_token='123',
         github_context='users',
@@ -71,7 +71,7 @@ def test_run_no_issues(mock_logger, mock_get_repos, mock_issues):
 
 @patch('woodchips.Logger')
 def test_setup_logger(mock_logger):
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
     ).setup_logger()
 
@@ -91,8 +91,8 @@ def test_setup_logger(mock_logger):
         (True, False, '123', False, False, True, '123', False),
     ],
 )
-@patch('pullbug.github_bug.GithubBug.get_issues')
-@patch('pullbug.github_bug.GithubBug.get_repos')
+@patch('pullbug.bug.Pullbug.get_issues')
+@patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.critical')
 def test_run_missing_required_cli_params(
     mock_logger,
@@ -108,7 +108,7 @@ def test_run_missing_required_cli_params(
     slack_channel,
 ):
     with pytest.raises(ValueError):
-        GithubBug(
+        Pullbug(
             github_owner='justintime50',
             github_token=github_token,
             pulls=pulls,
@@ -124,34 +124,34 @@ def test_run_missing_required_cli_params(
     mock_logger.assert_called_once()
 
 
-@patch('pullbug.github_bug.Github')
-@patch('pullbug.github_bug.Github.get_repos')
-@patch('pullbug.github_bug.Github.get_user')
+@patch('pullbug.bug.Github')
+@patch('pullbug.bug.Github.get_repos')
+@patch('pullbug.bug.Github.get_user')
 @patch('logging.Logger.info')
 def test_get_repos_users(mock_logger, mock_get_user, mock_get_repos, mock_github_instance):
-    github_bug = GithubBug(
+    bug = Pullbug(
         github_owner='justintime50',
         github_context='users',
         repos='justintime50',
     )
-    repos = github_bug.get_repos()
+    repos = bug.get_repos()
 
     mock_logger.call_count == 2
     assert type(repos) == list
     # TODO: Assert the get_repos and get_user/org gets called
 
 
-@patch('pullbug.github_bug.Github')
-@patch('pullbug.github_bug.Github.get_repos')
-@patch('pullbug.github_bug.Github.get_organization')
+@patch('pullbug.bug.Github')
+@patch('pullbug.bug.Github.get_repos')
+@patch('pullbug.bug.Github.get_organization')
 @patch('logging.Logger.info')
 def test_get_repos_orgs(mock_logger, mock_get_org, mock_get_repos, mock_github_instance):
-    github_bug = GithubBug(
+    bug = Pullbug(
         github_owner='justintime50',
         github_context='orgs',
         repos='justintime50',
     )
-    repos = github_bug.get_repos()
+    repos = bug.get_repos()
 
     mock_logger.call_count == 2
     assert type(repos) == list
@@ -160,7 +160,7 @@ def test_get_repos_orgs(mock_logger, mock_get_org, mock_get_repos, mock_github_i
 
 @patch('logging.Logger.info')
 def test_get_pull_requests(mock_logger):
-    pull_requests = GithubBug(
+    pull_requests = Pullbug(
         github_owner='justintime50',
     ).get_pull_requests(repos=[])
 
@@ -171,7 +171,7 @@ def test_get_pull_requests(mock_logger):
 
 @patch('logging.Logger.info')
 def test_get_issues(mock_logger):
-    issues = GithubBug(
+    issues = Pullbug(
         github_owner='justintime50',
     ).get_issues(repos=[])
 
@@ -181,7 +181,7 @@ def test_get_issues(mock_logger):
 
 
 def test_iterate_pull_requests():
-    messages, discord_messages = GithubBug(
+    messages, discord_messages = Pullbug(
         github_owner='justintime50',
     ).iterate_pull_requests(pull_requests=[])
 
@@ -191,7 +191,7 @@ def test_iterate_pull_requests():
 
 
 def test_iterate_issues():
-    messages, discord_messages = GithubBug(
+    messages, discord_messages = Pullbug(
         github_owner='justintime50',
     ).iterate_issues(issues=[])
 
@@ -200,11 +200,11 @@ def test_iterate_issues():
     # TODO: Assert the message building functions get called
 
 
-@patch('pullbug.github_bug.Message.send_discord_message')
+@patch('pullbug.bug.Message.send_discord_message')
 def test_send_messages_discord(mock_send_discord_message, mock_url):
     messages = discord_messages = []
 
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         discord=True,
         discord_url=mock_url,
@@ -213,11 +213,11 @@ def test_send_messages_discord(mock_send_discord_message, mock_url):
     mock_send_discord_message.assert_called_once_with(messages, mock_url)
 
 
-@patch('pullbug.github_bug.Message.send_slack_message')
+@patch('pullbug.bug.Message.send_slack_message')
 def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
     messages = discord_messages = []
 
-    GithubBug(
+    Pullbug(
         github_owner='justintime50',
         slack=True,
         slack_token=mock_token,

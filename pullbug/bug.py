@@ -22,7 +22,7 @@ DEFAULT_BASE_URL = 'https://api.github.com'
 LOGGER_NAME = 'pullbug'
 
 
-class GithubBug:
+class Pullbug:
     def __init__(
         self,
         github_owner: str,
@@ -66,7 +66,7 @@ class GithubBug:
         self.setup_logger()
         logger = woodchips.get(LOGGER_NAME)
         logger.info('Running Pullbug...')
-        self.run_missing_checks()
+        self._run_missing_checks()
 
         repos = self.get_repos()
 
@@ -109,19 +109,19 @@ class GithubBug:
         logger.log_to_console()
         logger.log_to_file(location=os.path.join(self.location, 'logs'))
 
-    def run_missing_checks(self):
+    def _run_missing_checks(self):
         """Check that values are set based on configuration before proceeding."""
         if not self.pulls and not self.issues:
-            self.throw_missing_error('pulls/issues')
+            self._throw_missing_error('pulls/issues')
         if self.discord and not self.discord_url:
-            self.throw_missing_error('discord_url')
+            self._throw_missing_error('discord_url')
         if self.slack and not self.slack_token:
-            self.throw_missing_error('slack_token')
+            self._throw_missing_error('slack_token')
         if self.slack and not self.slack_channel:
-            self.throw_missing_error('slack_channel')
+            self._throw_missing_error('slack_channel')
 
     @staticmethod
-    def throw_missing_error(missing_flag: str):
+    def _throw_missing_error(missing_flag: str):
         """Raise an error based on what env variables are missing."""
         logger = woodchips.get(LOGGER_NAME)
         message = f'No {missing_flag} set. Please correct and try again.'

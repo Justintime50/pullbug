@@ -8,6 +8,7 @@
 * Added `base_url` paremeter to specify an enterprise GitHub instance if necessary
 * Reworked the `github_token` logic to allow for better unauthenticated usage when no GitHub token is passed
 * Corrects the `Messages` class name to the singular `Message`
+* Renamed all occurances of `GithubBug` to `Pullbug` as Gitlab was removed previously and the distinction between platforms was no longer needed. Also renamed the `github_bug` module to `bug` and made various functions used only for the tool private
 
 ## v3.2.1 (2022-01-26)
 

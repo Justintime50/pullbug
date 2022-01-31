@@ -2,11 +2,11 @@ import argparse
 import os
 from typing import get_args
 
-from pullbug.github_bug import (
+from pullbug.bug import (
     DEFAULT_BASE_URL,
     GITHUB_CONTEXT_CHOICES,
     GITHUB_STATE_CHOICES,
-    GithubBug,
+    Pullbug,
 )
 
 
@@ -139,7 +139,7 @@ class PullBugCli:
         parser.parse_args(namespace=self)
 
     def run(self):
-        github_bug = GithubBug(
+        bug = Pullbug(
             self.github_owner,
             self.github_token,
             self.github_state,
@@ -156,7 +156,7 @@ class PullBugCli:
             self.location,
             self.base_url,
         )
-        github_bug.run()
+        bug.run()
 
 
 def main():

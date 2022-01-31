@@ -1,7 +1,7 @@
-from pullbug.github_bug import GithubBug
+from pullbug.bug import Pullbug
 from pullbug.messages import Message
 
 __all__ = [
-    'GithubBug',
+    'Pullbug',
     'Message',
 ]
