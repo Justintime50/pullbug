@@ -79,18 +79,16 @@ def test_setup_logger(mock_logger):
 
 
 @pytest.mark.parametrize(
-    'pulls, issues, github_token, discord, discord_url, slack, slack_token, slack_channel, rocketchat, rocketchat_url',
+    'pulls, issues, github_token, discord, discord_url, slack, slack_token, slack_channel',
     [
-        # no pulls (side-effect of testing no github_token)
-        (False, False, None, False, False, False, False, False, False, False),
-        # discord but no url
-        (True, False, '123', True, False, False, False, False, False, False),
-        # slack but no token
-        (True, False, '123', False, False, True, False, False, False, False),
-        # slack, token, but no channel
-        (True, False, '123', False, False, True, '123', False, False, False),
-        # rocketchat but no url
-        (True, False, '123', False, False, False, False, False, True, False),
+        # No pulls (side-effect of testing no github_token)
+        (False, False, None, False, False, False, False, False),
+        # Discord but no url
+        (True, False, '123', True, False, False, False, False),
+        # Slack but no token
+        (True, False, '123', False, False, True, False, False),
+        # Slack, token, but no channel
+        (True, False, '123', False, False, True, '123', False),
     ],
 )
 @patch('pullbug.github_bug.GithubBug.get_issues')
@@ -108,8 +106,6 @@ def test_run_missing_required_cli_params(
     slack,
     slack_token,
     slack_channel,
-    rocketchat,
-    rocketchat_url,
 ):
     with pytest.raises(ValueError):
         GithubBug(
@@ -122,8 +118,6 @@ def test_run_missing_required_cli_params(
             slack=slack,
             slack_token=slack_token,
             slack_channel=slack_channel,
-            rocketchat=rocketchat,
-            rocketchat_url=rocketchat_url,
         ).run()
 
     # throw_missing_error should get called which logs a critical error
@@ -231,16 +225,3 @@ def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
     ).send_messages(messages, discord_messages)
 
     mock_send_slack_message.assert_called_once_with(messages, mock_token, mock_channel)
-
-
-@patch('pullbug.github_bug.Message.send_rocketchat_message')
-def test_send_messages_rocketchat(mock_send_rocketchat_message, mock_url):
-    messages = discord_messages = []
-
-    GithubBug(
-        github_owner='justintime50',
-        rocketchat=True,
-        rocketchat_url=mock_url,
-    ).send_messages(messages, discord_messages)
-
-    mock_send_rocketchat_message.assert_called_once_with(messages, mock_url)

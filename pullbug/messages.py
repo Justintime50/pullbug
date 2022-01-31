@@ -11,7 +11,6 @@ LOGGER_NAME = 'pullbug'
 
 DESCRIPTION_CONTINUATION = '...'
 DESCRIPTION_MAX_LENGTH = 120
-MESSAGE_LENGTH = 40000
 
 
 class Message:
@@ -19,8 +18,8 @@ class Message:
     def send_discord_message(messages: List[str], discord_url: str):
         """Send a Discord message.
 
-        Discord has a hard limit of 2000 characters per message,
-        as such, we break up the messages into batches, allow for
+        Discord has a hard limit of 2000 characters per message.
+        As such, we break up the messages into batches, allow for
         breathing room, and send each batch of messages separately.
         """
         logger = woodchips.get(LOGGER_NAME)
@@ -44,24 +43,6 @@ class Message:
                 raise requests.exceptions.RequestException(discord_error)
 
     @staticmethod
-    def send_rocketchat_message(messages: List[str], rocketchat_url: str):
-        """Send a Rocket Chat message.
-
-        We truncate the message at 40,000 characters to match Slack
-        and improve performance. RC doesn't specify a char limit.
-        """
-        logger = woodchips.get(LOGGER_NAME)
-
-        rocketchat_message = ''.join(messages)[:MESSAGE_LENGTH]
-
-        try:
-            requests.post(rocketchat_url, json={'text': rocketchat_message})
-            logger.info('Rocket Chat message sent!')
-        except requests.exceptions.RequestException as rc_error:
-            logger.error(f'Could not send Rocket Chat message: {rc_error}')
-            raise requests.exceptions.RequestException(rc_error)
-
-    @staticmethod
     def send_slack_message(messages: List[str], slack_token: str, slack_channel: str):
         """Send Slack messages via a bot.
 
@@ -70,7 +51,8 @@ class Message:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        slack_message = ''.join(messages)[:MESSAGE_LENGTH]
+        message_max_length = 40000
+        slack_message = ''.join(messages)[:message_max_length]
         slack_client = slack.WebClient(slack_token)
 
         try:
@@ -90,8 +72,7 @@ class Message:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
 
-        Slack & RocketChat can use the same format while Discord requires
-        some tweaking.
+        Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if reviewers:
             users = discord_users = ''
@@ -114,13 +95,15 @@ class Message:
             if len(pull_request_body) > DESCRIPTION_MAX_LENGTH
             else pull_request_body
         )
-        message = (
+
+        slack_message = (
             f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
             f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
             f"\n*Author:* <{pull_request.user.html_url}|{pull_request.user.login}>"
             f"\n*Description:* {description}"
             f"\n*Reviews Requested From:* {users}"
         )
+
         discord_message = (
             f"\n:arrow_heading_up: **Pull Request:** {pull_request.title} (<{pull_request.html_url}>)"
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
@@ -129,15 +112,14 @@ class Message:
             f"\n**Reviews Requested From:** {discord_users}"
         )
 
-        return message, discord_message
+        return slack_message, discord_message
 
     @staticmethod
     def prepare_issues_message(issue: Issue) -> Tuple[str, str]:
         """Prepares a GitHub issue message with a single issue's data.
         This will then be appended to an array of messages.
 
-        Slack & RocketChat can use the same format while Discord requires
-        some tweaking.
+        Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         if issue.assignees:
             users = discord_users = ''
@@ -155,15 +137,19 @@ class Message:
             if len(issue_body) > DESCRIPTION_MAX_LENGTH
             else issue_body
         )
-        message = (
+
+        slack_message = (
             f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
             f"\n*Repo:* <{issue.repository.html_url}|{issue.repository.name}>"
-            f"\n*Description:* {description}\n*Assigned to:* {users}\n"
+            f"\n*Description:* {description}"
+            f"\n*Assigned to:* {users}\n"
         )
+
         discord_message = (
             f"\n:exclamation: **Issue:** {issue.title} (<{issue.html_url}>)"
             f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
-            f"\n**Description:** {description}\n**Assigned to:** {discord_users}\n"
+            f"\n**Description:** {description}"
+            f"\n**Assigned to:** {discord_users}\n"
         )
 
-        return message, discord_message
+        return slack_message, discord_message

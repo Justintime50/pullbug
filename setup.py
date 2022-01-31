@@ -25,7 +25,7 @@ DEV_REQUIREMENTS = [
 setuptools.setup(
     name='pullbug',
     version='3.2.1',
-    description='Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.',
+    description='Get bugged via Discord or Slack to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/pullbug',

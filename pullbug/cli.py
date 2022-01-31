@@ -13,7 +13,7 @@ from pullbug.github_bug import (
 class PullBugCli:
     def __init__(self):
         parser = argparse.ArgumentParser(
-            description='Get bugged via Slack or RocketChat to merge your GitHub pull requests.'
+            description='Get bugged via Discord or Slack to merge your GitHub pull requests.'
         )
         parser.add_argument(
             '-p',
@@ -106,22 +106,6 @@ class PullBugCli:
             help='The Slack channel to send messages to.',
         )
         parser.add_argument(
-            '-rc',
-            '--rocketchat',
-            required=False,
-            action='store_true',
-            default=False,
-            help='Send Pullbug messages to Rocket.Chat.',
-        )
-        parser.add_argument(
-            '-ru',
-            '--rocketchat_url',
-            required=False,
-            type=str,
-            default='',
-            help='The Rocket.Chat URL to send messages to.',
-        )
-        parser.add_argument(
             '-r',
             '--repos',
             required=False,
@@ -167,8 +151,6 @@ class PullBugCli:
             self.slack,
             self.slack_token,
             self.slack_channel,
-            self.rocketchat,
-            self.rocketchat_url,
             self.repos,
             self.drafts,
             self.location,

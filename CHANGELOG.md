@@ -2,6 +2,7 @@
 
 ## NEXT RELEASE
 
+* Removed support to send messages to `Rocket.Chat`
 * Added the `author` to the messages
 * Switched from `assignees` to `requested reviewers` for the `waiting on` portion of the message
 * Added `base_url` paremeter to specify an enterprise GitHub instance if necessary

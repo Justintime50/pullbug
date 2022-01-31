@@ -26,24 +26,6 @@ def test_discord_exception(mock_request, mock_logger, mock_url, mock_messages):
 
 
 @patch('logging.Logger.info')
-@patch('requests.post')
-def test_rocket_chat_success(mock_request, mock_logger, mock_url, mock_messages):
-    Message.send_rocketchat_message(mock_messages, mock_url)
-
-    mock_request.assert_called_once_with(mock_url, json={'text': mock_messages[0]})
-    mock_logger.assert_called_once_with('Rocket Chat message sent!')
-
-
-@patch('logging.Logger.error')
-@patch('requests.post', side_effect=requests.exceptions.RequestException('mock-error'))
-def test_rocket_chat_exception(mock_request, mock_logger, mock_url, mock_messages):
-    with pytest.raises(requests.exceptions.RequestException):
-        Message.send_rocketchat_message(mock_messages, mock_url)
-
-    mock_logger.assert_called_once_with('Could not send Rocket Chat message: mock-error')
-
-
-@patch('logging.Logger.info')
 @patch('slack.WebClient.chat_postMessage')
 def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
     Message.send_slack_message(mock_messages, mock_token, mock_channel)
@@ -76,7 +58,7 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
 
     result, discord_result = Message.prepare_pulls_message(mock_pull_request, reviewers)
 
-    # Message
+    # Slack message
     assert 'Pull Request' in result
     assert f'{reviewer.html_url}|{reviewer.login}' in result
     assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in result
@@ -97,7 +79,7 @@ def test_prepare_pulls_message_no_assignee(mock_pull_request):
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
     result, discord_result = Message.prepare_issues_message(mock_issue)
 
-    # Message
+    # Slack message
     assert 'Issue' in result
     assert f'{mock_issue.assignees[0].html_url}|{mock_issue.assignees[0].login}' in result
     assert f'{mock_issue.html_url}|{mock_issue.title}' in result

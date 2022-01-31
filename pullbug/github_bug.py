@@ -36,8 +36,6 @@ class GithubBug:
         slack: bool = False,
         slack_token: str = '',
         slack_channel: str = '',
-        rocketchat: bool = False,
-        rocketchat_url: str = '',
         repos: str = '',
         drafts: bool = False,
         location: str = os.path.expanduser('~/pullbug'),
@@ -55,8 +53,6 @@ class GithubBug:
         self.slack = slack
         self.slack_token = slack_token
         self.slack_channel = slack_channel
-        self.rocketchat = rocketchat
-        self.rocketchat_url = rocketchat_url
         self.repos = [repo.strip() for repo in repos.lower().split(',')] if repos else ''
         self.drafts = drafts
         self.location = location
@@ -123,8 +119,6 @@ class GithubBug:
             self.throw_missing_error('slack_token')
         if self.slack and not self.slack_channel:
             self.throw_missing_error('slack_channel')
-        if self.rocketchat and not self.rocketchat_url:
-            self.throw_missing_error('rocketchat_url')
 
     @staticmethod
     def throw_missing_error(missing_flag: str):
@@ -242,7 +236,5 @@ class GithubBug:
             Message.send_discord_message(discord_messages, self.discord_url)
         if self.slack:
             Message.send_slack_message(messages, self.slack_token, self.slack_channel)
-        if self.rocketchat:
-            Message.send_rocketchat_message(messages, self.rocketchat_url)
 
         logger.info(messages)

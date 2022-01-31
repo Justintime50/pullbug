@@ -2,7 +2,7 @@
 
 # Pullbug 🐛 
 
-Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.
+Get bugged via Discord or Slack to merge your GitHub pull requests.
 
 [![Build Status](https://github.com/Justintime50/pullbug/workflows/build/badge.svg)](https://github.com/Justintime50/pullbug/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Justintime50/pullbug/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/pullbug?branch=main)
@@ -13,9 +13,9 @@ Get bugged via Discord, Slack, or RocketChat to merge your GitHub pull requests.
 
 </div>
 
-Pullbug can notify you on Discord, Slack, or Rocket.Chat of all open pull requests from GitHub. This tool ensures requests never go unnoticed as it can be setup on a schedule to constantly bug you to merge your work. This is perfect for finding old or stale requests and helps you to stay current on new ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Rocket.Chat](https://rocket.chat/docs/developer-guides/rest-api/integration/create/) integration and you're all set to be bugged by Pullbug.
+Pullbug can notify you on Discord or Slack of all open pull requests from GitHub. This tool ensures requests never go unnoticed as it can be setup on a schedule to constantly bug you to merge your work. This is perfect for finding old or stale requests and helps you to stay current on new ones. Pass in a few environment variables, setup a [Slackbot](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) or [Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) webhook and you're all set to be bugged by Pullbug.
 
-**NOTE:** Pullbug works best if you have link unfurling turned off for GitHub on Discord, Slack, or Rocket.Chat.
+**NOTE:** Pullbug works best if you have link unfurling turned off for GitHub on Discord and Slack.
 
 ## Install
 
@@ -29,7 +29,7 @@ make install
 
 ## Usage
 
-Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Discord, Slack, or Rocket.Chat about pull requests.
+Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Discord or Slack about pull requests.
 
 Pullbug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull requests to retrieve.
 
@@ -57,9 +57,6 @@ Options:
                             The Slackbot token to authenticate with Slack.
     -sc SLACK_CHANNEL, --slack_channel SLACK_CHANNEL
                             The Slack channel to send messages to.
-    -rc, --rocketchat     Send Pullbug messages to Rocket.Chat.
-    -ru ROCKETCHAT_URL, --rocketchat_url ROCKETCHAT_URL
-                            The Rocket.Chat URL to send messages to.
     -r REPOS, --repos REPOS
                             A comma-separated list of repos to run Pullbug against.
     -dr, --drafts         Include draft pull requests.
