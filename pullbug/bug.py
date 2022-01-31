@@ -197,7 +197,7 @@ class Pullbug:
 
     def iterate_pull_requests(self, pull_requests: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each pull request of a repo and build the message array."""
-        message_array = []
+        slack_message_array = []
         discord_message_array = []
 
         for pull_request in pull_requests:
@@ -210,23 +210,23 @@ class Pullbug:
                 pull_request_reviewers = pull_request.get_review_requests()
 
                 message, discord_message = Message.prepare_pulls_message(pull_request, pull_request_reviewers)
-                message_array.append(message)
+                slack_message_array.append(message)
                 discord_message_array.append(discord_message)
 
-        return message_array, discord_message_array
+        return slack_message_array, discord_message_array
 
     @staticmethod
     def iterate_issues(issues: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each issue of a repo and build the message array."""
-        message_array = []
+        slack_message_array = []
         discord_message_array = []
 
         for issue in issues:
-            message, discord_message = Message.prepare_issues_message(issue)
-            message_array.append(message)
+            slack_message, discord_message = Message.prepare_issues_message(issue)
+            slack_message_array.append(slack_message)
             discord_message_array.append(discord_message)
 
-        return message_array, discord_message_array
+        return slack_message_array, discord_message_array
 
     def send_messages(self, messages: List[str], discord_messages: List[str]):
         """Sends a message to the messaging platforms requested (can be multiple at once)."""

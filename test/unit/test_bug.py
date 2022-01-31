@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -162,9 +162,9 @@ def test_get_repos_orgs(mock_logger, mock_get_org, mock_get_repos, mock_github_i
 def test_get_pull_requests(mock_logger):
     pull_requests = Pullbug(
         github_owner='justintime50',
-    ).get_pull_requests(repos=[])
+    ).get_pull_requests(repos=[MagicMock()])
 
-    assert pull_requests == []
+    assert type(pull_requests) == list
     mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
@@ -173,55 +173,58 @@ def test_get_pull_requests(mock_logger):
 def test_get_issues(mock_logger):
     issues = Pullbug(
         github_owner='justintime50',
-    ).get_issues(repos=[])
+    ).get_issues(repos=[MagicMock()])
 
-    assert issues == []
+    assert type(issues) == list
     mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
 
-def test_iterate_pull_requests():
-    messages, discord_messages = Pullbug(
+@patch('pullbug.messages.Message.prepare_pulls_message', return_value=([], []))
+def test_iterate_pull_requests(mock_prepare_pulls_message):
+    slack_messages, discord_messages = Pullbug(
         github_owner='justintime50',
-    ).iterate_pull_requests(pull_requests=[])
+        drafts=True,  # lazy approach but keeps us from needing to build the MagicMock object below
+    ).iterate_pull_requests(pull_requests=[MagicMock()])
 
-    assert messages == []
-    assert discord_messages == []
-    # TODO: Assert the message building functions get called
+    assert type(slack_messages) == list
+    assert type(discord_messages) == list
+    mock_prepare_pulls_message.assert_called_once()
 
 
-def test_iterate_issues():
-    messages, discord_messages = Pullbug(
+@patch('pullbug.messages.Message.prepare_issues_message', return_value=([], []))
+def test_iterate_issues(mock_prepare_issues_message):
+    slack_messages, discord_messages = Pullbug(
         github_owner='justintime50',
-    ).iterate_issues(issues=[])
+    ).iterate_issues(issues=[MagicMock()])
 
-    assert messages == []
-    assert discord_messages == []
-    # TODO: Assert the message building functions get called
+    assert type(slack_messages) == list
+    assert type(discord_messages) == list
+    mock_prepare_issues_message.assert_called_once()
 
 
 @patch('pullbug.bug.Message.send_discord_message')
 def test_send_messages_discord(mock_send_discord_message, mock_url):
-    messages = discord_messages = []
+    slack_messages = discord_messages = []
 
     Pullbug(
         github_owner='justintime50',
         discord=True,
         discord_url=mock_url,
-    ).send_messages(messages, discord_messages)
+    ).send_messages(slack_messages, discord_messages)
 
-    mock_send_discord_message.assert_called_once_with(messages, mock_url)
+    mock_send_discord_message.assert_called_once_with(slack_messages, mock_url)
 
 
 @patch('pullbug.bug.Message.send_slack_message')
 def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
-    messages = discord_messages = []
+    slack_messages = discord_messages = []
 
     Pullbug(
         github_owner='justintime50',
         slack=True,
         slack_token=mock_token,
         slack_channel=mock_channel,
-    ).send_messages(messages, discord_messages)
+    ).send_messages(slack_messages, discord_messages)
 
-    mock_send_slack_message.assert_called_once_with(messages, mock_token, mock_channel)
+    mock_send_slack_message.assert_called_once_with(slack_messages, mock_token, mock_channel)
