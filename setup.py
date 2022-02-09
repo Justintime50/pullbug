@@ -17,14 +17,14 @@ DEV_REQUIREMENTS = [
     'flake8',
     'isort',
     'mypy',
-    'pytest == 6.*',
-    'pytest-cov == 2.*',
+    'pytest == 7.*',
+    'pytest-cov == 3.*',
     'types-requests',
 ]
 
 setuptools.setup(
     name='pullbug',
-    version='4.0.1',
+    version='4.0.2',
     description='Get bugged via Discord or Slack to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",

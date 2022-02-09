@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.0.2 (2022-02-08)
+
+* Fixes a bug where if both pull request and issue flags were used at the same time that pull request data would bleed into the issue messages due to reassignment of variables (variables have since been distinguished from one another)
+* Bumps dev deps
+
 ## v4.0.1 (2022-01-31)
 
 * Fix the index error on retrieving requested reviewers

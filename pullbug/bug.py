@@ -73,30 +73,30 @@ class Pullbug:
         if self.pulls:
             pull_requests = self.get_pull_requests(repos)
             if pull_requests == []:
-                messages = discord_messages = ['No pull requests are available from GitHub.']
-                logger.info(messages[0])
+                slack_pull_messages = discord_pull_messages = ['No pull requests are available from GitHub.']
+                logger.info(slack_pull_messages[0])
             else:
                 message_preamble = (
                     '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
                 )
-                messages, discord_messages = self.iterate_pull_requests(pull_requests)
-                messages.insert(0, message_preamble)
-                discord_messages.insert(0, message_preamble)
+                slack_pull_messages, discord_pull_messages = self.iterate_pull_requests(pull_requests)
+                slack_pull_messages.insert(0, message_preamble)
+                discord_pull_messages.insert(0, message_preamble)
 
-                self.send_messages(messages, discord_messages)
+                self.send_messages(slack_pull_messages, discord_pull_messages)
 
         if self.issues:
             issues = self.get_issues(repos)
             if issues == []:
-                messages = discord_messages = ['No issues are available from GitHub.']
-                logger.info(messages[0])
+                slack_issue_messages = discord_issue_messages = ['No issues are available from GitHub.']
+                logger.info(slack_issue_messages[0])
             else:
                 message_preamble = '\n:bug: *The following issues on GitHub are still open and need your help!*\n'
-                messages, discord_messages = self.iterate_issues(issues)
-                messages.insert(0, message_preamble)
-                discord_messages.insert(0, message_preamble)
+                slack_issue_messages, discord_issue_messages = self.iterate_issues(issues)
+                slack_issue_messages.insert(0, message_preamble)
+                discord_issue_messages.insert(0, message_preamble)
 
-                self.send_messages(messages, discord_messages)
+                self.send_messages(slack_issue_messages, discord_issue_messages)
 
         logger.info('Pullbug finished bugging!')
 
