@@ -34,7 +34,7 @@ def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
 
     mock_get_repos.assert_called_once()
     mock_pull_request.assert_called_once()
-    assert mock_logger.call_count == 3
+    assert mock_logger.call_count == 4
 
 
 @patch('pullbug.bug.Pullbug.get_issues')
@@ -66,7 +66,7 @@ def test_run_no_issues(mock_logger, mock_get_repos, mock_issues):
 
     mock_get_repos.assert_called_once()
     mock_issues.assert_called_once()
-    assert mock_logger.call_count == 3
+    assert mock_logger.call_count == 4
 
 
 @patch('woodchips.Logger')

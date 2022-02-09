@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.0.3 (2022-02-09)
+
+* Fixes a bug where the "no pull requests" message wouldn't be used properly when draft pull requests were present but not requested as the check for pull requests happened before the filtering occured
+
 ## v4.0.2 (2022-02-08)
 
 * Fixes a bug where if both pull request and issue flags were used at the same time that pull request data would bleed into the issue messages due to reassignment of variables (variables have since been distinguished from one another)
