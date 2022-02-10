@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.1.0 (2022-02-10)
+
+* Adds reviewers to messages who have approved or requested changes. Previously, only reviewers that had been requested but had not reviewed would show in messages. Depending on the status of the review, an appropriate emoji will show in the message to signify what the user did for their review
+* Various other small improvements to message building
+
 ## v4.0.3 (2022-02-09)
 
 * Fixes a bug where the "no pull requests" message wouldn't be used properly when draft pull requests were present but not requested as the check for pull requests happened before the filtering occured

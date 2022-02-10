@@ -2,7 +2,7 @@ import os
 from typing import Any, List, Tuple
 
 import woodchips
-from github import Github, Issue, PaginatedList, PullRequest
+from github import Github, Issue, NamedUser, PaginatedList, PullRequest
 from typing_extensions import Literal
 
 from pullbug.messages import Message
@@ -76,9 +76,7 @@ class Pullbug:
 
             # Check if there are pull requests and available messages to send (eg: filtering for drafts)
             if pull_requests != [] and slack_pull_messages:
-                pull_message_preamble = (
-                    '\n:bug: *The following pull requests on GitHub are still open and need your help!*\n'
-                )
+                pull_message_preamble = '\n:bug: *The following GitHub pull requests still need your help!*\n'
                 slack_pull_messages.insert(0, pull_message_preamble)
                 discord_pull_messages.insert(0, pull_message_preamble)
             else:
@@ -93,7 +91,7 @@ class Pullbug:
 
             # Check if there are issues and available messages to send
             if issues != [] and slack_issue_messages:
-                issue_message_preamble = '\n:bug: *The following issues on GitHub are still open and need your help!*\n'
+                issue_message_preamble = '\n:bug: *The following GitHub issues still need your help!*\n'
                 slack_issue_messages.insert(0, issue_message_preamble)
                 discord_issue_messages.insert(0, issue_message_preamble)
             else:
@@ -178,6 +176,35 @@ class Pullbug:
 
         return flat_pull_requests_list
 
+    def get_pull_request_reviews(
+        self, pull_request: PullRequest.PullRequest
+    ) -> Tuple[List[NamedUser.NamedUser], List[NamedUser.NamedUser]]:
+        """Grab all pull request reviews of a single pull request.
+
+        We then break down these reviews into `APPROVED` or `CHANGES_REQUESTED` as the `state`.
+        """
+        logger = woodchips.get(LOGGER_NAME)
+
+        logger.debug(f'Bugging GitHub for pull request reviews of {pull_request.title}...')
+
+        users_who_approved = []
+        users_who_requested_changes = []
+
+        pull_request_reviews = pull_request.get_reviews()
+
+        for pull_request_review in pull_request_reviews:
+            if pull_request_review and pull_request_review.state == 'APPROVED':
+                users_who_approved.append(pull_request_review.user)
+            elif pull_request_review and pull_request_review.state == 'CHANGES_REQUESTED':
+                users_who_requested_changes.append(pull_request_review.user)
+            else:
+                # These reviews more than likely have a `DISMISSED` state, we'll discard them for now
+                pass
+
+        logger.debug(f'Pull request reviews retrieved for {pull_request.title}!')
+
+        return users_who_approved, users_who_requested_changes
+
     def get_issues(self, repos: PaginatedList.PaginatedList) -> List[Issue.Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
         logger = woodchips.get(LOGGER_NAME)
@@ -210,10 +237,18 @@ class Pullbug:
                 continue
             else:
                 # Only reviewers requested who haven't approved or requested changes will be returned here
-                reviewer_lists = pull_request.get_review_requests()
-                reviewers_requested = reviewer_lists[0]  # index 0 is the list of users, index 1 is a list of teams
+                reviewers = pull_request.get_review_requests()
+                # This is a hack to get around this bug: https://github.com/PyGithub/PyGithub/issues/2053
+                # TODO: Change this from `get_page(0) != []` to `totalCount != 0` once `PyGithub > 1.55` is out
+                reviewers_requested = reviewers[0] if reviewers[0].get_page(0) != [] else []
+                users_who_approved, users_who_requested_changes = self.get_pull_request_reviews(pull_request)
 
-                message, discord_message = Message.prepare_pulls_message(pull_request, reviewers_requested)
+                message, discord_message = Message.prepare_pulls_message(
+                    pull_request,
+                    reviewers_requested,
+                    users_who_approved,
+                    users_who_requested_changes,
+                )
                 slack_message_array.append(message)
                 discord_message_array.append(discord_message)
 

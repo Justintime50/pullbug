@@ -56,42 +56,42 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
     reviewer.html_url = f'https://github.com/{mock_user}'
     reviewers = [reviewer]
 
-    result, discord_result = Message.prepare_pulls_message(mock_pull_request, reviewers)
+    slack_message, discord_message = Message.prepare_pulls_message(mock_pull_request, reviewers, reviewers, reviewers)
 
     # Slack message
-    assert 'Pull Request' in result
-    assert f'{reviewer.html_url}|{reviewer.login}' in result
-    assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in result
+    assert 'Pull Request' in slack_message
+    assert f'{reviewer.html_url}|{reviewer.login}' in slack_message
+    assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in slack_message
 
     # Discord message
-    assert 'Pull Request' in discord_result
-    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_result
-    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_result
+    assert 'Pull Request' in discord_message
+    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
+    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
 
 
 def test_prepare_pulls_message_no_assignee(mock_pull_request):
     mock_pull_request.requested_reviewers = []
-    result, discord_result = Message.prepare_pulls_message(mock_pull_request, [])
+    slack_message, _ = Message.prepare_pulls_message(mock_pull_request, [], [], [])
 
-    assert '*Reviews Requested From:* NA' in result
+    assert 'Reviewers:*  :white_check_mark: NA;  :no_entry: NA;  :timer_clock: NA' in slack_message
 
 
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
-    result, discord_result = Message.prepare_issues_message(mock_issue)
+    slack_message, discord_message = Message.prepare_issues_message(mock_issue)
 
     # Slack message
-    assert 'Issue' in result
-    assert f'{mock_issue.assignees[0].html_url}|{mock_issue.assignees[0].login}' in result
-    assert f'{mock_issue.html_url}|{mock_issue.title}' in result
+    assert 'Issue' in slack_message
+    assert f'{mock_issue.assignees[0].html_url}|{mock_issue.assignees[0].login}' in slack_message
+    assert f'{mock_issue.html_url}|{mock_issue.title}' in slack_message
 
     # Discord message
-    assert 'Issue' in discord_result
-    assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_result
-    assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_result
+    assert 'Issue' in discord_message
+    assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_message
+    assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_message
 
 
 def test_prepare_issues_message_no_assignee(mock_issue):
     mock_issue.assignees = []
-    result, discord_result = Message.prepare_issues_message(mock_issue)
+    slack_message, _ = Message.prepare_issues_message(mock_issue)
 
-    assert '*Assigned to:* NA' in result
+    assert '*Assigned to:* NA' in slack_message

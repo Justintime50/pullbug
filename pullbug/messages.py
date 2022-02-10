@@ -1,11 +1,10 @@
 import math
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import requests
 import slack
 import woodchips
-from github import PaginatedList, PullRequest
-from github.Issue import Issue
+from github import Issue, NamedUser, PaginatedList, PullRequest
 
 LOGGER_NAME = 'pullbug'
 
@@ -67,23 +66,16 @@ class Message:
 
     @staticmethod
     def prepare_pulls_message(
-        pull_request: PullRequest.PullRequest, reviewers: PaginatedList.PaginatedList
+        pull_request: PullRequest.PullRequest,
+        reviewers: PaginatedList.PaginatedList,
+        users_who_approved: List[NamedUser.NamedUser],
+        users_who_requested_changes: List[NamedUser.NamedUser],
     ) -> Tuple[str, str]:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
 
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
-        if reviewers:
-            slack_users = []
-            discord_users = []
-            for reviewer in reviewers:
-                slack_users.append(f"<{reviewer.html_url}|{reviewer.login}>")
-                discord_users.append(f"{reviewer.login} (<{reviewer.html_url}>)")
-        else:
-            slack_users = ['NA']
-            discord_users = ['NA']
-
         pull_request_body = pull_request.body if pull_request.body else ''
         description = (
             pull_request_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
@@ -91,41 +83,65 @@ class Message:
             else pull_request_body
         )
 
+        if reviewers:
+            slack_reviewers = []
+            discord_reviewers = []
+            for reviewer in reviewers:
+                slack_reviewers.append(Message._create_slack_user_link(reviewer))
+                discord_reviewers.append(Message._create_discord_user_link(reviewer))
+
+        if users_who_approved:
+            slack_users_who_approved = []
+            discord_users_who_approved = []
+            for user in users_who_approved:
+                slack_users_who_approved.append(Message._create_slack_user_link(user))
+                discord_users_who_approved.append(Message._create_discord_user_link(user))
+
+        if users_who_requested_changes:
+            slack_users_who_requested_changes = []
+            discord_users_who_requested_changes = []
+            for user in users_who_requested_changes:
+                slack_users_who_requested_changes.append(Message._create_slack_user_link(user))
+                discord_users_who_requested_changes.append(Message._create_discord_user_link(user))
+
+        slack_reviewers_string = ''
+        discord_reviewers_string = ''
+
+        if users_who_approved:
+            slack_reviewers_string += f"  :white_check_mark: {', '.join(slack_users_who_approved)};"
+            discord_reviewers_string += f"  :white_check_mark: {', '.join(discord_users_who_approved)};"
+        if users_who_requested_changes:
+            slack_reviewers_string += f"  :no_entry: {', '.join(slack_users_who_requested_changes)};"
+            discord_reviewers_string += f"  :no_entry: {', '.join(discord_users_who_requested_changes)};"
+        if reviewers:
+            slack_reviewers_string += f"  :timer_clock: {', '.join(slack_reviewers)};"
+            discord_reviewers_string += f"  :timer: {', '.join(discord_reviewers)};"
+
         slack_message = (
-            f"\n:arrow_heading_up: *Pull Request:* <{pull_request.html_url}|{pull_request.title}>"
+            f"\n:arrow_heading_up: *Pull Request:* {Message._create_slack_object_link(pull_request)}"
             f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
             f"\n*Author:* <{pull_request.user.html_url}|{pull_request.user.login}>"
             f"\n*Description:* {description}"
-            f"\n*Reviews Requested From:* {', '.join(slack_users)}\n"
+            f"\n*Reviewers:*{slack_reviewers_string if slack_reviewers_string else ' NA'}\n"
         )
 
         discord_message = (
-            f"\n:arrow_heading_up: **Pull Request:** {pull_request.title} (<{pull_request.html_url}>)"
+            f"\n:arrow_heading_up: **Pull Request:** {Message._create_discord_object_link(pull_request)}"
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Author:** {pull_request.user.html_url} (<{pull_request.user.login}>)"
             f"\n**Description:** {description}"
-            f"\n**Reviews Requested From:** {', '.join(discord_users)}\n"
+            f"\n*Reviewers:*{discord_reviewers_string if discord_reviewers_string else ' NA'}\n"
         )
 
         return slack_message, discord_message
 
     @staticmethod
-    def prepare_issues_message(issue: Issue) -> Tuple[str, str]:
+    def prepare_issues_message(issue: Issue.Issue) -> Tuple[str, str]:
         """Prepares a GitHub issue message with a single issue's data.
         This will then be appended to an array of messages.
 
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
-        if issue.assignees:
-            slack_users = []
-            discord_users = []
-            for assignee in issue.assignees:
-                slack_users.append(f"<{assignee.html_url}|{assignee.login}>")
-                discord_users.append(f"{assignee.login} (<{assignee.html_url}>)")
-        else:
-            slack_users = ['NA']
-            discord_users = ['NA']
-
         issue_body = issue.body if issue.body else ''
         description = (
             issue_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
@@ -133,18 +149,48 @@ class Message:
             else issue_body
         )
 
+        if issue.assignees:
+            slack_users = []
+            discord_users = []
+            for assignee in issue.assignees:
+                slack_users.append(Message._create_slack_user_link(assignee))
+                discord_users.append(Message._create_discord_user_link(assignee))
+        else:
+            slack_users = ['NA']
+            discord_users = ['NA']
+
         slack_message = (
-            f"\n:exclamation: *Issue:* <{issue.html_url}|{issue.title}>"
+            f"\n:exclamation: *Issue:* {Message._create_slack_object_link(issue)}"
             f"\n*Repo:* <{issue.repository.html_url}|{issue.repository.name}>"
             f"\n*Description:* {description}"
             f"\n*Assigned to:* {', '.join(slack_users)}\n"
         )
 
         discord_message = (
-            f"\n:exclamation: **Issue:** {issue.title} (<{issue.html_url}>)"
+            f"\n:exclamation: **Issue:** {Message._create_discord_object_link(issue)}"
             f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
             f"\n**Description:** {description}"
             f"\n**Assigned to:** {', '.join(discord_users)}\n"
         )
 
         return slack_message, discord_message
+
+    @staticmethod
+    def _create_slack_user_link(user: NamedUser.NamedUser) -> str:
+        """Creates a Slack user name/url combo to be used in messages."""
+        return f'<{user.html_url}|{user.login}>'
+
+    @staticmethod
+    def _create_discord_user_link(user: NamedUser.NamedUser) -> str:
+        """Creates a Discord user name/url combo to be used in messages."""
+        return f'{user.login} (<{user.html_url}>)'
+
+    @staticmethod
+    def _create_slack_object_link(object: Union[PullRequest.PullRequest, Issue.Issue]) -> str:
+        """Creates a Slack object name/url combo to be used in messages."""
+        return f'<{object.html_url}|{object.title}>'
+
+    @staticmethod
+    def _create_discord_object_link(object: Union[PullRequest.PullRequest, Issue.Issue]) -> str:
+        """Creates a Discord object name/url combo to be used in messages."""
+        return f'{object.title} (<{object.html_url}>)'

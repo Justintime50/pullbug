@@ -184,7 +184,7 @@ def test_get_issues(mock_logger):
 def test_iterate_pull_requests(mock_prepare_pulls_message):
     slack_messages, discord_messages = Pullbug(
         github_owner='justintime50',
-        drafts=True,  # lazy approach but keeps us from needing to build the MagicMock object below
+        drafts=True,  # Lazy approach but keeps us from needing to build the MagicMock object below
     ).iterate_pull_requests(pull_requests=[MagicMock()])
 
     assert type(slack_messages) == list
