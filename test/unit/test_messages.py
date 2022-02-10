@@ -71,9 +71,10 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
 
 def test_prepare_pulls_message_no_assignee(mock_pull_request):
     mock_pull_request.requested_reviewers = []
-    slack_message, _ = Message.prepare_pulls_message(mock_pull_request, [], [], [])
+    slack_message, discord_message = Message.prepare_pulls_message(mock_pull_request, [], [], [])
 
-    assert 'Reviewers:*  :white_check_mark: NA;  :no_entry: NA;  :timer_clock: NA' in slack_message
+    assert 'Reviewers:* NA' in slack_message
+    assert 'Reviewers:* NA' in discord_message
 
 
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
