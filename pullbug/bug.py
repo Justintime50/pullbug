@@ -178,10 +178,10 @@ class Pullbug:
 
     def get_pull_request_reviews(
         self, pull_request: PullRequest.PullRequest
-    ) -> Tuple[List[NamedUser.NamedUser], List[NamedUser.NamedUser]]:
+    ) -> Tuple[List[NamedUser.NamedUser], List[NamedUser.NamedUser], List[NamedUser.NamedUser]]:
         """Grab all pull request reviews of a single pull request.
 
-        We then break down these reviews into `APPROVED` or `CHANGES_REQUESTED` as the `state`.
+        We then break down these reviews into `APPROVED`, `CHANGES_REQUESTED`, or `DISMISSED` as the `state`.
         """
         logger = woodchips.get(LOGGER_NAME)
 
@@ -189,6 +189,7 @@ class Pullbug:
 
         users_who_approved = []
         users_who_requested_changes = []
+        users_who_were_dismissed = []
 
         pull_request_reviews = pull_request.get_reviews()
 
@@ -197,13 +198,12 @@ class Pullbug:
                 users_who_approved.append(pull_request_review.user)
             elif pull_request_review and pull_request_review.state == 'CHANGES_REQUESTED':
                 users_who_requested_changes.append(pull_request_review.user)
-            else:
-                # These reviews more than likely have a `DISMISSED` state, we'll discard them for now
-                pass
+            elif pull_request_review and pull_request_review.state == 'DISMISSED':
+                users_who_were_dismissed.append(pull_request_review.user)
 
         logger.debug(f'Pull request reviews retrieved for {pull_request.title}!')
 
-        return users_who_approved, users_who_requested_changes
+        return users_who_approved, users_who_requested_changes, users_who_were_dismissed
 
     def get_issues(self, repos: PaginatedList.PaginatedList) -> List[Issue.Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
@@ -241,13 +241,18 @@ class Pullbug:
                 # This is a hack to get around this bug: https://github.com/PyGithub/PyGithub/issues/2053
                 # TODO: Change this from `get_page(0) != []` to `totalCount != 0` once `PyGithub > 1.55` is out
                 reviewers_requested = reviewers[0] if reviewers[0].get_page(0) != [] else []
-                users_who_approved, users_who_requested_changes = self.get_pull_request_reviews(pull_request)
+                (
+                    users_who_approved,
+                    users_who_requested_changes,
+                    users_who_were_dismissed,
+                ) = self.get_pull_request_reviews(pull_request)
 
                 message, discord_message = Message.prepare_pulls_message(
                     pull_request,
                     reviewers_requested,
                     users_who_approved,
                     users_who_requested_changes,
+                    users_who_were_dismissed,
                 )
                 slack_message_array.append(message)
                 discord_message_array.append(discord_message)

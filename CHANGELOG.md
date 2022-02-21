@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4.2.0 (2022-02-21)
+
+* Messages now include dismissed reviewers under the `Reviewers` section
+* Reviewers are now a set to avoid duplicates (such as multiple "changes requested" or "dismissed" reviews)
+
 ## v4.1.0 (2022-02-10)
 
 * Adds reviewers to messages who have approved or requested changes. Previously, only reviewers that had been requested but had not reviewed would show in messages. Depending on the status of the review, an appropriate emoji will show in the message to signify what the user did for their review

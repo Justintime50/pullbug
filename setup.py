@@ -24,7 +24,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='4.1.0',
+    version='4.2.0',
     description='Get bugged via Discord or Slack to merge your GitHub pull requests.',
     long_description=long_description,
     long_description_content_type="text/markdown",

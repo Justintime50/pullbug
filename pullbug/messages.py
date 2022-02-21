@@ -70,6 +70,7 @@ class Message:
         reviewers: PaginatedList.PaginatedList,
         users_who_approved: List[NamedUser.NamedUser],
         users_who_requested_changes: List[NamedUser.NamedUser],
+        users_who_were_dismissed: List[NamedUser.NamedUser],
     ) -> Tuple[str, str]:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
@@ -83,39 +84,58 @@ class Message:
             else pull_request_body
         )
 
-        if reviewers:
-            slack_reviewers = []
-            discord_reviewers = []
-            for reviewer in reviewers:
-                slack_reviewers.append(Message._create_slack_user_link(reviewer))
-                discord_reviewers.append(Message._create_discord_user_link(reviewer))
-
-        if users_who_approved:
-            slack_users_who_approved = []
-            discord_users_who_approved = []
-            for user in users_who_approved:
-                slack_users_who_approved.append(Message._create_slack_user_link(user))
-                discord_users_who_approved.append(Message._create_discord_user_link(user))
-
-        if users_who_requested_changes:
-            slack_users_who_requested_changes = []
-            discord_users_who_requested_changes = []
-            for user in users_who_requested_changes:
-                slack_users_who_requested_changes.append(Message._create_slack_user_link(user))
-                discord_users_who_requested_changes.append(Message._create_discord_user_link(user))
-
         slack_reviewers_string = ''
         discord_reviewers_string = ''
 
         if users_who_approved:
-            slack_reviewers_string += f"  :white_check_mark: {', '.join(slack_users_who_approved)};"
-            discord_reviewers_string += f"  :white_check_mark: {', '.join(discord_users_who_approved)};"
+            slack_users_who_approved = []
+            discord_users_who_approved = []
+
+            for user in users_who_approved:
+                slack_users_who_approved.append(Message._create_slack_user_link(user))
+                discord_users_who_approved.append(Message._create_discord_user_link(user))
+
+            if slack_users_who_approved:
+                slack_reviewers_string += f"  :white_check_mark: {', '.join(set(slack_users_who_approved))};"
+                discord_reviewers_string += f"  :white_check_mark: {', '.join(set(discord_users_who_approved))};"
+
         if users_who_requested_changes:
-            slack_reviewers_string += f"  :no_entry: {', '.join(slack_users_who_requested_changes)};"
-            discord_reviewers_string += f"  :no_entry: {', '.join(discord_users_who_requested_changes)};"
+            slack_users_who_requested_changes = []
+            discord_users_who_requested_changes = []
+
+            for user in users_who_requested_changes:
+                if user not in users_who_approved:
+                    slack_users_who_requested_changes.append(Message._create_slack_user_link(user))
+                    discord_users_who_requested_changes.append(Message._create_discord_user_link(user))
+
+            if slack_users_who_requested_changes:
+                slack_reviewers_string += f"  :no_entry: {', '.join(set(slack_users_who_requested_changes))};"
+                discord_reviewers_string += f"  :no_entry: {', '.join(set(discord_users_who_requested_changes))};"
+
+        if users_who_were_dismissed:
+            slack_users_who_were_dismissed = []
+            discord_users_who_were_dismissed = []
+
+            for user in users_who_were_dismissed:
+                if user not in users_who_approved:
+                    slack_users_who_were_dismissed.append(Message._create_slack_user_link(user))
+                    discord_users_who_were_dismissed.append(Message._create_discord_user_link(user))
+
+            if slack_users_who_were_dismissed:
+                slack_reviewers_string += f"  :eyes: {', '.join(set(slack_users_who_were_dismissed))};"
+                discord_reviewers_string += f"  :eyes: {', '.join(set(discord_users_who_were_dismissed))};"
+
         if reviewers:
-            slack_reviewers_string += f"  :timer_clock: {', '.join(slack_reviewers)};"
-            discord_reviewers_string += f"  :timer: {', '.join(discord_reviewers)};"
+            slack_reviewers = []
+            discord_reviewers = []
+
+            for reviewer in reviewers:
+                slack_reviewers.append(Message._create_slack_user_link(reviewer))
+                discord_reviewers.append(Message._create_discord_user_link(reviewer))
+
+            if slack_reviewers:
+                slack_reviewers_string += f"  :timer_clock: {', '.join(set(slack_reviewers))};"
+                discord_reviewers_string += f"  :timer: {', '.join(set(discord_reviewers))};"
 
         slack_message = (
             f"\n:arrow_heading_up: *Pull Request:* {Message._create_slack_object_link(pull_request)}"
