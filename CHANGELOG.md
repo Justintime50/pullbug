@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.2.1 (2021-02-21)
+
+* Filters out pull requests from the returned issues. Apparently GitHub's v3 API returns pull requests in the response of a list of issues, see https://docs.github.com/en/rest/reference/issues#list-repository-issues for details
+
 ## v4.2.0 (2022-02-21)
 
 * Messages now include dismissed reviewers under the `Reviewers` section

@@ -220,7 +220,9 @@ class Pullbug:
                 # Repo has no issues
                 continue
 
-        flat_issues_list = [issue for issue in issues for issue in issue]
+        # GitHub's v3 API apparently treats pull requests as issues, filter them out here
+        # Docs: https://docs.github.com/en/rest/reference/issues#list-repository-issues
+        flat_issues_list = [issue for issue in issues for issue in issue if not issue.pull_request]
 
         logger.info('Issues retrieved!')
 
@@ -272,13 +274,13 @@ class Pullbug:
 
         return slack_message_array, discord_message_array
 
-    def send_messages(self, messages: List[str], discord_messages: List[str]):
+    def send_messages(self, slack_messages: List[str], discord_messages: List[str]):
         """Sends a message to the messaging platforms requested (can be multiple at once)."""
         logger = woodchips.get(LOGGER_NAME)
 
         if self.discord:
             Message.send_discord_message(discord_messages, self.discord_url)
         if self.slack:
-            Message.send_slack_message(messages, self.slack_token, self.slack_channel)
+            Message.send_slack_message(slack_messages, self.slack_token, self.slack_channel)
 
-        logger.info(messages)
+        logger.info(slack_messages)
