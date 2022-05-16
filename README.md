@@ -1,6 +1,6 @@
 <div align="center">
 
-# Pullbug 🐛 
+# Pullbug 🐛
 
 Get bugged via Discord or Slack to merge your GitHub pull requests or close open issues.
 
@@ -63,6 +63,8 @@ Options:
     -l LOCATION, --location LOCATION
                             The location of the Pullbug logs and files.
     --base_url BASE_URL   The base URL of your GitHub instance (useful for enterprise users with custom hostnames).
+    --log_level {error,debug,warning,info,critical}
+                            The log level used for the tool.
 ```
 
 ## Development

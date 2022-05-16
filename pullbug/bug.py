@@ -17,6 +17,16 @@ GITHUB_CONTEXT_CHOICES = Literal[
     'orgs',
 ]
 
+DEFAULT_LOG_LEVEL = 'info'
+LOG_LEVEL_CHOICES = Literal[
+    'notset',
+    'debug',
+    'info',
+    'warning',
+    'error',
+    'critical',
+]
+
 DEFAULT_BASE_URL = 'https://api.github.com'
 
 LOGGER_NAME = 'pullbug'
@@ -40,6 +50,7 @@ class Pullbug:
         drafts: bool = False,
         location: str = os.path.expanduser('~/pullbug'),
         base_url: str = DEFAULT_BASE_URL,
+        log_level: str = DEFAULT_LOG_LEVEL,
     ):
         # Parameter variables
         self.github_owner = github_owner
@@ -57,6 +68,7 @@ class Pullbug:
         self.drafts = drafts
         self.location = location
         self.base_url = base_url
+        self.log_level = log_level
 
         # Internal variables
         self.github_instance = Github(login_or_token=self.github_token, base_url=self.base_url)
@@ -106,7 +118,7 @@ class Pullbug:
         """Setup a `woodchips` logger for the project."""
         logger = woodchips.Logger(
             name=LOGGER_NAME,
-            level='INFO',
+            level=self.log_level,
         )
         logger.log_to_console()
         logger.log_to_file(location=os.path.join(self.location, 'logs'))

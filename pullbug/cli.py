@@ -4,8 +4,10 @@ from typing import get_args
 
 from pullbug.bug import (
     DEFAULT_BASE_URL,
+    DEFAULT_LOG_LEVEL,
     GITHUB_CONTEXT_CHOICES,
     GITHUB_STATE_CHOICES,
+    LOG_LEVEL_CHOICES,
     Pullbug,
 )
 
@@ -136,6 +138,14 @@ class PullBugCli:
             default=DEFAULT_BASE_URL,
             help='The base URL of your GitHub instance (useful for enterprise users with custom hostnames).',
         )
+        parser.add_argument(
+            '--log_level',
+            type=str,
+            required=False,
+            default=DEFAULT_LOG_LEVEL,
+            choices=set(get_args(LOG_LEVEL_CHOICES)),
+            help='The log level used for the tool.',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
@@ -155,6 +165,7 @@ class PullBugCli:
             self.drafts,
             self.location,
             self.base_url,
+            self.log_level,
         )
         bug.run()
 
