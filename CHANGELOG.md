@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+- Adds support for team reviewers to populate in messages
+
 ## v4.3.0 (2022-05-16)
 
 - Adds `log_level` flag allowing the user to specify a log level of their choice (defaults to `INFO`)
