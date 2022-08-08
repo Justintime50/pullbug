@@ -4,7 +4,7 @@ from typing import List, Tuple, Union
 import requests
 import slack
 import woodchips
-from github import Issue, NamedUser, PaginatedList, PullRequest
+from github import Issue, NamedUser, PullRequest, Team
 
 LOGGER_NAME = 'pullbug'
 
@@ -67,7 +67,7 @@ class Message:
     @staticmethod
     def prepare_pulls_message(
         pull_request: PullRequest.PullRequest,
-        reviewers: PaginatedList.PaginatedList,
+        reviewers: List[Union[NamedUser.NamedUser, Team.Team]],
         users_who_approved: List[NamedUser.NamedUser],
         users_who_requested_changes: List[NamedUser.NamedUser],
         users_who_were_dismissed: List[NamedUser.NamedUser],
@@ -130,8 +130,12 @@ class Message:
             discord_reviewers = []
 
             for reviewer in reviewers:
-                slack_reviewers.append(Message._create_slack_user_link(reviewer))
-                discord_reviewers.append(Message._create_discord_user_link(reviewer))
+                if isinstance(reviewer, NamedUser.NamedUser):
+                    slack_reviewers.append(Message._create_slack_user_link(reviewer))
+                    discord_reviewers.append(Message._create_discord_user_link(reviewer))
+                elif isinstance(reviewer, Team.Team):
+                    slack_reviewers.append(Message._create_slack_team_link(reviewer))
+                    discord_reviewers.append(Message._create_discord_team_link(reviewer))
 
             if slack_reviewers:
                 slack_reviewers_string += f"  :timer_clock: {', '.join(set(slack_reviewers))};"
@@ -214,3 +218,15 @@ class Message:
     def _create_discord_object_link(object: Union[PullRequest.PullRequest, Issue.Issue]) -> str:
         """Creates a Discord object name/url combo to be used in messages."""
         return f'{object.title} (<{object.html_url}>)'
+
+    @staticmethod
+    def _create_slack_team_link(team: Team.Team) -> str:
+        """Creates a Slack team name/url combo to be used in messages."""
+        # TODO: The URL is not populating currently from PyGithub
+        return team.name
+
+    @staticmethod
+    def _create_discord_team_link(team: Team.Team) -> str:
+        """Creates a Discord team name/url combo to be used in messages."""
+        # TODO: The URL is not populating currently from PyGithub
+        return team.name

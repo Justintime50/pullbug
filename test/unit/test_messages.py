@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 import slack
+from github import NamedUser, Team
 
 from pullbug.messages import Message
 
@@ -10,6 +11,7 @@ from pullbug.messages import Message
 @patch('logging.Logger.info')
 @patch('requests.post')
 def test_discord_success(mock_request, mock_logger, mock_url, mock_messages):
+    """Tests that we can send a Discord message."""
     Message.send_discord_message(mock_messages, mock_url)
 
     mock_request.assert_called_once_with(mock_url, json={'content': mock_messages[0]})
@@ -19,6 +21,7 @@ def test_discord_success(mock_request, mock_logger, mock_url, mock_messages):
 @patch('logging.Logger.error')
 @patch('requests.post', side_effect=requests.exceptions.RequestException('mock-error'))
 def test_discord_exception(mock_request, mock_logger, mock_url, mock_messages):
+    """Tests that we log errors when sending Discord messages."""
     with pytest.raises(requests.exceptions.RequestException):
         Message.send_discord_message(mock_messages, mock_url)
 
@@ -28,6 +31,7 @@ def test_discord_exception(mock_request, mock_logger, mock_url, mock_messages):
 @patch('logging.Logger.info')
 @patch('slack.WebClient.chat_postMessage')
 def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
+    """Tests that we can send a Slack message."""
     Message.send_slack_message(mock_messages, mock_token, mock_channel)
 
     mock_slack.assert_called_once_with(channel='mock-channel', text=mock_messages[0])
@@ -42,6 +46,7 @@ def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_
     ),
 )
 def test_slack_exception(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
+    """Tests that we log errors when sending Slack messages."""
     with pytest.raises(slack.errors.SlackApiError):
         Message.send_slack_message(mock_messages, mock_token, mock_channel)
 
@@ -51,51 +56,71 @@ def test_slack_exception(mock_slack, mock_logger, mock_messages, mock_token, moc
 
 
 def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
-    """Tests that we build user strings and messages correctly when present."""
-    reviewer = MagicMock()
+    """Tests that we build all user strings and messages correctly when present."""
+    reviewer = MagicMock(spec=NamedUser.NamedUser)
     reviewer.login = 'reviewer'
     reviewer.html_url = f'https://github.com/{mock_user}'
-    reviewers = [reviewer]
 
-    approved_reviewer = MagicMock()
+    team = MagicMock(spec=Team.Team)
+    team.name = 'team'
+
+    reviewers = [reviewer, team]
+
+    approved_reviewer = MagicMock(spec=NamedUser.NamedUser)
     approved_reviewer.login = 'approved_reviewer'
     approved_reviewer.html_url = f'https://github.com/{mock_user}'
     approved_reviewers = [approved_reviewer]
 
-    requested_changes_reviewer = MagicMock()
+    requested_changes_reviewer = MagicMock(spec=NamedUser.NamedUser)
     requested_changes_reviewer.login = 'requested_changes_reviewer'
     requested_changes_reviewer.html_url = f'https://github.com/{mock_user}'
     requested_changes_reviewers = [requested_changes_reviewer]
 
-    dismissed_reviewer = MagicMock()
+    dismissed_reviewer = MagicMock(spec=NamedUser.NamedUser)
     dismissed_reviewer.login = 'dismissed_reviewer'
     dismissed_reviewer.html_url = f'https://github.com/{mock_user}'
     dismissed_reviewers = [dismissed_reviewer]
 
     slack_message, discord_message = Message.prepare_pulls_message(
-        mock_pull_request, reviewers, approved_reviewers, requested_changes_reviewers, dismissed_reviewers
+        pull_request=mock_pull_request,
+        reviewers=reviewers,
+        users_who_approved=approved_reviewers,
+        users_who_requested_changes=requested_changes_reviewers,
+        users_who_were_dismissed=dismissed_reviewers,
     )
 
     # Slack message
     assert 'Pull Request' in slack_message
     assert f'{reviewer.html_url}|{reviewer.login}' in slack_message
+    assert team.name in slack_message
+    assert f'{approved_reviewer.html_url}|{approved_reviewer.login}' in slack_message
+    assert f'{requested_changes_reviewer.html_url}|{requested_changes_reviewer.login}' in slack_message
+    assert f'{dismissed_reviewer.html_url}|{dismissed_reviewer.login}' in slack_message
     assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in slack_message
 
     # Discord message
     assert 'Pull Request' in discord_message
     assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
+    assert team.name in discord_message
+    assert f'{approved_reviewer.login} (<{approved_reviewer.html_url}>)' in discord_message
+    assert f'{requested_changes_reviewer.login} (<{requested_changes_reviewer.html_url}>)' in discord_message
+    assert f'{dismissed_reviewer.login} (<{dismissed_reviewer.html_url}>)' in discord_message
     assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
 
 
 def test_prepare_pulls_message_same_reviewer(mock_pull_request, mock_user, mock_repo):
     """Ensures that when a user has requested changes, been dismissed, then approved, we filter those correctly."""
-    reviewer = MagicMock()
+    reviewer = MagicMock(spec=NamedUser.NamedUser)
     reviewer.login = 'reviewer'
     reviewer.html_url = f'https://github.com/{mock_user}'
     reviewers = [reviewer]
 
     slack_message, discord_message = Message.prepare_pulls_message(
-        mock_pull_request, reviewers, reviewers, reviewers, reviewers
+        pull_request=mock_pull_request,
+        reviewers=reviewers,
+        users_who_approved=reviewers,
+        users_who_requested_changes=reviewers,
+        users_who_were_dismissed=reviewers,
     )
 
     # Slack message
@@ -112,13 +137,20 @@ def test_prepare_pulls_message_same_reviewer(mock_pull_request, mock_user, mock_
 def test_prepare_pulls_message_no_reviewers(mock_pull_request):
     """Tests that no user strings are generated when there are no reviewers."""
     mock_pull_request.requested_reviewers = []
-    slack_message, discord_message = Message.prepare_pulls_message(mock_pull_request, [], [], [], [])
+    slack_message, discord_message = Message.prepare_pulls_message(
+        pull_request=mock_pull_request,
+        reviewers=[],
+        users_who_approved=[],
+        users_who_requested_changes=[],
+        users_who_were_dismissed=[],
+    )
 
     assert '*Reviewers:* NA' in slack_message
     assert '*Reviewers:* NA' in discord_message
 
 
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
+    """Tests that we build the issue message strings correctly when there is an assignee."""
     slack_message, discord_message = Message.prepare_issues_message(mock_issue)
 
     # Slack message
@@ -133,6 +165,7 @@ def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
 
 
 def test_prepare_issues_message_no_assignee(mock_issue):
+    """Tests that we build the issue message string correctly when there is no assignee."""
     mock_issue.assignees = []
     slack_message, _ = Message.prepare_issues_message(mock_issue)
 

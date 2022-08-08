@@ -206,12 +206,13 @@ class Pullbug:
         pull_request_reviews = pull_request.get_reviews()
 
         for pull_request_review in pull_request_reviews:
+            pull_request_review_user = pull_request_review.user
             if pull_request_review and pull_request_review.state == 'APPROVED':
-                users_who_approved.append(pull_request_review.user)
+                users_who_approved.append(pull_request_review_user)
             elif pull_request_review and pull_request_review.state == 'CHANGES_REQUESTED':
-                users_who_requested_changes.append(pull_request_review.user)
+                users_who_requested_changes.append(pull_request_review_user)
             elif pull_request_review and pull_request_review.state == 'DISMISSED':
-                users_who_were_dismissed.append(pull_request_review.user)
+                users_who_were_dismissed.append(pull_request_review_user)
 
         logger.debug(f'Pull request reviews retrieved for {pull_request.title}!')
 
@@ -250,11 +251,21 @@ class Pullbug:
                 # Exclude drafts if the user doesn't want them included
                 continue
             else:
-                # Only reviewers requested who haven't approved or requested changes will be returned here
+                # Only reviewers requested who haven't approved, requested changes, or been dismissed will
+                # be returned here.
                 reviewers = pull_request.get_review_requests()
                 # This is a hack to get around this bug: https://github.com/PyGithub/PyGithub/issues/2053
-                # TODO: Change this from `get_page(0) != []` to `totalCount != 0` once `PyGithub > 1.55` is out
-                reviewers_requested = reviewers[0] if reviewers[0].get_page(0) != [] else []
+                # TODO: Change this from `.get_page(0) != []` to `.totalCount != 0` once `PyGithub > 1.55` is out
+                user_reviewers_requested = reviewers[0] if reviewers[0].get_page(0) != [] else []
+                team_reviewers_requested = reviewers[1] if reviewers[1].get_page(0) != [] else []
+
+                reviewers_requested = []
+                for user in user_reviewers_requested:
+                    reviewers_requested.append(user)
+                for team in team_reviewers_requested:
+                    reviewers_requested.append(team)
+
+                # We need to separately get reviewers who approved, requested changes, or got dismissed
                 (
                     users_who_approved,
                     users_who_requested_changes,
@@ -262,11 +273,11 @@ class Pullbug:
                 ) = self.get_pull_request_reviews(pull_request)
 
                 message, discord_message = Message.prepare_pulls_message(
-                    pull_request,
-                    reviewers_requested,
-                    users_who_approved,
-                    users_who_requested_changes,
-                    users_who_were_dismissed,
+                    pull_request=pull_request,
+                    reviewers=reviewers_requested,
+                    users_who_approved=users_who_approved,
+                    users_who_requested_changes=users_who_requested_changes,
+                    users_who_were_dismissed=users_who_were_dismissed,
                 )
                 slack_message_array.append(message)
                 discord_message_array.append(discord_message)
