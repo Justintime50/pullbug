@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import woodchips
 from github import Github, Issue, NamedUser, PaginatedList, PullRequest
@@ -188,9 +188,7 @@ class Pullbug:
 
         return flat_pull_requests_list
 
-    def get_pull_request_reviews(
-        self, pull_request: PullRequest.PullRequest
-    ) -> Tuple[List[NamedUser.NamedUser], List[NamedUser.NamedUser], List[NamedUser.NamedUser]]:
+    def get_pull_request_reviews(self, pull_request: PullRequest.PullRequest) -> Dict[str, List[NamedUser.NamedUser]]:
         """Grab all pull request reviews of a single pull request.
 
         We then break down these reviews into `APPROVED`, `CHANGES_REQUESTED`, or `DISMISSED` as the `state`.
@@ -199,24 +197,26 @@ class Pullbug:
 
         logger.debug(f'Bugging GitHub for pull request reviews of {pull_request.title}...')
 
-        users_who_approved = []
-        users_who_requested_changes = []
-        users_who_were_dismissed = []
+        pull_request_reviews_by_category: Dict[str, List[NamedUser.NamedUser]] = {
+            'users_who_approved': [],
+            'users_who_requested_changes': [],
+            'users_who_were_dismissed': [],
+        }
 
         pull_request_reviews = pull_request.get_reviews()
 
         for pull_request_review in pull_request_reviews:
             pull_request_review_user = pull_request_review.user
             if pull_request_review and pull_request_review.state == 'APPROVED':
-                users_who_approved.append(pull_request_review_user)
+                pull_request_reviews_by_category['users_who_approved'].append(pull_request_review_user)
             elif pull_request_review and pull_request_review.state == 'CHANGES_REQUESTED':
-                users_who_requested_changes.append(pull_request_review_user)
+                pull_request_reviews_by_category['users_who_requested_changes'].append(pull_request_review_user)
             elif pull_request_review and pull_request_review.state == 'DISMISSED':
-                users_who_were_dismissed.append(pull_request_review_user)
+                pull_request_reviews_by_category['users_who_were_dismissed'].append(pull_request_review_user)
 
         logger.debug(f'Pull request reviews retrieved for {pull_request.title}!')
 
-        return users_who_approved, users_who_requested_changes, users_who_were_dismissed
+        return pull_request_reviews_by_category
 
     def get_issues(self, repos: PaginatedList.PaginatedList) -> List[Issue.Issue]:
         """Grab all issues from each repo and return a flat list of issues."""
@@ -266,11 +266,10 @@ class Pullbug:
                     reviewers_requested.append(team)
 
                 # We need to separately get reviewers who approved, requested changes, or got dismissed
-                (
-                    users_who_approved,
-                    users_who_requested_changes,
-                    users_who_were_dismissed,
-                ) = self.get_pull_request_reviews(pull_request)
+                pull_request_reviews_by_category = self.get_pull_request_reviews(pull_request)
+                users_who_approved = pull_request_reviews_by_category['users_who_approved']
+                users_who_requested_changes = pull_request_reviews_by_category['users_who_requested_changes']
+                users_who_were_dismissed = pull_request_reviews_by_category['users_who_were_dismissed']
 
                 message, discord_message = Message.prepare_pulls_message(
                     pull_request=pull_request,
