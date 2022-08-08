@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v4.4.0 (2022-08-08)
 
 - Adds support for team reviewers to populate in messages
 
