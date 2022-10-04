@@ -1,11 +1,23 @@
 import os
-from typing import Any, Dict, List, Tuple
+from typing import (
+    Any,
+    Dict,
+    List,
+    Tuple,
+)
 
 import woodchips
-from github import Github, Issue, NamedUser, PaginatedList, PullRequest
+from github import (
+    Github,
+    Issue,
+    NamedUser,
+    PaginatedList,
+    PullRequest,
+)
 from typing_extensions import Literal
 
 from pullbug.messages import Message
+
 
 GITHUB_STATE_CHOICES = Literal[
     'all',
@@ -33,7 +45,7 @@ LOGGER_NAME = 'pullbug'
 
 
 class Pullbug:
-    def __init__(
+    def __init__(  # nosec - no hardcoded token here, ignore
         self,
         github_owner: str,
         github_token: str = None,

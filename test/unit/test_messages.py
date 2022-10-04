@@ -1,9 +1,15 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import (
+    MagicMock,
+    patch,
+)
 
 import pytest
 import requests
 import slack
-from github import NamedUser, Team
+from github import (
+    NamedUser,
+    Team,
+)
 
 from pullbug.messages import Message
 

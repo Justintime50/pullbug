@@ -1,10 +1,20 @@
 import math
-from typing import List, Tuple, Union
+from typing import (
+    List,
+    Tuple,
+    Union,
+)
 
 import requests
 import slack
 import woodchips
-from github import Issue, NamedUser, PullRequest, Team
+from github import (
+    Issue,
+    NamedUser,
+    PullRequest,
+    Team,
+)
+
 
 LOGGER_NAME = 'pullbug'
 
