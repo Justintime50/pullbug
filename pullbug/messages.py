@@ -81,6 +81,7 @@ class Message:
         users_who_approved: List[NamedUser.NamedUser],
         users_who_requested_changes: List[NamedUser.NamedUser],
         users_who_were_dismissed: List[NamedUser.NamedUser],
+        disable_descriptions: bool = False,
     ) -> Tuple[str, str]:
         """Prepares a GitHub pull request message with a single pull request's data.
         This will then be appended to an array of messages.
@@ -88,11 +89,15 @@ class Message:
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         pull_request_body = pull_request.body if pull_request.body else ''
-        description = (
-            pull_request_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
-            if len(pull_request_body) > DESCRIPTION_MAX_LENGTH
-            else pull_request_body
-        )
+        description_message_element = ''
+
+        if disable_descriptions is False:
+            description = (
+                pull_request_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+                if len(pull_request_body) > DESCRIPTION_MAX_LENGTH
+                else pull_request_body
+            )
+            description_message_element = f"\n*Description:* {description}"
 
         slack_reviewers_string = ''
         discord_reviewers_string = ''
@@ -155,7 +160,7 @@ class Message:
             f"\n:arrow_heading_up: *Pull Request:* {Message._create_slack_object_link(pull_request)}"
             f"\n*Repo:* <{pull_request.base.repo.html_url}|{pull_request.base.repo.name}>"
             f"\n*Author:* <{pull_request.user.html_url}|{pull_request.user.login}>"
-            f"\n*Description:* {description}"
+            f"{description_message_element}"
             f"\n*Reviewers:*{slack_reviewers_string if slack_reviewers_string else ' NA'}\n"
         )
 
@@ -163,25 +168,29 @@ class Message:
             f"\n:arrow_heading_up: **Pull Request:** {Message._create_discord_object_link(pull_request)}"
             f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
             f"\n**Author:** {pull_request.user.html_url} (<{pull_request.user.login}>)"
-            f"\n**Description:** {description}"
+            f"{description_message_element}"
             f"\n*Reviewers:*{discord_reviewers_string if discord_reviewers_string else ' NA'}\n"
         )
 
         return slack_message, discord_message
 
     @staticmethod
-    def prepare_issues_message(issue: Issue.Issue) -> Tuple[str, str]:
+    def prepare_issues_message(issue: Issue.Issue, disable_descriptions: bool = False) -> Tuple[str, str]:
         """Prepares a GitHub issue message with a single issue's data.
         This will then be appended to an array of messages.
 
         Slack and Discord each have slightly different formatting required, both messages are returned here.
         """
         issue_body = issue.body if issue.body else ''
-        description = (
-            issue_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
-            if len(issue_body) > DESCRIPTION_MAX_LENGTH
-            else issue_body
-        )
+        description_message_element = ''
+
+        if disable_descriptions is False:
+            description = (
+                issue_body[:DESCRIPTION_MAX_LENGTH] + DESCRIPTION_CONTINUATION
+                if len(issue_body) > DESCRIPTION_MAX_LENGTH
+                else issue_body
+            )
+            description_message_element = f"\n*Description:* {description}"
 
         if issue.assignees:
             slack_users = []
@@ -196,14 +205,14 @@ class Message:
         slack_message = (
             f"\n:exclamation: *Issue:* {Message._create_slack_object_link(issue)}"
             f"\n*Repo:* <{issue.repository.html_url}|{issue.repository.name}>"
-            f"\n*Description:* {description}"
+            f"{description_message_element}"
             f"\n*Assigned to:* {', '.join(slack_users)}\n"
         )
 
         discord_message = (
             f"\n:exclamation: **Issue:** {Message._create_discord_object_link(issue)}"
             f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
-            f"\n**Description:** {description}"
+            f"{description_message_element}"
             f"\n**Assigned to:** {', '.join(discord_users)}\n"
         )
 

@@ -146,6 +146,13 @@ class PullBugCli:
             choices=set(get_args(LOG_LEVEL_CHOICES)),
             help='The log level used for the tool.',
         )
+        parser.add_argument(
+            '--disable_descriptions',
+            required=False,
+            action='store_true',
+            default=False,
+            help='Disables descriptions in messages.',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
@@ -166,6 +173,7 @@ class PullBugCli:
             self.location,
             self.base_url,
             self.log_level,
+            self.disable_descriptions,
         )
         bug.run()
 

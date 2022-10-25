@@ -97,6 +97,7 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
 
     # Slack message
     assert 'Pull Request' in slack_message
+    assert 'Description' in slack_message
     assert f'{reviewer.html_url}|{reviewer.login}' in slack_message
     assert team.name in slack_message
     assert f'{approved_reviewer.html_url}|{approved_reviewer.login}' in slack_message
@@ -106,6 +107,7 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
 
     # Discord message
     assert 'Pull Request' in discord_message
+    assert 'Description' in discord_message
     assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
     assert team.name in discord_message
     assert f'{approved_reviewer.login} (<{approved_reviewer.html_url}>)' in discord_message
@@ -155,17 +157,75 @@ def test_prepare_pulls_message_no_reviewers(mock_pull_request):
     assert '*Reviewers:* NA' in discord_message
 
 
+def test_prepare_pulls_message_disabled_description(mock_pull_request, mock_user, mock_repo):
+    """Tests that we build all user strings and messages correctly when descriptions are disabled."""
+    reviewer = MagicMock(spec=NamedUser.NamedUser)
+    reviewer.login = 'reviewer'
+    reviewer.html_url = f'https://github.com/{mock_user}'
+
+    team = MagicMock(spec=Team.Team)
+    team.name = 'team'
+
+    reviewers = [reviewer, team]
+
+    approved_reviewer = MagicMock(spec=NamedUser.NamedUser)
+    approved_reviewer.login = 'approved_reviewer'
+    approved_reviewer.html_url = f'https://github.com/{mock_user}'
+    approved_reviewers = [approved_reviewer]
+
+    requested_changes_reviewer = MagicMock(spec=NamedUser.NamedUser)
+    requested_changes_reviewer.login = 'requested_changes_reviewer'
+    requested_changes_reviewer.html_url = f'https://github.com/{mock_user}'
+    requested_changes_reviewers = [requested_changes_reviewer]
+
+    dismissed_reviewer = MagicMock(spec=NamedUser.NamedUser)
+    dismissed_reviewer.login = 'dismissed_reviewer'
+    dismissed_reviewer.html_url = f'https://github.com/{mock_user}'
+    dismissed_reviewers = [dismissed_reviewer]
+
+    slack_message, discord_message = Message.prepare_pulls_message(
+        pull_request=mock_pull_request,
+        reviewers=reviewers,
+        users_who_approved=approved_reviewers,
+        users_who_requested_changes=requested_changes_reviewers,
+        users_who_were_dismissed=dismissed_reviewers,
+        disable_descriptions=True,
+    )
+
+    # Slack message
+    assert 'Pull Request' in slack_message
+    assert 'Description' not in slack_message
+    assert f'{reviewer.html_url}|{reviewer.login}' in slack_message
+    assert team.name in slack_message
+    assert f'{approved_reviewer.html_url}|{approved_reviewer.login}' in slack_message
+    assert f'{requested_changes_reviewer.html_url}|{requested_changes_reviewer.login}' in slack_message
+    assert f'{dismissed_reviewer.html_url}|{dismissed_reviewer.login}' in slack_message
+    assert f'{mock_pull_request.html_url}|{mock_pull_request.title}' in slack_message
+
+    # Discord message
+    assert 'Pull Request' in discord_message
+    assert 'Description' not in discord_message
+    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
+    assert team.name in discord_message
+    assert f'{approved_reviewer.login} (<{approved_reviewer.html_url}>)' in discord_message
+    assert f'{requested_changes_reviewer.login} (<{requested_changes_reviewer.html_url}>)' in discord_message
+    assert f'{dismissed_reviewer.login} (<{dismissed_reviewer.html_url}>)' in discord_message
+    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
+
+
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
     """Tests that we build the issue message strings correctly when there is an assignee."""
     slack_message, discord_message = Message.prepare_issues_message(mock_issue)
 
     # Slack message
     assert 'Issue' in slack_message
+    assert 'Description' in slack_message
     assert f'{mock_issue.assignees[0].html_url}|{mock_issue.assignees[0].login}' in slack_message
     assert f'{mock_issue.html_url}|{mock_issue.title}' in slack_message
 
     # Discord message
     assert 'Issue' in discord_message
+    assert 'Description' in discord_message
     assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_message
     assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_message
 
@@ -176,3 +236,20 @@ def test_prepare_issues_message_no_assignee(mock_issue):
     slack_message, _ = Message.prepare_issues_message(mock_issue)
 
     assert '*Assigned to:* NA' in slack_message
+
+
+def test_prepare_issues_message_disable_descriptions(mock_issue, mock_user, mock_repo):
+    """Tests that we build the issue message strings correctly when descriptions are disabled."""
+    slack_message, discord_message = Message.prepare_issues_message(issue=mock_issue, disable_descriptions=True)
+
+    # Slack message
+    assert 'Issue' in slack_message
+    assert 'Description' not in slack_message
+    assert f'{mock_issue.assignees[0].html_url}|{mock_issue.assignees[0].login}' in slack_message
+    assert f'{mock_issue.html_url}|{mock_issue.title}' in slack_message
+
+    # Discord message
+    assert 'Issue' in discord_message
+    assert 'Description' not in discord_message
+    assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_message
+    assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_message

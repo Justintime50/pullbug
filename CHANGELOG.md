@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v4.5.0 (2022-10-25)
+
+- Adds `--disable_descriptions` flag which will not populate the description in messages
+
 ## v4.4.0 (2022-08-08)
 
 - Adds support for team reviewers to populate in messages

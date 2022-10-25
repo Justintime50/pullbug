@@ -63,6 +63,7 @@ class Pullbug:
         location: str = os.path.expanduser('~/pullbug'),
         base_url: str = DEFAULT_BASE_URL,
         log_level: str = DEFAULT_LOG_LEVEL,
+        disable_descriptions: bool = False,
     ):
         # Parameter variables
         self.github_owner = github_owner
@@ -81,6 +82,7 @@ class Pullbug:
         self.location = location
         self.base_url = base_url
         self.log_level = log_level
+        self.disable_descriptions = disable_descriptions
 
         # Internal variables
         self.github_instance = Github(login_or_token=self.github_token, base_url=self.base_url)
@@ -289,20 +291,20 @@ class Pullbug:
                     users_who_approved=users_who_approved,
                     users_who_requested_changes=users_who_requested_changes,
                     users_who_were_dismissed=users_who_were_dismissed,
+                    disable_descriptions=self.disable_descriptions,
                 )
                 slack_message_array.append(message)
                 discord_message_array.append(discord_message)
 
         return slack_message_array, discord_message_array
 
-    @staticmethod
-    def iterate_issues(issues: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
+    def iterate_issues(self, issues: PaginatedList.PaginatedList) -> Tuple[List[str], List[str]]:
         """Iterate through each issue of a repo and build the message array."""
         slack_message_array = []
         discord_message_array = []
 
         for issue in issues:
-            slack_message, discord_message = Message.prepare_issues_message(issue)
+            slack_message, discord_message = Message.prepare_issues_message(issue, self.disable_descriptions)
             slack_message_array.append(slack_message)
             discord_message_array.append(discord_message)
 
