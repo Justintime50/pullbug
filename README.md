@@ -31,7 +31,7 @@ make install
 
 Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug to notify you at whatever interval you'd like to be bugged via Discord or Slack about pull requests.
 
-Pullbug is highly customizable allowing you to mix and match version control software along with messaging platforms to get the right fit. Additionally choose which kinds of pull requests to retrieve.
+Pullbug is highly customizable allowing you to choose which messaging service and what kinds of pull requests or issues you'd like.
 
 ```
 Usage:

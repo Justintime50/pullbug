@@ -34,6 +34,7 @@ class Message:
         logger = woodchips.get(LOGGER_NAME)
 
         num_of_messages = len(messages)
+        # The message size of ~300 characters means we can send 6 messages per request plus some buffer room
         max_messages_per_batch = 6
         i = 1
         new_cutoff = max_messages_per_batch
