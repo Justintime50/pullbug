@@ -20,7 +20,7 @@ def test_discord_success(mock_request, mock_logger, mock_url, mock_messages):
     """Tests that we can send a Discord message."""
     Message.send_discord_message(mock_messages, mock_url)
 
-    mock_request.assert_called_once_with(mock_url, json={'content': mock_messages[0]})
+    mock_request.assert_called_once_with(mock_url, json={'content': mock_messages[0]}, timeout=30)
     mock_logger.assert_called_once_with('Discord message sent!')
 
 
