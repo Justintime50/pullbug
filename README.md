@@ -33,38 +33,41 @@ Pullbug works best when run on a schedule. Run one-off reports or setup Pullbug 
 
 Pullbug is highly customizable allowing you to choose which messaging service and what kinds of pull requests or issues you'd like.
 
-```
+```text
 Usage:
-    pullbug --github_token 123... --github_owner justintime50 --github_context users
+  pullbug --github_token 123... --github_owner justintime50 --github_context users
 
 Options:
-    -h, --help            show this help message and exit
-    -p, --pulls           Bug GitHub for Pull Requests.
-    -i, --issues          Bug GitHub for Issues.
-    -gt GITHUB_TOKEN, --github_token GITHUB_TOKEN
-                            The token to authenticate with GitHub.
-    -go GITHUB_OWNER, --github_owner GITHUB_OWNER
-                            The GitHub owner to retrieve pull requests or issues for (can be a user or organization).
-    -gs {closed,all,open}, --github_state {closed,all,open}
-                            The GitHub state to retrieve pull requests or issues for.
-    -gc {orgs,users}, --github_context {orgs,users}
-                            The GitHub context to retrieve pull requests or issues for.
-    -d, --discord         Send Pullbug messages to Discord.
-    -du DISCORD_URL, --discord_url DISCORD_URL
-                            The Discord webhook URL to send messages to.
-    -s, --slack           Send Pullbug messages to Slack.
-    -st SLACK_TOKEN, --slack_token SLACK_TOKEN
-                            The Slackbot token to authenticate with Slack.
-    -sc SLACK_CHANNEL, --slack_channel SLACK_CHANNEL
-                            The Slack channel to send messages to.
-    -r REPOS, --repos REPOS
-                            A comma-separated list of repos to run Pullbug against.
-    -dr, --drafts         Include draft pull requests.
-    -l LOCATION, --location LOCATION
-                            The location of the Pullbug logs and files.
-    --base_url BASE_URL   The base URL of your GitHub instance (useful for enterprise users with custom hostnames).
-    --log_level {error,debug,warning,info,critical}
-                            The log level used for the tool.
+  -h, --help            show this help message and exit
+  -p, --pulls           Bug GitHub for Pull Requests.
+  -i, --issues          Bug GitHub for Issues.
+  -gt GITHUB_TOKEN, --github_token GITHUB_TOKEN
+                        The token to authenticate with GitHub.
+  -go GITHUB_OWNER, --github_owner GITHUB_OWNER
+                        The GitHub owner to retrieve pull requests or issues for (can be a user or organization).
+  -gs {all,open,closed}, --github_state {all,open,closed}
+                        The GitHub state to retrieve pull requests or issues for.
+  -gc {orgs,users}, --github_context {orgs,users}
+                        The GitHub context to retrieve pull requests or issues for.
+  -d, --discord         Send Pullbug messages to Discord.
+  -du DISCORD_URL, --discord_url DISCORD_URL
+                        The Discord webhook URL to send messages to.
+  -s, --slack           Send Pullbug messages to Slack.
+  -st SLACK_TOKEN, --slack_token SLACK_TOKEN
+                        The Slackbot token to authenticate with Slack.
+  -sc SLACK_CHANNEL, --slack_channel SLACK_CHANNEL
+                        The Slack channel to send messages to.
+  -r REPOS, --repos REPOS
+                        A comma-separated list of repos to run Pullbug against.
+  -dr, --drafts         Include draft pull requests.
+  -l LOCATION, --location LOCATION
+                        The location of the Pullbug logs and files.
+  --base_url BASE_URL   The base URL of your GitHub instance (useful for enterprise users with custom hostnames).
+  --log_level {warning,debug,info,notset,error,critical}
+                        The log level used for the tool.
+  --disable_descriptions
+                        Disables descriptions in messages.
+  --quiet               Does not output when there is nothing to bug about.
 ```
 
 ## Development
