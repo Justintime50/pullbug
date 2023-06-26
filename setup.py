@@ -8,17 +8,16 @@ REQUIREMENTS = [
     'PyGithub == 1.*',
     'requests == 2.*',
     'slackclient == 2.*',
-    'typing_extensions',  # TODO: Remove once we drop support for Python 3.7
     'woodchips == 0.2.*',
 ]
 
 DEV_REQUIREMENTS = [
     'bandit == 1.7.*',
-    'black == 22.*',
-    'build == 0.7.*',
-    'flake8 == 4.*',
+    'black == 23.*',
+    'build == 0.10.*',
+    'flake8 == 6.*',
     'isort == 5.*',
-    'mypy == 0.942',
+    'mypy == 1.3.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
     'twine == 4.*',
@@ -27,7 +26,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='4.5.0',
+    version='5.0.0',
     description='Get bugged via Discord or Slack to merge your GitHub pull requests or close open issues.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -59,5 +58,5 @@ setuptools.setup(
             'pullbug=pullbug.cli:main',
         ],
     },
-    python_requires='>=3.7, <4',
+    python_requires='>=3.8, <4',
 )

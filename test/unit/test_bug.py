@@ -231,3 +231,24 @@ def test_send_messages_slack(mock_send_slack_message, mock_token, mock_channel):
     ).send_messages(slack_messages, discord_messages)
 
     mock_send_slack_message.assert_called_once_with(slack_messages, mock_token, mock_channel)
+
+
+@patch('pullbug.bug.Pullbug.send_messages')
+@patch('pullbug.bug.Pullbug.get_pull_requests')
+@patch('pullbug.bug.Pullbug.get_repos')
+@patch('logging.Logger.info')
+def test_no_messages_when_quiet(mock_logger, mock_get_repos, mock_pull_request, mock_send_messages):
+    """Tests that we do not send messages when the user passes the `quiet` flag."""
+    Pullbug(
+        github_owner='justintime50',
+        github_token='123',
+        github_context='users',
+        pulls=True,
+        issues=True,
+        quiet=True,
+    ).run()
+
+    mock_get_repos.assert_called_once()
+    mock_pull_request.assert_called_once()
+    mock_logger.assert_called()
+    mock_send_messages.assert_not_called()

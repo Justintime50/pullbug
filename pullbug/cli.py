@@ -153,6 +153,13 @@ class PullBugCli:
             default=False,
             help='Disables descriptions in messages.',
         )
+        parser.add_argument(
+            '--quiet',
+            required=False,
+            action='store_true',
+            default=False,
+            help='Does not output when there is nothing to bug about.',
+        )
         parser.parse_args(namespace=self)
 
     def run(self):
@@ -174,6 +181,7 @@ class PullBugCli:
             self.base_url,
             self.log_level,
             self.disable_descriptions,
+            self.quiet,
         )
         bug.run()
 

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v5.0.0 (2023-06-26)
+
+- Drops support for Python 3.7
+- Adds a new `--quiet` flag which will not send messages if no PRs or issues can be found
+
 ## v4.5.0 (2022-10-25)
 
 - Adds `--disable_descriptions` flag which will not populate the description in messages

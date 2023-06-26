@@ -3,18 +3,20 @@ from typing import (
     Any,
     Dict,
     List,
+    Literal,
+    Optional,
     Tuple,
 )
 
 import woodchips
 from github import (
+    Auth,
     Github,
     Issue,
     NamedUser,
     PaginatedList,
     PullRequest,
 )
-from typing_extensions import Literal
 
 from pullbug.messages import Message
 
@@ -48,7 +50,7 @@ class Pullbug:
     def __init__(  # nosec - no hardcoded token here, ignore
         self,
         github_owner: str,
-        github_token: str = None,
+        github_token: Optional[str] = None,
         github_state: GITHUB_STATE_CHOICES = 'open',
         github_context: GITHUB_CONTEXT_CHOICES = 'users',
         pulls: bool = False,
@@ -64,6 +66,7 @@ class Pullbug:
         base_url: str = DEFAULT_BASE_URL,
         log_level: str = DEFAULT_LOG_LEVEL,
         disable_descriptions: bool = False,
+        quiet: bool = False,
     ):
         # Parameter variables
         self.github_owner = github_owner
@@ -83,9 +86,13 @@ class Pullbug:
         self.base_url = base_url
         self.log_level = log_level
         self.disable_descriptions = disable_descriptions
+        self.quiet = quiet
 
         # Internal variables
-        self.github_instance = Github(login_or_token=self.github_token, base_url=self.base_url)
+        if github_token:
+            self.github_instance = Github(auth=Auth.Token(github_token), base_url=self.base_url)
+        else:
+            self.github_instance = Github(base_url=self.base_url)
 
     def run(self):
         """Run the logic to get PR's from GitHub and send that data via message."""
@@ -102,14 +109,20 @@ class Pullbug:
 
             # Check if there are pull requests and available messages to send (eg: filtering for drafts)
             if pull_requests != [] and slack_pull_messages:
+                found_pull_requests = True
                 pull_message_preamble = '\n:bug: *The following GitHub pull requests still need your help!*\n'
                 slack_pull_messages.insert(0, pull_message_preamble)
                 discord_pull_messages.insert(0, pull_message_preamble)
             else:
+                found_pull_requests = False
                 slack_pull_messages = discord_pull_messages = ['\n:bug: *Pullbug found no ready pull requests!*\n']
                 logger.info(slack_pull_messages[0])
 
-            self.send_messages(slack_pull_messages, discord_pull_messages)
+            if found_pull_requests is False and self.quiet:
+                # The user doesn't want messages sent when there are no pull requests
+                pass
+            else:
+                self.send_messages(slack_pull_messages, discord_pull_messages)
 
         if self.issues:
             issues = self.get_issues(repos)
@@ -117,14 +130,20 @@ class Pullbug:
 
             # Check if there are issues and available messages to send
             if issues != [] and slack_issue_messages:
+                found_issues = True
                 issue_message_preamble = '\n:bug: *The following GitHub issues still need your help!*\n'
                 slack_issue_messages.insert(0, issue_message_preamble)
                 discord_issue_messages.insert(0, issue_message_preamble)
             else:
+                found_issues = False
                 slack_issue_messages = discord_issue_messages = ['\n:bug: *Pullbug found no open issues!*\n']
                 logger.info(slack_issue_messages[0])
 
-            self.send_messages(slack_issue_messages, discord_issue_messages)
+            if found_issues is False and self.quiet:
+                # The user doesn't want messages sent when there are no issues
+                pass
+            else:
+                self.send_messages(slack_issue_messages, discord_issue_messages)
 
         logger.info('Pullbug finished bugging!')
 
