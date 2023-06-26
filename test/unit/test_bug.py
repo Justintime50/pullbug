@@ -8,10 +8,11 @@ import pytest
 from pullbug.bug import Pullbug
 
 
+@patch('pullbug.bug.Pullbug.send_messages')
 @patch('pullbug.bug.Pullbug.get_pull_requests')
 @patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
-def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
+def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request, mock_send_messages):
     Pullbug(
         github_owner='justintime50',
         github_token='123',
@@ -22,6 +23,7 @@ def test_run_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
     mock_get_repos.assert_called_once()
     mock_pull_request.assert_called_once()
     mock_logger.assert_called()
+    mock_send_messages.assert_called_once()
 
 
 @patch('pullbug.bug.Pullbug.get_pull_requests', return_value=[])
@@ -40,10 +42,11 @@ def test_run_no_pull_requests(mock_logger, mock_get_repos, mock_pull_request):
     assert mock_logger.call_count == 4
 
 
+@patch('pullbug.bug.Pullbug.send_messages')
 @patch('pullbug.bug.Pullbug.get_issues')
 @patch('pullbug.bug.Pullbug.get_repos')
 @patch('logging.Logger.info')
-def test_run_issues(mock_logger, mock_get_repos, mock_issues):
+def test_run_issues(mock_logger, mock_get_repos, mock_issues, mock_send_messages):
     Pullbug(
         github_owner='justintime50',
         github_token='123',
@@ -54,6 +57,7 @@ def test_run_issues(mock_logger, mock_get_repos, mock_issues):
     mock_get_repos.assert_called_once()
     mock_issues.assert_called_once()
     mock_logger.assert_called()
+    mock_send_messages.assert_called_once()
 
 
 @patch('pullbug.bug.Pullbug.get_issues', return_value=[])
