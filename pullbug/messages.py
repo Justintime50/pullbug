@@ -21,6 +21,8 @@ LOGGER_NAME = 'pullbug'
 DESCRIPTION_CONTINUATION = '...'
 DESCRIPTION_MAX_LENGTH = 120
 
+TIMEOUT = 30
+
 
 class Message:
     @staticmethod
@@ -46,7 +48,11 @@ class Message:
             new_cutoff += max_messages_per_batch
             old_cutoff += max_messages_per_batch
             try:
-                requests.post(discord_url, json={'content': batch_message})
+                requests.post(
+                    discord_url,
+                    json={'content': batch_message},
+                    timeout=TIMEOUT,
+                )
                 logger.info('Discord message sent!')
             except requests.exceptions.RequestException as discord_error:
                 logger.error(f'Could not send Discord message: {discord_error}')
