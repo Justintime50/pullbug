@@ -24,7 +24,7 @@ Pullbug can notify you on Discord or Slack of all open pull requests from GitHub
 pip3 install pullbug
 
 # Install locally
-make install
+just install
 ```
 
 ## Usage
@@ -74,7 +74,7 @@ Options:
 
 ```bash
 # Get a comprehensive list of development tools
-make help
+just --list
 
 # Run the tool locally
 venv/bin/python pullbug/cli.py --help

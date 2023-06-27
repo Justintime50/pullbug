@@ -25,11 +25,9 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install Dependencies
-        run: make install
-      - name: Check format
-        run: make format-check
-      - name: Scan for security vulnerabilities
-        run: make scan
+        run: just install
+      - name: Lint
+        run: just lint
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -43,9 +41,9 @@ jobs:
         with:
           python-version: ${{ matrix.pythonversion }}
       - name: Install Dependencies
-        run: make install
+        run: just install
       - name: Run tests
-        run: make coverage
+        run: just coverage
       - name: Coveralls
         if: github.ref == 'refs/heads/main'
         uses: coverallsapp/github-action@master

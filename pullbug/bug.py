@@ -47,7 +47,7 @@ LOGGER_NAME = 'pullbug'
 
 
 class Pullbug:
-    def __init__(  # nosec - no hardcoded token here, ignore
+    def __init__(  # nosec hardcoded_password_default
         self,
         github_owner: str,
         github_token: Optional[str] = None,
