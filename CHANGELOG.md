@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v5.0.1 (2023-06-29)
+
+- Pins the correct version of `PyGithub` to properly use the new `Auth` object
+
 ## v5.0.0 (2023-06-26)
 
 - Drops support for Python 3.7

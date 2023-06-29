@@ -22,11 +22,11 @@ black-check:
 
 # Test the project and generate an HTML coverage report
 coverage:
-    {{VIRTUAL_BIN}}/pytest --cov={{PROJECT_NAME}} --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
+    {{VIRTUAL_BIN}}/pytest --cov={{PROJECT_NAME}} --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing --cov-fail-under=90
 
-# Remove the virtual environment and clear out .pyc files
+# Cleans the project
 clean:
-    rm -rf {{VIRTUAL_ENV}} dist *.egg-info .coverage
+    rm -rf {{VIRTUAL_ENV}} dist *.egg-info .coverage htmlcov .*cache
     find . -name '*.pyc' -delete
 
 # Lints the project

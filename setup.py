@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
-    'PyGithub == 1.*',
+    'PyGithub >= 1.59.0',
     'requests == 2.*',
     'slackclient == 2.*',
     'woodchips == 0.2.*',
@@ -26,7 +26,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='pullbug',
-    version='5.0.0',
+    version='5.0.1',
     description='Get bugged via Discord or Slack to merge your GitHub pull requests or close open issues.',
     long_description=long_description,
     long_description_content_type="text/markdown",
