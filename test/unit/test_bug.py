@@ -144,7 +144,7 @@ def test_get_repos_users(mock_logger, mock_get_user, mock_get_repos, mock_github
     repos = bug.get_repos()
 
     mock_logger.call_count == 2
-    assert type(repos) == list
+    assert isinstance(repos, list)
     # TODO: Assert the get_repos and get_user/org gets called
 
 
@@ -161,7 +161,7 @@ def test_get_repos_orgs(mock_logger, mock_get_org, mock_get_repos, mock_github_i
     repos = bug.get_repos()
 
     mock_logger.call_count == 2
-    assert type(repos) == list
+    assert isinstance(repos, list)
     # TODO: Assert the get_repos and get_user/org gets called
 
 
@@ -171,7 +171,7 @@ def test_get_pull_requests(mock_logger):
         github_owner='justintime50',
     ).get_pull_requests(repos=[MagicMock()])
 
-    assert type(pull_requests) == list
+    assert isinstance(pull_requests, list)
     mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
@@ -182,7 +182,7 @@ def test_get_issues(mock_logger):
         github_owner='justintime50',
     ).get_issues(repos=[MagicMock()])
 
-    assert type(issues) == list
+    assert isinstance(issues, list)
     mock_logger.call_count == 2
     # TODO: Assert and mock that `get_pulls` gets called
 
@@ -194,8 +194,8 @@ def test_iterate_pull_requests(mock_prepare_pulls_message):
         drafts=True,  # Lazy approach but keeps us from needing to build the MagicMock object below
     ).iterate_pull_requests(pull_requests=[MagicMock()])
 
-    assert type(slack_messages) == list
-    assert type(discord_messages) == list
+    assert isinstance(slack_messages, list)
+    assert isinstance(discord_messages, list)
     mock_prepare_pulls_message.assert_called_once()
 
 
@@ -205,8 +205,8 @@ def test_iterate_issues(mock_prepare_issues_message):
         github_owner='justintime50',
     ).iterate_issues(issues=[MagicMock()])
 
-    assert type(slack_messages) == list
-    assert type(discord_messages) == list
+    assert isinstance(slack_messages, list)
+    assert isinstance(discord_messages, list)
     mock_prepare_issues_message.assert_called_once()
 
 
