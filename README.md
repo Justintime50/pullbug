@@ -68,6 +68,7 @@ Options:
   --disable_descriptions
                         Disables descriptions in messages.
   --quiet               Does not output when there is nothing to bug about.
+  --version             show program's version number and exit
 ```
 
 ## Development

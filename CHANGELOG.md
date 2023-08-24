@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## v5.0.2 (2023-08-24)
+## v5.1.0 (2023-08-24)
 
+- Adds `--version` CLI flag
 - Bumps dependencies
 
 ## v5.0.1 (2023-06-29)

@@ -2,6 +2,7 @@ import argparse
 import os
 from typing import get_args
 
+from pullbug._version import __version__
 from pullbug.bug import (
     DEFAULT_BASE_URL,
     DEFAULT_LOG_LEVEL,
@@ -159,6 +160,11 @@ class PullBugCli:
             action='store_true',
             default=False,
             help='Does not output when there is nothing to bug about.',
+        )
+        parser.add_argument(
+            '--version',
+            action='version',
+            version=f'%(prog)s {__version__}',
         )
         parser.parse_args(namespace=self)
 
