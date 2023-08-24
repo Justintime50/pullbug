@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v5.0.2 (2023-08-24)
+
+- Bumps dependencies
+
 ## v5.0.1 (2023-06-29)
 
 - Pins the correct version of `PyGithub` to properly use the new `Auth` object
