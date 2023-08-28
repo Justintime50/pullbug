@@ -42,6 +42,7 @@ LOG_LEVEL_CHOICES = Literal[
 ]
 
 DEFAULT_BASE_URL = 'https://api.github.com'
+DEFAULT_LOCATION = os.path.join('~', 'pullbug')
 
 LOGGER_NAME = 'pullbug'
 
@@ -62,7 +63,7 @@ class Pullbug:
         slack_channel: str = '',
         repos: str = '',
         drafts: bool = False,
-        location: str = os.path.expanduser('~/pullbug'),
+        location: str = DEFAULT_LOCATION,
         base_url: str = DEFAULT_BASE_URL,
         log_level: str = DEFAULT_LOG_LEVEL,
         disable_descriptions: bool = False,
@@ -82,7 +83,7 @@ class Pullbug:
         self.slack_channel = slack_channel
         self.repos = [repo.strip() for repo in repos.lower().split(',')] if repos else ''
         self.drafts = drafts
-        self.location = location
+        self.location = os.path.expanduser(location)
         self.base_url = base_url
         self.log_level = log_level
         self.disable_descriptions = disable_descriptions

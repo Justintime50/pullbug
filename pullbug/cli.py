@@ -1,10 +1,10 @@
 import argparse
-import os
 from typing import get_args
 
 from pullbug._version import __version__
 from pullbug.bug import (
     DEFAULT_BASE_URL,
+    DEFAULT_LOCATION,
     DEFAULT_LOG_LEVEL,
     GITHUB_CONTEXT_CHOICES,
     GITHUB_STATE_CHOICES,
@@ -129,7 +129,7 @@ class PullBugCli:
             '--location',
             required=False,
             type=str,
-            default=os.path.expanduser('~/pullbug'),
+            default=DEFAULT_LOCATION,
             help='The location of the Pullbug logs and files.',
         )
         parser.add_argument(
