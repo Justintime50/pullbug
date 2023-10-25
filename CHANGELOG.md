@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v5.1.2 (2023-10-25)
+
+- Swaps the deprecated `slackclient` for the new `slack_sdk`, no user impact expected
+
 ## v5.1.1 (2023-08-27)
 
 - Expand paths for user-supplied `--location` strings. This now allows for spaces in paths and proper expansion of home directories (eg: `~`)

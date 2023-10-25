@@ -6,7 +6,7 @@ from typing import (
 )
 
 import requests
-import slack
+import slack_sdk
 import woodchips
 from github import (
     Issue,
@@ -69,7 +69,7 @@ class Message:
 
         message_max_length = 40000
         slack_message = ''.join(messages)[:message_max_length]
-        slack_client = slack.WebClient(slack_token)
+        slack_client = slack_sdk.WebClient(slack_token)
 
         try:
             slack_client.chat_postMessage(
@@ -77,9 +77,9 @@ class Message:
                 text=slack_message,
             )
             logger.info('Slack message sent!')
-        except slack.errors.SlackApiError as slack_error:
+        except slack_sdk.errors.SlackApiError as slack_error:
             logger.error(f'Could not send Slack message: {slack_error}')
-            raise slack.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
+            raise slack_sdk.errors.SlackApiError(slack_error.response["ok"], slack_error.response['error'])
 
     @staticmethod
     def prepare_pulls_message(

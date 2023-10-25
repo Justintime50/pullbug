@@ -5,7 +5,7 @@ from unittest.mock import (
 
 import pytest
 import requests
-import slack
+import slack_sdk
 from github import (
     NamedUser,
     Team,
@@ -35,7 +35,7 @@ def test_discord_exception(mock_request, mock_logger, mock_url, mock_messages):
 
 
 @patch('logging.Logger.info')
-@patch('slack.WebClient.chat_postMessage')
+@patch('slack_sdk.WebClient.chat_postMessage')
 def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
     """Tests that we can send a Slack message."""
     Message.send_slack_message(mock_messages, mock_token, mock_channel)
@@ -46,14 +46,14 @@ def test_slack_success(mock_slack, mock_logger, mock_messages, mock_token, mock_
 
 @patch('logging.Logger.error')
 @patch(
-    'slack.WebClient.chat_postMessage',
-    side_effect=slack.errors.SlackApiError(
+    'slack_sdk.WebClient.chat_postMessage',
+    side_effect=slack_sdk.errors.SlackApiError(
         message='The request to the Slack API failed.', response={'ok': False, 'error': 'not_authed'}
     ),
 )
 def test_slack_exception(mock_slack, mock_logger, mock_messages, mock_token, mock_channel):
     """Tests that we log errors when sending Slack messages."""
-    with pytest.raises(slack.errors.SlackApiError):
+    with pytest.raises(slack_sdk.errors.SlackApiError):
         Message.send_slack_message(mock_messages, mock_token, mock_channel)
 
     mock_logger.assert_called_once_with(

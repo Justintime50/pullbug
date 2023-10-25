@@ -17,7 +17,7 @@ with open('pullbug/_version.py', 'r') as version_file:
 REQUIREMENTS = [
     'PyGithub >= 1.59.0',
     'requests == 2.*',
-    'slackclient == 2.*',
+    'slack_sdk == 3.*',
     'woodchips == 1.*',
 ]
 
