@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v5.1.3 (2024-07-16)
+
+- Fixes Discord message links to appear correctly (previously the wrong syntax was used or has since changed on the Discord side and inline links weren't getting wrapped properly)
+
 ## v5.1.2 (2023-10-25)
 
 - Swaps the deprecated `slackclient` for the new `slack_sdk`, no user impact expected

@@ -173,8 +173,8 @@ class Message:
 
         discord_message = (
             f"\n:arrow_heading_up: **Pull Request:** {Message._create_discord_object_link(pull_request)}"
-            f"\n**Repo:** {pull_request.base.repo.name} (<{pull_request.base.repo.html_url}>)"
-            f"\n**Author:** {pull_request.user.html_url} (<{pull_request.user.login}>)"
+            f"\n**Repo:** [{pull_request.base.repo.name}]({pull_request.base.repo.html_url})"
+            f"\n**Author:** [{pull_request.user.login}]({pull_request.user.html_url})"
             f"{description_message_element}"
             f"\n*Reviewers:*{discord_reviewers_string if discord_reviewers_string else ' NA'}\n"
         )
@@ -218,7 +218,7 @@ class Message:
 
         discord_message = (
             f"\n:exclamation: **Issue:** {Message._create_discord_object_link(issue)}"
-            f"\n**Repo:** {issue.repository.name} (<{issue.repository.html_url}>)"
+            f"\n**Repo:** [{issue.repository.name}]({issue.repository.html_url})"
             f"{description_message_element}"
             f"\n**Assigned to:** {', '.join(discord_users)}\n"
         )
@@ -233,7 +233,7 @@ class Message:
     @staticmethod
     def _create_discord_user_link(user: NamedUser.NamedUser) -> str:
         """Creates a Discord user name/url combo to be used in messages."""
-        return f'{user.login} (<{user.html_url}>)'
+        return f'[{user.login}]({user.html_url})'
 
     @staticmethod
     def _create_slack_object_link(object: Union[PullRequest.PullRequest, Issue.Issue]) -> str:
@@ -243,7 +243,7 @@ class Message:
     @staticmethod
     def _create_discord_object_link(object: Union[PullRequest.PullRequest, Issue.Issue]) -> str:
         """Creates a Discord object name/url combo to be used in messages."""
-        return f'{object.title} (<{object.html_url}>)'
+        return f'[{object.title}]({object.html_url})'
 
     @staticmethod
     def _create_slack_team_link(team: Team.Team) -> str:

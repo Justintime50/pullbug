@@ -108,12 +108,12 @@ def test_prepare_pulls_message(mock_pull_request, mock_user, mock_repo):
     # Discord message
     assert 'Pull Request' in discord_message
     assert 'Description' in discord_message
-    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
+    assert f'[{reviewer.login}]({reviewer.html_url})' in discord_message
     assert team.name in discord_message
-    assert f'{approved_reviewer.login} (<{approved_reviewer.html_url}>)' in discord_message
-    assert f'{requested_changes_reviewer.login} (<{requested_changes_reviewer.html_url}>)' in discord_message
-    assert f'{dismissed_reviewer.login} (<{dismissed_reviewer.html_url}>)' in discord_message
-    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
+    assert f'[{approved_reviewer.login}]({approved_reviewer.html_url})' in discord_message
+    assert f'[{requested_changes_reviewer.login}]({requested_changes_reviewer.html_url})' in discord_message
+    assert f'[{dismissed_reviewer.login}]({dismissed_reviewer.html_url})' in discord_message
+    assert f'[{mock_pull_request.title}]({mock_pull_request.html_url})' in discord_message
 
 
 def test_prepare_pulls_message_same_reviewer(mock_pull_request, mock_user, mock_repo):
@@ -138,8 +138,8 @@ def test_prepare_pulls_message_same_reviewer(mock_pull_request, mock_user, mock_
 
     # Discord message
     assert 'Pull Request' in discord_message
-    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
-    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
+    assert f'[{reviewer.login}]({reviewer.html_url})' in discord_message
+    assert f'[{mock_pull_request.title}]({mock_pull_request.html_url})' in discord_message
 
 
 def test_prepare_pulls_message_no_reviewers(mock_pull_request):
@@ -205,12 +205,12 @@ def test_prepare_pulls_message_disabled_description(mock_pull_request, mock_user
     # Discord message
     assert 'Pull Request' in discord_message
     assert 'Description' not in discord_message
-    assert f'{reviewer.login} (<{reviewer.html_url}>)' in discord_message
+    assert f'[{reviewer.login}]({reviewer.html_url})' in discord_message
     assert team.name in discord_message
-    assert f'{approved_reviewer.login} (<{approved_reviewer.html_url}>)' in discord_message
-    assert f'{requested_changes_reviewer.login} (<{requested_changes_reviewer.html_url}>)' in discord_message
-    assert f'{dismissed_reviewer.login} (<{dismissed_reviewer.html_url}>)' in discord_message
-    assert f'{mock_pull_request.title} (<{mock_pull_request.html_url}>)' in discord_message
+    assert f'[{approved_reviewer.login}]({approved_reviewer.html_url})' in discord_message
+    assert f'[{requested_changes_reviewer.login}]({requested_changes_reviewer.html_url})' in discord_message
+    assert f'[{dismissed_reviewer.login}]({dismissed_reviewer.html_url})' in discord_message
+    assert f'[{mock_pull_request.title}]({mock_pull_request.html_url})' in discord_message
 
 
 def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
@@ -226,8 +226,8 @@ def test_prepare_issues_message(mock_issue, mock_user, mock_repo):
     # Discord message
     assert 'Issue' in discord_message
     assert 'Description' in discord_message
-    assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_message
-    assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_message
+    assert f'[{mock_issue.assignees[0].login}]({mock_issue.assignees[0].html_url})' in discord_message
+    assert f'[{mock_issue.title}]({mock_issue.html_url})' in discord_message
 
 
 def test_prepare_issues_message_no_assignee(mock_issue):
@@ -251,5 +251,5 @@ def test_prepare_issues_message_disable_descriptions(mock_issue, mock_user, mock
     # Discord message
     assert 'Issue' in discord_message
     assert 'Description' not in discord_message
-    assert f'{mock_issue.assignees[0].login} (<{mock_issue.assignees[0].html_url}>)' in discord_message
-    assert f'{mock_issue.title} (<{mock_issue.html_url}>)' in discord_message
+    assert f'[{mock_issue.assignees[0].login}]({mock_issue.assignees[0].html_url})' in discord_message
+    assert f'[{mock_issue.title}]({mock_issue.html_url})' in discord_message
