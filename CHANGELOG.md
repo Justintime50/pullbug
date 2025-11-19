@@ -4,7 +4,8 @@
 
 - Drops support for Python 3.8 and 3.9
 - Flattens `messages.py` since the `Message` class is not necessary
-- Bumps deps
+- Bumps dependencies
+  - PyGithub was updated to v2 which brings retry logic and rate limiting. Depending on the number of resources you request with PullBug, you may see different behavior than before
 
 ## v5.1.3 (2024-07-16)
 
