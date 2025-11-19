@@ -5,7 +5,7 @@
 Get bugged via Discord or Slack to merge your GitHub pull requests or close open issues.
 
 [![Build Status](https://github.com/Justintime50/pullbug/workflows/build/badge.svg)](https://github.com/Justintime50/pullbug/actions)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/pullbug/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/pullbug?branch=main)
+[![Coverage Status](https://img.shields.io/codecov/c/github/justintime50/pullbug)](https://app.codecov.io/github/Justintime50/pullbug)
 [![PyPi](https://img.shields.io/pypi/v/pullbug)](https://pypi.org/project/pullbug)
 [![Licence](https://img.shields.io/github/license/justintime50/pullbug)](LICENSE)
 

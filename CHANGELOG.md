@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v6.0.0 (2025-11-18)
+
+- Drops support for Python 3.8 and 3.9
+- Flattens `messages.py` since the `Message` class is not necessary
+- Bumps deps
+
 ## v5.1.3 (2024-07-16)
 
 - Fixes Discord message links to appear correctly (previously the wrong syntax was used or has since changed on the Discord side and inline links weren't getting wrapped properly)

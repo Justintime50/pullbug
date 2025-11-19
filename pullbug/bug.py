@@ -18,33 +18,38 @@ from github import (
     PullRequest,
 )
 
-from pullbug.messages import Message
+from pullbug.messages import (
+    prepare_issues_message,
+    prepare_pulls_message,
+    send_discord_message,
+    send_slack_message,
+)
 
 
 GITHUB_STATE_CHOICES = Literal[
-    'all',
-    'closed',
-    'open',
+    "all",
+    "closed",
+    "open",
 ]
 GITHUB_CONTEXT_CHOICES = Literal[
-    'users',
-    'orgs',
+    "users",
+    "orgs",
 ]
 
-DEFAULT_LOG_LEVEL = 'info'
+DEFAULT_LOG_LEVEL = "info"
 LOG_LEVEL_CHOICES = Literal[
-    'notset',
-    'debug',
-    'info',
-    'warning',
-    'error',
-    'critical',
+    "notset",
+    "debug",
+    "info",
+    "warning",
+    "error",
+    "critical",
 ]
 
-DEFAULT_BASE_URL = 'https://api.github.com'
-DEFAULT_LOCATION = os.path.join('~', 'pullbug')
+DEFAULT_BASE_URL = "https://api.github.com"
+DEFAULT_LOCATION = os.path.join("~", "pullbug")
 
-LOGGER_NAME = 'pullbug'
+LOGGER_NAME = "pullbug"
 
 
 class Pullbug:
@@ -52,16 +57,16 @@ class Pullbug:
         self,
         github_owner: str,
         github_token: Optional[str] = None,
-        github_state: GITHUB_STATE_CHOICES = 'open',
-        github_context: GITHUB_CONTEXT_CHOICES = 'users',
+        github_state: GITHUB_STATE_CHOICES = "open",
+        github_context: GITHUB_CONTEXT_CHOICES = "users",
         pulls: bool = False,
         issues: bool = False,
         discord: bool = False,
-        discord_url: str = '',
+        discord_url: str = "",
         slack: bool = False,
-        slack_token: str = '',
-        slack_channel: str = '',
-        repos: str = '',
+        slack_token: str = "",
+        slack_channel: str = "",
+        repos: str = "",
         drafts: bool = False,
         location: str = DEFAULT_LOCATION,
         base_url: str = DEFAULT_BASE_URL,
@@ -81,7 +86,7 @@ class Pullbug:
         self.slack = slack
         self.slack_token = slack_token
         self.slack_channel = slack_channel
-        self.repos = [repo.strip() for repo in repos.lower().split(',')] if repos else ''
+        self.repos = [repo.strip() for repo in repos.lower().split(",")] if repos else ""
         self.drafts = drafts
         self.location = os.path.expanduser(location)
         self.base_url = base_url
@@ -99,7 +104,7 @@ class Pullbug:
         """Run the logic to get PR's from GitHub and send that data via message."""
         self.setup_logger()
         logger = woodchips.get(LOGGER_NAME)
-        logger.info('Running Pullbug...')
+        logger.info("Running Pullbug...")
         self._run_missing_checks()
 
         repos = self.get_repos()
@@ -111,12 +116,12 @@ class Pullbug:
             # Check if there are pull requests and available messages to send (eg: filtering for drafts)
             if pull_requests != [] and slack_pull_messages:
                 found_pull_requests = True
-                pull_message_preamble = '\n:bug: *The following GitHub pull requests still need your help!*\n'
+                pull_message_preamble = "\n:bug: *The following GitHub pull requests still need your help!*\n"
                 slack_pull_messages.insert(0, pull_message_preamble)
                 discord_pull_messages.insert(0, pull_message_preamble)
             else:
                 found_pull_requests = False
-                slack_pull_messages = discord_pull_messages = ['\n:bug: *Pullbug found no ready pull requests!*\n']
+                slack_pull_messages = discord_pull_messages = ["\n:bug: *Pullbug found no ready pull requests!*\n"]
                 logger.info(slack_pull_messages[0])
 
             if found_pull_requests is False and self.quiet:
@@ -132,12 +137,12 @@ class Pullbug:
             # Check if there are issues and available messages to send
             if issues != [] and slack_issue_messages:
                 found_issues = True
-                issue_message_preamble = '\n:bug: *The following GitHub issues still need your help!*\n'
+                issue_message_preamble = "\n:bug: *The following GitHub issues still need your help!*\n"
                 slack_issue_messages.insert(0, issue_message_preamble)
                 discord_issue_messages.insert(0, issue_message_preamble)
             else:
                 found_issues = False
-                slack_issue_messages = discord_issue_messages = ['\n:bug: *Pullbug found no open issues!*\n']
+                slack_issue_messages = discord_issue_messages = ["\n:bug: *Pullbug found no open issues!*\n"]
                 logger.info(slack_issue_messages[0])
 
             if found_issues is False and self.quiet:
@@ -146,7 +151,7 @@ class Pullbug:
             else:
                 self.send_messages(slack_issue_messages, discord_issue_messages)
 
-        logger.info('Pullbug finished bugging!')
+        logger.info("Pullbug finished bugging!")
 
     def setup_logger(self):
         """Setup a `woodchips` logger for the project."""
@@ -155,24 +160,24 @@ class Pullbug:
             level=self.log_level,
         )
         logger.log_to_console()
-        logger.log_to_file(location=os.path.join(self.location, 'logs'))
+        logger.log_to_file(location=os.path.join(self.location, "logs"))
 
     def _run_missing_checks(self):
         """Check that values are set based on configuration before proceeding."""
         if not self.pulls and not self.issues:
-            self._throw_missing_error('pulls/issues')
+            self._throw_missing_error("pulls/issues")
         if self.discord and not self.discord_url:
-            self._throw_missing_error('discord_url')
+            self._throw_missing_error("discord_url")
         if self.slack and not self.slack_token:
-            self._throw_missing_error('slack_token')
+            self._throw_missing_error("slack_token")
         if self.slack and not self.slack_channel:
-            self._throw_missing_error('slack_channel')
+            self._throw_missing_error("slack_channel")
 
     @staticmethod
     def _throw_missing_error(missing_flag: str):
         """Raise an error based on what env variables are missing."""
         logger = woodchips.get(LOGGER_NAME)
-        message = f'No {missing_flag} set. Please correct and try again.'
+        message = f"No {missing_flag} set. Please correct and try again."
         logger.critical(message)
 
         raise ValueError(message)
@@ -181,13 +186,13 @@ class Pullbug:
         """Get all repos of the `github_owner`."""
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.info('Bugging GitHub for repos...')
+        logger.info("Bugging GitHub for repos...")
 
         repos: Any  # Fixes `mypy` type checking, repos are either a Python list or a GitHub PaginatedList
 
-        if self.github_context == 'orgs':
+        if self.github_context == "orgs":
             repos = self.github_instance.get_organization(self.github_owner).get_repos()
-        elif self.github_context == 'users':
+        elif self.github_context == "users":
             repos = self.github_instance.get_user(self.github_owner).get_repos()
 
         # If the user specified a list of repos, let's filter them here
@@ -195,7 +200,7 @@ class Pullbug:
             filtered_repos = filter(lambda repo: repo.name.lower() in self.repos, repos)
             repos = list(filtered_repos)
 
-        logger.info('GitHub repos retrieved!')
+        logger.info("GitHub repos retrieved!")
 
         return repos
 
@@ -203,7 +208,7 @@ class Pullbug:
         """Grab all pull requests from each repo and return a flat list of pull requests."""
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.info('Bugging GitHub for pull requests...')
+        logger.info("Bugging GitHub for pull requests...")
         pull_requests = []
 
         for repo in repos:
@@ -218,7 +223,7 @@ class Pullbug:
             pull_request for pull_request in pull_requests for pull_request in pull_request
         ]
 
-        logger.info('Pull requests retrieved!')
+        logger.info("Pull requests retrieved!")
 
         return flat_pull_requests_list
 
@@ -229,26 +234,26 @@ class Pullbug:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.debug(f'Bugging GitHub for pull request reviews of {pull_request.title}...')
+        logger.debug(f"Bugging GitHub for pull request reviews of {pull_request.title}...")
 
         pull_request_reviews_by_category: Dict[str, List[NamedUser.NamedUser]] = {
-            'users_who_approved': [],
-            'users_who_requested_changes': [],
-            'users_who_were_dismissed': [],
+            "users_who_approved": [],
+            "users_who_requested_changes": [],
+            "users_who_were_dismissed": [],
         }
 
         pull_request_reviews = pull_request.get_reviews()
 
         for pull_request_review in pull_request_reviews:
             pull_request_review_user = pull_request_review.user
-            if pull_request_review and pull_request_review.state == 'APPROVED':
-                pull_request_reviews_by_category['users_who_approved'].append(pull_request_review_user)
-            elif pull_request_review and pull_request_review.state == 'CHANGES_REQUESTED':
-                pull_request_reviews_by_category['users_who_requested_changes'].append(pull_request_review_user)
-            elif pull_request_review and pull_request_review.state == 'DISMISSED':
-                pull_request_reviews_by_category['users_who_were_dismissed'].append(pull_request_review_user)
+            if pull_request_review and pull_request_review.state == "APPROVED":
+                pull_request_reviews_by_category["users_who_approved"].append(pull_request_review_user)
+            elif pull_request_review and pull_request_review.state == "CHANGES_REQUESTED":
+                pull_request_reviews_by_category["users_who_requested_changes"].append(pull_request_review_user)
+            elif pull_request_review and pull_request_review.state == "DISMISSED":
+                pull_request_reviews_by_category["users_who_were_dismissed"].append(pull_request_review_user)
 
-        logger.debug(f'Pull request reviews retrieved for {pull_request.title}!')
+        logger.debug(f"Pull request reviews retrieved for {pull_request.title}!")
 
         return pull_request_reviews_by_category
 
@@ -256,7 +261,7 @@ class Pullbug:
         """Grab all issues from each repo and return a flat list of issues."""
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.info('Bugging GitHub for issues...')
+        logger.info("Bugging GitHub for issues...")
         issues = []
 
         for repo in repos:
@@ -271,7 +276,7 @@ class Pullbug:
         # Docs: https://docs.github.com/en/rest/reference/issues#list-repository-issues
         flat_issues_list = [issue for issue in issues for issue in issue if not issue.pull_request]
 
-        logger.info('Issues retrieved!')
+        logger.info("Issues retrieved!")
 
         return flat_issues_list
 
@@ -301,11 +306,11 @@ class Pullbug:
 
                 # We need to separately get reviewers who approved, requested changes, or got dismissed
                 pull_request_reviews_by_category = self.get_pull_request_reviews(pull_request)
-                users_who_approved = pull_request_reviews_by_category['users_who_approved']
-                users_who_requested_changes = pull_request_reviews_by_category['users_who_requested_changes']
-                users_who_were_dismissed = pull_request_reviews_by_category['users_who_were_dismissed']
+                users_who_approved = pull_request_reviews_by_category["users_who_approved"]
+                users_who_requested_changes = pull_request_reviews_by_category["users_who_requested_changes"]
+                users_who_were_dismissed = pull_request_reviews_by_category["users_who_were_dismissed"]
 
-                message, discord_message = Message.prepare_pulls_message(
+                message, discord_message = prepare_pulls_message(
                     pull_request=pull_request,
                     reviewers=reviewers_requested,
                     users_who_approved=users_who_approved,
@@ -324,7 +329,7 @@ class Pullbug:
         discord_message_array = []
 
         for issue in issues:
-            slack_message, discord_message = Message.prepare_issues_message(issue, self.disable_descriptions)
+            slack_message, discord_message = prepare_issues_message(issue, self.disable_descriptions)
             slack_message_array.append(slack_message)
             discord_message_array.append(discord_message)
 
@@ -335,8 +340,8 @@ class Pullbug:
         logger = woodchips.get(LOGGER_NAME)
 
         if self.discord:
-            Message.send_discord_message(discord_messages, self.discord_url)
+            send_discord_message(discord_messages, self.discord_url)
         if self.slack:
-            Message.send_slack_message(slack_messages, self.slack_token, self.slack_channel)
+            send_slack_message(slack_messages, self.slack_token, self.slack_channel)
 
         logger.info(slack_messages)
