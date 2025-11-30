@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 .env
 *.lcov
+build
 dist
 htmlcov
 pullbug.egg-info

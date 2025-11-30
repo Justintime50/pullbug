@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v6.0.1 (2025-11-30)
+
+- Fix Homebrew build so it's installable
+- Swaps setup.py for pyproject.toml
+
 ## v6.0.0 (2025-11-18)
 
 - Drops support for Python 3.8 and 3.9
