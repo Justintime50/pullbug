@@ -15,7 +15,6 @@ from github import (
     Team,
 )
 
-
 LOGGER_NAME = "pullbug"
 DESCRIPTION_CONTINUATION = "..."
 DESCRIPTION_MAX_LENGTH = 120

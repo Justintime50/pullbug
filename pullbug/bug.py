@@ -25,7 +25,6 @@ from pullbug.messages import (
     send_slack_message,
 )
 
-
 GITHUB_STATE_CHOICES = Literal[
     "all",
     "closed",
