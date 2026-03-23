@@ -84,9 +84,3 @@ just --list
 # Run the tool locally
 venv/bin/python pullbug/cli.py --help
 ```
-
-## Trusted By
-
-The following companies use `Pullbug`:
-
-* [EasyPost](https://easypost.com)
