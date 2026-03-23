@@ -13,7 +13,7 @@ authors = [{ name = "Justintime50" }]
 urls = { Homepage = "http://github.com/justintime50/pullbug" }
 scripts = { pullbug = "pullbug.cli:main" }
 dependencies = [
-    "PyGithub == 2.8.*",
+    "PyGithub == 2.9.*",
     "requests == 2.*",
     "slack_sdk == 3.*",
     "woodchips == 2.*",

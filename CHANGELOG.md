@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v6.0.2 (2026-03-23)
+
+- Fixes a bug that could result in 404s when using the default "get pull requests" flag
+- Bumps PyGithub to v2.9.x
+
 ## v6.0.1 (2025-11-30)
 
 - Fix Homebrew build so it's installable

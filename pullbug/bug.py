@@ -85,7 +85,7 @@ class Pullbug:
         self.slack = slack
         self.slack_token = slack_token
         self.slack_channel = slack_channel
-        self.repos = [repo.strip() for repo in repos.lower().split(",")] if repos else ""
+        self.repos = [repo.strip() for repo in repos.lower().split(",")]
         self.drafts = drafts
         self.location = os.path.expanduser(location)
         self.base_url = base_url
