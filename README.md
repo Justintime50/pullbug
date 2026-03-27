@@ -20,10 +20,6 @@ Pullbug can notify you on Discord or Slack of all open pull requests from GitHub
 ## Install
 
 ```bash
-# Homebrew install
-brew tap justintime50/formulas
-brew install pullbug
-
 # Pip install
 pip3 install pullbug
 
